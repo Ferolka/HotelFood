@@ -1,4 +1,5 @@
-﻿using System;
+﻿using HotelFood.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -7,5 +8,6 @@ namespace HotelFood.Repositories
 {
     public interface IHotelUserRepository
     {
+        int ValidateUserOnLogin(HotelUser user);
     }
 }

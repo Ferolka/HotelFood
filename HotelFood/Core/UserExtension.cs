@@ -1,5 +1,8 @@
-﻿using System;
+﻿using HotelFood.Models;
+using Microsoft.AspNetCore.Identity;
+using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
 using System.Security.Claims;
 using System.Security.Principal;
@@ -31,6 +34,11 @@ namespace HotelFood.Core
                 return 0;// claim.Value;
             return int.Parse(claim.Value);
         }
-        
+        public static async Task<HotelUser> FindByCardTokenAsync(this UserManager<HotelUser> src, string cardtoken)
+        {
+            return await src.Users.FirstOrDefaultAsync(u => u.CardTag == cardtoken);
+
+        }
+
     }
 }

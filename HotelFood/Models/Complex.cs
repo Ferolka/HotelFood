@@ -43,7 +43,7 @@ namespace HotelFood.Models
         [DisplayName("Complex Dishes")]
         public virtual ICollection<DishComplex> DishComplex { get; set; }
 
-        //public virtual ICollection<ComplexCategory> ComplexCategories { get; set; }
+        public virtual ICollection<DayComplex> DayComplex { get; set; }
 
     }
 }

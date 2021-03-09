@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using HotelFood.Models;
+using HotelFood.Core;
 
 namespace HotelFood
 {
@@ -71,6 +72,12 @@ namespace HotelFood
                 options.AccessDeniedPath = "/Account/AccessDenied";
                 //options.SlidingExpiration = true;
             });
+            services.AddTransient<SharedViewLocalizer>();
+            //services.AddTransient<URLHelperContextLess>();
+            services.AddLocalization(options => options.ResourcesPath = "Resources");
+            services.AddMvc()
+                .AddViewLocalization(Microsoft.AspNetCore.Mvc.Razor.LanguageViewLocationExpanderFormat.Suffix)
+                .AddDataAnnotationsLocalization(options => options.DataAnnotationLocalizerProvider = (t, f) => f.Create(typeof(SharedResources)));
 
         }
 

@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
+using HotelFood.Core;
 using HotelFood.Models;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -13,13 +15,38 @@ namespace HotelFood.Data
     public class AppDbContext : IdentityDbContext<HotelUser, HotelRole, string>
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
-        private int companyId = -1;
-        private bool isCompanyIdSet = false;
+        private int hotelId = -1;
+        private bool isHotelIdSet = false;
         private readonly IWebHostEnvironment _hostingEnv;
         public AppDbContext(DbContextOptions<AppDbContext> options, IHttpContextAccessor httpContextAccessor, IWebHostEnvironment hostingEnv) : base(options)
         {
             _httpContextAccessor = httpContextAccessor;
             _hostingEnv = hostingEnv;
+        }
+        public void SetCompanyID(int val)
+        {
+            hotelId = val;
+            isHotelIdSet = true;
+        }
+        public int CompanyId
+        {
+            get
+            {
+                if (isHotelIdSet)
+                    return hotelId;
+                if (_httpContextAccessor != null && _httpContextAccessor.HttpContext != null && _httpContextAccessor.HttpContext.User != null)
+                    return _httpContextAccessor.HttpContext.User.GetHotelID();
+                return hotelId;
+            }
+        }
+        public ClaimsPrincipal CurrentUser
+        {
+            get
+            {
+                if (_httpContextAccessor != null && _httpContextAccessor.HttpContext != null && _httpContextAccessor.HttpContext.User != null)
+                    return _httpContextAccessor.HttpContext.User;
+                return null;
+            }
         }
         public DbSet<Hotel> Hotel { get; set; }
         public DbSet<HotelUser> HotelUser { get; set; }
@@ -100,6 +127,10 @@ namespace HotelFood.Data
 
             modelBuilder.Entity<DayDish>()
               .HasKey(d => new { d.Date, d.DishId, d.HotelId, d.CategoriesId});
+            modelBuilder.Entity<DayDish>().HasOne(d => d.Dish)
+                .WithMany(d => d.DayDish)
+                .HasForeignKey(d => d.DishId)
+                .OnDelete(DeleteBehavior.NoAction);
 
 
             modelBuilder.Entity<DayComplex>()
@@ -108,6 +139,10 @@ namespace HotelFood.Data
 
             modelBuilder.Entity<DayComplex>()
               .HasKey(d => new { d.Date, d.ComplexId, d.HotelId });
+            modelBuilder.Entity<DayComplex>().HasOne(d => d.Complex)
+                .WithMany(d => d.DayComplex)
+                .HasForeignKey(d => d.ComplexId)
+                .OnDelete(DeleteBehavior.NoAction);
           
 
             modelBuilder.Entity<UserDayDish>()

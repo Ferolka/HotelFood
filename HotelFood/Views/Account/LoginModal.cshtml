@@ -1,0 +1,67 @@
+@model LoginViewModel
+@inject HotelFood.Core.SharedViewLocalizer Localizer
+
+
+    <div class="modal-header">
+        <h5 class="modal-title">@Localizer["Please login"]</h5>
+        <button class="close" data-dismiss="modal" area-hidden="true">
+            <span aria-hidden="true">&times;</span>
+        </button>
+
+    </div>
+    <div class="modal-body">
+        <form asp-controller="Account" asp-action="Login" method="post" class="form-horizontal" role="form">
+            <h4>@Localizer["Login Title"]</h4>
+            <hr />
+            <input type="hidden" asp-for="IsModal" value="true" />
+            <input type="hidden" asp-for="ReturnUrl" />
+            <div asp-validation-summary="All" class="text-danger"></div>
+
+            <div class="form-group">
+                <label asp-for="UserName" class="col-md-8 control-label">@Localizer["LoginOrEmail"]</label>
+                <div class="col-md-10">
+                    <input asp-for="UserName" class="form-control" />
+                    <span asp-validation-for="UserName" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Password" class="col-md-8 control-label"></label>
+                <div class="col-md-10">
+                    <input asp-for="Password" class="form-control" />
+                    <span asp-validation-for="Password" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label asp-for="IsRemember" class="col-md-8 col-8 control-label"></label>
+                <div class="col-md-4 col-4">
+                    <input asp-for="IsRemember" />
+                </div>
+
+
+            </div>
+        </form>
+        <div class="col-md-7 col-7">
+            <input type="checkbox" onclick="myFunction()">Show Password
+        </div>
+    </div>
+    <div class="modal-footer">
+        <a href="/Account/RestorePassword" class="mr-auto">@Localizer["ForgotPassword"]</a>
+        @*<button asp-controller="Account" asp-action="RestorePassword" type="button" class="btn btn-primary mr-auto">@Localizer["RestorePassword"]</button>*@
+        <input asp-controller="Account" asp-action="Login" type="submit" class="btn btn-primary" data-save="modal" value="@Localizer["UserButtonLogin"]" />
+    </div>
+
+    <script>
+        function myFunction() {
+            var x = document.getElementById("Password");
+            if (x.type === "password") {
+                x.type = "text";
+            } else {
+                x.type = "password";
+            }
+        }
+    </script>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
