@@ -16,6 +16,7 @@ namespace HotelFood.Models
         public string HotelUserId { get; set; }
         public HotelUser HotelUser { get; set; }
 
-       
+        [DisplayName("User Group")]
+        public int? UserGroupId { get; set; }
     }
 }
