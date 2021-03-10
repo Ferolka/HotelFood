@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using  System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace HotelFood.Models
 {
@@ -20,7 +21,9 @@ namespace HotelFood.Models
     }
     public abstract class HotelDataOwnId: HotelData
     {
-        [StringLength(100)]
+        //[StringLength(100)]
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
     }
     public abstract class HotelData

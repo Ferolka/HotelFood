@@ -1,0 +1,151 @@
+﻿
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Open Sans', sans-serif;
+}
+
+.main-header {
+    text-align: center;
+    background: black;
+    color: white;
+
+    h1 {
+        margin: 0 0 0.5rem 0;
+    }
+
+    a {
+        color: white;
+    }
+}
+.service-header {
+    padding: 0rem 5rem 0rem;
+    display: block;
+    overflow: hidden;
+}
+.toogles {
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: block;
+    background-color: grey;
+    height: 30px;
+    width: 100px;
+    cursor: pointer;
+}
+.toogles-right {
+    position: absolute;
+    top: 0;
+    right: 0;
+    display: block;
+    background-color: grey;
+    height: 30px;
+    width: 100px;
+    cursor:pointer;
+}
+/*
+h1 {
+    font-size: 3rem;
+    margin: 0 0 1rem 0;
+}
+
+p {
+    margin: 0 0 0.5rem 0;
+}
+
+main.tabs {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.service-status {
+    display: block;
+    
+    width: 100%;
+}
+ */
+.service-status.offline, .service-status.error {
+    background-color: red;
+}
+
+.service-status.online {
+    background-color: green;
+}
+.order-dish-select1 {
+    display: block;
+    width: 100%;
+    background-color: gray;
+    font-size:large;
+    font-weight:bolder;
+    cursor:pointer;
+}
+.order-dish-select.active1 {
+  background-color:chartreuse;
+}
+.delivery-command {
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+.wrongdelivery, .errordelivery {
+    display: block;
+    width: 100%;
+    background-color: gray;
+    font-size: xx-large;
+    font-weight: bold;
+}
+.queue-first {
+    box-shadow: 10px 10px 5px green;
+    border: solid 2px #E4E4E4;
+    border-radius: 6px;
+    background-color:darkorange;
+}
+/*
+.deliverydish, .queue-dish {
+    background-color: aquamarine;
+}
+
+
+*/
+.wrongdelivery{
+    background-color: coral;
+}
+.errordelivery {
+    background-color: red;
+    color:white;
+}
+.container-order-dish-select, .container-state, .container-wrongdelivery, .container-errordelivery {
+    text-align: center;
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+.search-card-btn{
+
+    height:100%;
+}
+.w200x200 {
+    width: 200px;
+    height: 200px;
+}
+.img.queue-img ,.w100x100 {
+    width: 100px;
+    height: 100px;
+}
+.w150x150 {
+    width: 150px;
+    height: 150px;
+}
+
+.user-queue.queue-first  img.queue-img {
+    width: 150px;
+    height: 150px;
+}
+.user-queue img.queue-img {
+    width: 100px;
+    height: 100px;
+}

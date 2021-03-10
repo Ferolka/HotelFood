@@ -1,0 +1,74 @@
+@using Microsoft.AspNetCore.Identity
+@using Microsoft.AspNetCore.Identity.EntityFrameworkCore
+
+@inject SignInManager<HotelUser> SignInManager
+
+@if (!SignInManager.IsSignedIn(User))
+{
+    @if (this.ViewData.ContainsKey("autoLogon"))
+    {
+        <div id="autologon">
+        </div>
+
+
+    }
+    <div id="modDialogLogin" class="modal" tabindex="-1" role="dialog">
+        <div  class="modal-dialog">
+            <div id="dialogContentLogin" class="modal-content">
+
+            </div>
+
+        </div>
+    </div>
+
+    <script type="text/javascript">
+
+        $(function () {
+
+
+            $('#loginLink,#loginLink-1').click(function (e) {
+                e.preventDefault();
+                var url = '@Url.Content("~/Account/LoginModal")';
+
+                $.get(url, function (data) {
+                    $('#dialogContentLogin').html(data);
+                    $('#modDialogLogin').modal('show');
+                });
+            });
+
+
+            $(document).on('click', '[data-save="modal"]', function (event) {
+                event.preventDefault();
+
+                var form = $(this).parent().parents().find('.modal-body').find('form');
+                var actionUrl = form.attr('action');
+                var dataToSend = form.serialize();
+
+                $.post(actionUrl, dataToSend).done(function (data, statusText, xhr) {
+                    var isValid = false;
+
+                    if (data && data.res && data.res == "OK")
+                        isValid = true;
+
+                    if (isValid) {
+                        $('#modDialog').modal('hide');
+                        $('#dialogContent').empty();
+
+                        window.location.href = data.returnUrl;
+                    }
+                    else {
+                        var newBody = $('.modal-body', data);
+                        $(document).find('.modal-body').replaceWith(newBody);
+                    }
+                }).fail(function (xhr, status, error) {
+                    var message = error + '\r\n';
+                    if (xhr)
+                        message += xhr.responseText;
+                    dialog_error(message);
+                   // $('html').html(xhr.responseText); 
+                });
+            });
+        })
+    </script>
+    await Html.RenderPartialAsync("_ValidationScriptsPartial");
+}

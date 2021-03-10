@@ -81,5 +81,6 @@ namespace HotelFood.Models
 
         public virtual ICollection<DishComplex> DishComplex { get; set; }
         public virtual ICollection<DayDish> DayDish { get; set; }
+        public virtual ICollection<UserDayDish> UserDayDish { get; set; }
     }
 }

@@ -13,6 +13,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using HotelFood.Models;
 using HotelFood.Core;
+using HotelFood.Repositories;
 
 namespace HotelFood
 {
@@ -72,8 +73,23 @@ namespace HotelFood
                 options.AccessDeniedPath = "/Account/AccessDenied";
                 //options.SlidingExpiration = true;
             });
+            services.AddTransient<ICompanyUserRepository, CompanyUserRepository>();
+
+           // services.AddTransient<IDayDishesRepository, DayDishesRepository>();
+            services.AddTransient<IUserDayDishesRepository, UserDayDishesRepository>();
+            services.AddTransient<IGenericModelRepository<Dish>, GenericModelRepository<Dish>>();
+            
+            services.AddTransient<IComplexRepository, ComplexRepository>();
+           
+            //services.AddTransient<IUserGroupsRepository, UserGroupsRepository>();
+            services.AddTransient<ICompanyUserRepository, CompanyUserRepository>();
+            //services.AddTransient<IUserFinRepository, UserFinRepository>();
+            services.AddTransient<IServiceRepository, ServiceRepository>();
+            services.AddTransient<IGenericModelRepository<Categories>, GenericModelRepository<Categories>>();
+            services.AddTransient<IGenericModelRepository<Categories>, GenericModelRepository<Categories>>();
             services.AddTransient<SharedViewLocalizer>();
             //services.AddTransient<URLHelperContextLess>();
+            services.AddScoped<IUserClaimsPrincipalFactory<HotelUser>, CustomClaimsPrincipalFactory>();
             services.AddLocalization(options => options.ResourcesPath = "Resources");
             services.AddMvc()
                 .AddViewLocalization(Microsoft.AspNetCore.Mvc.Razor.LanguageViewLocationExpanderFormat.Suffix)

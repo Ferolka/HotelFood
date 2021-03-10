@@ -24,14 +24,14 @@ namespace HotelFood.Controllers
         private readonly UserManager<HotelUser> _userManager;
         private readonly SignInManager<HotelUser> _signInManager;
         private readonly ILogger<HotelUser> _logger;
-        private readonly IHotelUserRepository _companyuser_repo;
+        private readonly ICompanyUserRepository _companyuser_repo;
         private readonly SharedViewLocalizer _localizer;
 
         private const int pictWidth = 200;
         private const int pictHeight = 300;
         public AccountController(AppDbContext context, UserManager<HotelUser> userManager,
                                  SignInManager<HotelUser> signInManager,
-                                 ILogger<HotelUser> logger, IHotelUserRepository companyuser_repo, SharedViewLocalizer localizer)
+                                 ILogger<HotelUser> logger, ICompanyUserRepository companyuser_repo, SharedViewLocalizer localizer)
         {
             _context = context;
             _userManager = userManager;

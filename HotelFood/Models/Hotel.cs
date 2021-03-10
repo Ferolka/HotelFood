@@ -27,7 +27,8 @@ namespace HotelFood.Models
         {
             this.HotelGuests = new HashSet<HotelGuests>();
         }
-
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
         [StringLength(10)]
@@ -81,6 +82,8 @@ namespace HotelFood.Models
             return (OrderTypeEnum)this.OrderType;
         }
         public virtual ICollection<HotelGuests> HotelGuests { get; set; }
+        public virtual ICollection<UserDayComplex> UserDayComplex { get; set; }
+        public virtual ICollection<UserDayDish> UserDayDish { get; set; }
 
     }
 }

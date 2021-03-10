@@ -1,0 +1,760 @@
+﻿@inject HotelFood.Core.SharedViewLocalizer Localizer
+@{
+    ViewData["Title"] = Localizer["OrderWindow"];
+    Layout = null;
+    int numDishes = 10;
+    bool isDebug = false;
+#if DEBUG
+    isDebug = true;
+#endif
+}
+
+
+<!doctype html>
+<html lang="en">
+
+<head>
+    <link rel="stylesheet" href="~/css/service.css">
+    <link rel="stylesheet" href="~/css/bootstrap.min.css" />
+</head>
+<body>
+    <header class="main-header">
+        <div class="toogles">
+
+        </div>
+        <div class="toogles-right">
+            H
+        </div>
+        <div id="service-header" class="service-header">
+            <h1>@Localizer["OrderWindow"]</h1>
+            <h1 id="currentdate"></h1>
+        </div>
+    </header>
+
+    <div class="container order-service">
+        <div id="error" class="bg-danger text-white h1" style=" display: none;width:100%;position:absolute;z-index:3000;top:0;left:0;height:200px;">
+
+        </div>
+        <div id="nfc_isoffline" class="row container-state bg-danger text-white" style="display: none;">
+            <div class="col-4 container-state">
+                <span id="nfc_isoffline">
+                    @Localizer["NFC Reader Offline"]
+                </span>
+                <span id="error-offline" class="service-status error"></span>
+            </div>
+            <div class="col-4 container-state">
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text" ">URL</span>
+                    </div>
+                    <input id="nfcurl" class="form-control" value="wss://localhost:44360/ws" />
+                </div>
+
+
+            </div>
+            <div class="col-4 container-state">
+                <button id="connectnfc" class="btn btn-info">@Localizer["Connect NFC"]</button>
+            </div>
+        </div>
+        <div id="nfc_isonline" class="row bg-success text-white" style="display: none;">
+            <div class="col-4 container-state">
+                <img id="nfc_image" src="~/images/acr122u.png" style="width:50px;height:50px;" />
+
+            </div>
+            <div class="col-4 container-state">
+                <span class="service-status online">
+                    <span id="nfc_readername"></span>
+                    @Localizer["NFC Reader Online"]
+                </span>
+
+                <span id="error-online" class="service-status error"></span>
+            </div>
+            <div class="col-4 container-state">
+                <span>@Localizer["Scan card at any time to detect user"]</span>
+
+            </div>
+        </div>
+        <div class="row dishes-num">
+            <div data-num="-1" class="col-2 order-complexcategories-select  border rounded bg-secondary text-white btn">
+                <select class="form-control" id="complexcategories" name="complexcategories">
+                </select>
+            </div>
+            <div data-num="-1" class="col-2 order-dish-select welcome border rounded bg-secondary text-white btn">
+                @* <span data-num="-1" class="order-dish-select welcome w-100">Welcome</span>*@
+                @Localizer["Welcome"]
+
+            </div>
+            @for (int i = 1; i <= numDishes; i++)
+            {
+                <div data-num="@(i-1)" class="col-2 order-dish-select border rounded bg-secondary text-white btn">
+                    @i @Localizer["Dish"]
+                </div>
+            }
+        </div>
+        <div class="row delivery-command text-center">
+            <div class="col-6">
+                <button id="btnstart" class="service-action btn btn-primary">Почати</button>
+            </div>
+            <div class="col-6">
+                <button id="btnstop" class="service-action btn btn-danger">Припинити</button>
+            </div>
+
+        </div>
+        @if (!isDebug)
+        {
+            <div id="userinfo" class="row" style="display: none;">
+                <div class="col-4">
+                    <label for="userid">userid</label>
+                    <input id="userid" />
+                </div>
+                <div class="col-4">
+                    <button id="btnsend" class="service-action btn btn-primary">Send</button>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div id="userinfo" class="row" >
+                <div class="col-4">
+                    <label for="userid">userid</label>
+                    <input id="userid" />
+                </div>
+                <div class="col-4">
+                    <button id="btnsend" class="service-action btn btn-primary">Send</button>
+                </div>
+            </div>
+        }
+
+        <div id="delivery-dishes-row" class="row" style="display: none;">
+            <div id="delivery-dishes-content" class="col-12 delivery-dishes-content">
+
+            </div>
+        </div>
+        <div id="delivery-queue-row" class="row" style="display: none;">
+            <div class="col-12">
+                <div id="delivery-queue-content" class="container  delivery-queue-content">
+
+                </div>
+            </div>
+        </div>
+        <div id="delivery-welcome-row" class="row fo" style="display: none;">
+            <div class="col-12">
+                <div id="delivery-welcome-content" class="container  h-100 delivery-welcome-content">
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="./js/jquery.min.js"></script>
+    <script src="~/js/bootstrap.min.js"></script>
+    <script src="../js/resources.js"></script>
+    <script src="../js/site.js"></script>
+    <script src="./js/nfcsocket.js"></script>
+
+    @*
+        <script src="./js/service.js"></script>
+    *@
+    <script>
+        $(function () {
+            //setting
+            var isQueueMode = true;
+            const max_queue = 5;
+
+            //session state
+            var isStarted = false;
+            var isNfcConnected = false;
+            var lastQueueid = -1;
+
+            var baseurl = "/Service";
+            var serviceurl = baseurl + "/RequestForDelivery";
+            var el_online = $("#isonline");
+            var el_offline = $("#isoffline");
+            var elnfc_online = $("#nfc_isonline");
+            var elnfc_offline = $("#nfc_isoffline");
+            var el_error = $("#error");
+            var is_button_shift = false;
+            const el_header = $('#service-header');
+
+            el_online.hide();
+            const key_url = 'nfcurl';
+            el_offline.hide();
+            elnfc_online.hide();
+            elnfc_offline.show();
+            var timer_checknfcstate;
+            $('#nfcurl').val(localStorage[key_url] || 'wss://localhost:5001/ws');
+            var curr_date = new Date();
+            var readable_date = curr_date.toJSON().slice(0, 10).split("-").reverse().join(".");
+
+            $('#currentdate').text(readable_date);
+            const height_header = el_header.first().outerHeight(true);
+            localStorage[key_url] = $('#nfcurl').val();
+
+
+            var nfcsock = newnfcsocket($('#nfcurl').val())
+            function newnfcsocket(url) {
+                const newnfc = new nfc_socket(url,
+                    function (data) {
+                        //console.log(data);
+                    },
+                    function (cmd, event) {
+                        // console.log(cmd);
+                        // console.log(event);
+                        // if (cmd === 'open') {
+                        //      nfcsock.getstatus(function () { });
+                        //  }
+                    });
+                newnfc.on('status', function (msg) {
+                    showNfcInfo(msg);
+                });
+                newnfc.on('error', function (msg) {
+                    $('#connectnfc').prop('disabled', false);
+                    dialog_error(msg);
+                });
+                newnfc.on('cardreaded', function (msg) {
+                    $('#userid').val(msg.Cardtag);
+                    if (IsWelcomeMode() && isQueueMode && isStarted) {
+                        requestfordelivery(filldeliverydishes);
+                    }
+                });
+                newnfc.on('state', function (msg) {
+
+                    check_statenfc(msg);
+                    showNfcInfo(msg);
+
+                });
+                return newnfc;
+            }
+            $('#nfcurl').change(function (e) {
+                localStorage[key_url] = e.target.value;
+                nfcsock = newnfcsocket($('#nfcurl').val())
+            });
+            refreshState();
+            fillComplexCategories();
+            $('#connectnfc').click(function (e) {
+                e.preventDefault();
+                $('#connectnfc').prop('disabled', true);
+                nfcsock.connect();
+
+            });
+
+            function check_statenfc(msg) {
+                if (msg && msg.Isreaderconnected) {
+                    if (timer_checknfcstate)
+                        clearTimeout(timer_checknfcstate);
+                }
+                else {
+                    if (!timer_checknfcstate)
+                        check_nfc();
+                }
+            }
+            function check_nfc() {
+                console.log('checknfc');
+                if (nfcsock.issocketconnected()) {
+                    nfcsock.getstatus();
+                }
+                timer_checknfcstate = setTimeout(check_nfc, 10000);
+            }
+
+            function fillComplexCategories() {
+
+                $.post(baseurl + '/GetAvailableCategories', readable_date).done(function (data, statusText, xhr) {
+                    $('#complexcategories').empty();
+                    try {
+                        if (data && Array.isArray(data) && data.length != 0) {
+                            var options = "";
+                            data.forEach(function (elem, idx) {
+                                var sel = idx == 0 ? 'selected' : ''
+                                options += `<option ${sel} value='${elem.id}'>${elem.name}</option>`;
+                            });
+                            $('#complexcategories').append(options);
+                        }
+                        el_error.hide();
+                    }
+                    catch{
+                    }
+                })
+                    .fail(function (xhr, code, error) {
+                        el_error.text(error);
+                        el_error.show();
+                    });
+            }
+
+            function IsWelcomeMode() {
+                return $(".order-dish-select.welcome").hasClass('active');
+            }
+            $(".order-dish-select").click(function (e) {
+                e.preventDefault();
+                if (isStarted)
+                    return;
+                var dishnum = parseInt($(this).attr('data-num'));
+                if (dishnum > 0 && IsWelcomeMode())
+                    return;
+
+                if ($(this).hasClass('active')) {
+                    $(this).removeClass('active');
+                }
+                else {
+
+                    if (dishnum < 0)
+                        $('.order-dish-select').removeClass('active');
+                    $(this).addClass('active')
+                }
+                $('.order-dish-select').not('active').removeClass("bg-success").addClass('bg-secondary');
+                $('.order-dish-select.active').removeClass('bg-secondary').addClass("bg-success");
+                refreshNfcState();
+
+            });
+
+            function getdishesnum() {
+                return $('.dishes-num').find('.order-dish-select.active').map(function (index, element) {
+                    return parseInt($(element).attr('data-num'));
+                }).get();
+            }
+            function refreshDeliveryContentState() {
+                $('#delivery-dishes-row').hide();
+                $('#delivery-queue-row').hide();
+                $('#delivery-welcome-row').hide();
+                if (IsWelcomeMode()) {
+                    $('#delivery-welcome-row').show();
+                }
+                else if (isQueueMode) {
+                    $('#delivery-queue-row').show();
+                } else {
+                    $('#delivery-dishes-row').show();
+
+                }
+            }
+            function refreshState() {
+                $("#btnstart").prop('disabled', isStarted);
+                $("#btnstop").prop('disabled', !isStarted);
+                $("#btnsend").prop('disabled', !isStarted);
+                if (isStarted) {
+
+
+                }
+                else {
+
+                }
+                refreshNfcState();
+            }
+            function refreshNfcState() {
+                if (!IsWelcomeMode()) {
+                    elnfc_online.hide();
+                    elnfc_offline.hide();
+                }
+                else if (isNfcConnected == true) {
+                    elnfc_online.show();
+                    elnfc_offline.hide();
+                }
+                else {
+                    elnfc_online.hide();
+                    elnfc_offline.show();
+                }
+            }
+            function getnewQueue() {
+                var queue_count = getQueueCount();
+                if (queue_count == 0)
+                    lastQueueid = -1;
+                if (queue_count < max_queue) {
+                    requestfordeliveryQueue(function (data) {
+                        fillQueue(data);
+                        if (isStarted) {
+                            setTimeout(getnewQueue, 1000);  //start only when last finished completelly
+                        }
+                    });
+                }
+                else {
+                    if (isStarted) {
+                        setTimeout(getnewQueue, 1000);
+                    }
+                }
+
+            }
+            $('#btnstart').click(function (e) {
+                e.preventDefault();
+
+                if (!IsWelcomeMode()) {
+                    var dishesnum = getdishesnum();
+                    if (dishesnum &&  dishesnum.length == 0) {
+                        alert("Не задано параметри для старту");
+                        return;
+                    }
+                }
+                isStarted = true;
+                lastQueueid = -1;
+                el_header.animate({
+                    height: '0px'
+                }, 300);
+                $('.delivery-command').toggle(500);
+                refreshState();
+                refreshDeliveryContentState();
+                if (isQueueMode && !IsWelcomeMode()) {
+
+                    getnewQueue();
+                }
+            });
+            $('#btnstop').click(function (e) {
+                e.preventDefault();
+                isStarted = false;
+                el_header.animate({
+                    height: `${height_header}px`
+                }, 300)
+                refreshState();
+            });
+            $('#btnsend').click(function (e) {
+                e.preventDefault();
+                //requestfordelivery(filldeliverydishes);
+                requestfordelivery(filldeliverydishes);
+
+            });
+            $('.toogles').click(function (e) {
+                e.preventDefault();
+                $('.delivery-command').toggle(500);
+            })
+            $('.toogles-right').click(function (e) {
+                e.preventDefault();
+                var url = `${baseurl}/ServiceHistory`;
+                var dishesnum = getdishesnum();
+                var categories = getcategories();
+                var ServiceRequest = { DayDate: curr_date.toDateString(), Type: "info", DishesNum: dishesnum, MaxQueue: max_queue, ComplexCategoriesIds: categories };
+               // var str = "";
+               // for (var key in ServiceRequest) {
+               //     if (str != "") {
+               //         str += "&";
+               //     }
+               //     str += key + "=" + encodeURIComponent(ServiceRequest[key]);
+               // }
+                var url = `${baseurl}/ServiceHistory?request=${JSON.stringify(ServiceRequest)}`;
+                window.open(url, '_blank');
+            })
+            function getcategories() {
+
+                var categories = [];
+                var selected = parseInt($('#complexcategories').children("option:selected").val());
+                if (!isNaN(selected))
+                     categories.push(selected);
+                return categories;
+            }
+            function getQueueCount() {
+                return $('#delivery-queue-content').find(".user-queue").length;
+            }
+            function getLastQueueid() {
+                var arofqueue = $('#delivery-queue-content').find(".user-queue");
+                var max_queue = arofqueue.reduce((max, p) => parseInt(p.attr('data-maxid')) > max ? parseInt(p.attr('data-maxid')) : max, parseInt(arofqueue[0].attr('data-maxid')));
+
+            }
+            function fillWelcome(data) {
+                $('#delivery-welcome-content').empty();
+                if (!data || data.overalResult != "success") {
+                    if (data && data.userFound) {
+                        var pictURL = '/Pictures/GetPicture?id=' + data.userPictureId;
+                        var divuser = `<div class="row user-welcome py-2 bg-danger text-white h1 justify-content-center align-self-center" >
+                                                <div class="col-6 welcome-user">
+                                                    <img src="${pictURL}" class="w200x200"/>
+                                                </div>
+                                                <div class="col-6 welcome-user justify-content-center align-self-center ">
+                                                     ${data.userName}
+                                                </div>
+                                            </div>`
+                        $('#delivery-welcome-content').append(divuser);
+                    }
+                    var div = `<div class="row bg-danger text-white h1"><div class="col-12 container-errordelivery">Помилка:${data.errorMessage}</div></div>`;
+                    $('#delivery-welcome-content').append(div);
+                    return;
+                }
+                //var inner_div = data.dishes.map(function (element, index) {
+                var inner_div = "";
+                data.dishes.forEach(element => {
+                    inner_div += `<div class="row"><div class="col-12 welcome-dish  h2" data-id="${element.id}" data-id=${element.id}>${element.name}</div></div>`;
+                });
+
+                var pictureURL = '/Pictures/GetPicture?id=' + data.userPictureId;
+                var div = $(`<div class="row user-welcome bg-success text-white py-2" >
+                                            <div class="col-6 welcome-user h1 ">
+                                                <div class="row">
+                                                    <div class="col-12 justify-content-center align-self-center text-center">${data.userName}</div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-12 justify-content-center align-self-center ">
+                                                        <img src="${pictureURL}" class="w200x200 rounded mx-auto d-block"/>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-6 welcome-dishes h-100 justify-content-center align-self-center  ">
+                                                ${inner_div}
+                                             </div>
+                                        </div>`);
+                $('#delivery-welcome-content').append(div);
+            }
+            function fillQueue(data) {
+                var queunum = getQueueCount();
+                // $('#delivery-queue-content').empty(); // to do
+                var content = $('#delivery-queue-content');
+                if (!data || data.overalResult != "success") {
+                    if (data) {
+                        el_error.text(data.errorMessage);
+                        el_error.show();
+                    }
+                    else {
+                        el_error.text("Сталася помилка, спробуйте перезавантажити");
+                        el_error.show();
+                    }
+                    return;
+                }
+                el_error.hide();
+                data.queues.forEach(el => {
+                    var inner_div = '';
+                    var queue_list = [];
+                    queunum++;
+                    el.dishes.map(function (element, index) {
+                        inner_div += `<div class="row queue-dish border rounded my-1 " class="queue-dish" data-queueid="${element.queueId}" data-id=${element.id}>
+                                            <div class="col-12 h2">
+                                               ${element.name}
+                                            </div>
+                                          </div> `;
+                        queue_list.push(element.queueId);
+                    });
+                    var maxid = el.dishes.reduce((max, p) => p.queueId > max ? p.queueId : max, el.dishes[0].queueId);
+                    lastQueueid = maxid;
+
+                    var pictureURL = '/Pictures/GetPicture?id=' + el.userPictureId;
+                    var timestam = Date.now();
+                    var div_start = `<div class="row user-queue shadow p-1 mb-2 mt-2  justify-content-center" data-userid="${el.userId}"  data-timestamp="${timestam}" data-number="${queunum} data-maxid=${maxid} ">
+                                            <div class="col-1 h1 text-success h-100 justify-content-center align-self-center">
+                                                <div class="row">
+                                                    <div class="col-12  queue-number  align-self-center text-center">
+                                                        ${queunum}
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-12  align-self-center text-center" >
+                                                       <button class="btn bg-danger text-white btn-remove-queue" data-userid="${el.userId}"  data-timestamp="${timestam}"  data-queue-list=${JSON.stringify(queue_list)}>X</button >
+                                                    </div>
+                                                 </div>
+                                            </div>
+                                            <div class="col-4 queue-user">
+                                                <div class="row">
+                                                    <div class="col-12 h5">${el.userName}</div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-12 ">
+                                                        <img src="${pictureURL}" class="queue-img"/>
+                                                    </div>
+                                                </div>
+                                            </div>`;
+
+                    var div_dish=`<div class="col-4 queue-dishes justify-content-center align-self-center h-100">
+                                                ${inner_div}
+                                             </div>`;
+                    var div_btn = `<div class="col-3  align-self-center h-100 ">
+                                                 <button class="btn bg-success text-white btn-confirm-queue  w-100" style="height:100px"  data-userid="${el.userId}"  data-timestamp="${timestam}"  data-queue-list=${JSON.stringify(queue_list)}> @Localizer["Delivered"]</button >
+                                             </div>`;
+
+                    var div_end = `</div>`;
+                    var div_all = div_start + div_dish + div_btn + div_end;
+                    if (is_button_shift==true) {
+                        div_all = div_start + div_btn + div_dish+ div_end;
+                    }
+                    is_button_shift = !is_button_shift;
+                    var div = $(div_all);
+                    content.append(div);
+                    content.find(".user-queue").removeClass("queue-first");
+                    content.find(".user-queue").first().addClass("queue-first");
+                    queueHandler(div);
+                });
+            }
+            function queueHandler(div) {
+                $(div).find('.btn-confirm-queue').click(function (e) {
+                    e.preventDefault();
+                    var selfbtn = $(this)
+                    selfbtn.prop('disabled', true);
+                    var timestamp = $(this).attr('data-timestamp');
+                    var ServiceRequest = { DayDate: curr_date.toDateString(), UserId: $(this).attr('data-userid'), Type: "askforqueueconfirm", QueueIds: JSON.parse($(this).attr('data-queue-list')) };
+
+
+                    $.post(serviceurl, ServiceRequest).done(function (data, statusText, xhr) {
+                        if (data && data.overalResult == 'success') {
+                            removeQueue(timestamp);
+                            el_error.hide();
+                        }
+                        else {
+                            if (data) {
+                                el_error.text(data.errorMessage);
+                            }
+                            else {
+                                el_error.text('Сталася помилка, спробуйте перезавантажити');
+                            }
+                            el_error.show();
+                            selfbtn.prop('disabled', false);
+                        }
+                        
+                    })
+                        .fail(function (xhr, code, error) {
+                            el_error.text(error);
+                            el_error.show();
+                            selfbtn.prop('disabled', false);
+                        });
+
+
+                });
+                $(div).find('.btn-remove-queue').click(function (e) {
+                    e.preventDefault();
+                    var timestamp = $(this).attr('data-timestamp');
+                    var ServiceRequest = { DayDate: curr_date.toDateString(), UserId: $(this).attr('data-userid'), Type: "askforqueueremove", QueueIds: JSON.parse($(this).attr('data-queue-list')) };
+
+                    promise_dialog_yes_no('Підтвердіть дію. <p/> В результаті цієї операції, страви клієнта будуть видалені із черги вікна видачі<p/>')
+                        .then(() => {
+                            $.post(serviceurl, ServiceRequest).done(function (data, statusText, xhr) {
+                                if (data && data.overalResult == 'success') {
+                                    removeQueue(timestamp);
+                                }
+                            })
+                                .fail(function (xhr, code, error) {
+                                    throw (error)
+                                });
+
+                        })
+                        .catch(error => {
+                            if (error)
+                                dialog_error(error);
+                            console.error('error:', error)
+                        });
+
+
+
+                });
+            }
+            function removeQueue(timestamp) {
+                var content = $('#delivery-queue-content');
+                var queue = content.find(`.user-queue[data-timestamp="${timestamp}"]`);
+                queue.remove();
+                recalcqueues();
+            }
+            function recalcqueues() {
+                var content = $('#delivery-queue-content');
+                content.find(".user-queue").each(function (index, element) {
+                    $(element).find('.queue-number').text(index + 1);
+                    if (index == 0)
+                        $(element).addClass("queue-first");
+                });
+            }
+            function filldeliverydishes(data) {
+                if (IsWelcomeMode()) {
+                    fillWelcome(data);
+                    return;
+                }
+
+                $('#delivery-dishes-content').empty();
+                if (!data || data.overalResult != "success") {
+
+                    var div = `<div class="row"><div class="col-8 container-errordelivery"><span class="errordelivery">Помилка:${data.errorMessage}</span></div></div>`;
+                    $('#delivery-dishes-content').append(div);
+                }
+                else if (!Array.isArray(data.dishes) || data.dishes.length == 0) {
+                    var div = `<div class="row"><div class="col-8 container-wrongdelivery"><span class="wrongdelivery">Кошик пустий</span></div></div>`;
+                    $('#delivery-dishes-content').append(div);
+                }
+                else {
+                    var dishesid = data.dishes.map(function (index, element) { return element.id; });
+                    data.dishes.forEach(el => {
+                        var div = $(`<div class="row"><div class="col-8 container-deliverydish"><span class="deliverydish" data-id="${el.id}">${el.name}</span></div></div>`);
+                        $('#delivery-dishes-content').append(div);
+                    });
+                    var divconfirm = $(`<div class="row"><div class="col-8 class="button-deliverydish"><button id="delivery-confirm">Пiдвердити</button></div></div>`);
+                    $('#delivery-dishes-content').append(divconfirm);
+                    divconfirm.find("#delivery-confirm").click(function (e) {
+                        e.preventDefault();
+                        requestforconfirmation(confirmdeliverydishes, dishesid);
+
+                    });
+                }
+            }
+            function confirmdeliverydishes(data) {
+
+                if (!data || data.overalresult != "success") {
+                    var div = `<div class="row"><div class="col-8 container-errordelivery"><span class="errordelivery">Помилка${data.errormessage}</span></div></div>`;
+                    $('#delivery-dishes-content').append(div);
+                } else {
+                    $('#delivery-dishes-content').empty();
+                }
+            }
+            function requestforconfirmation(cb, dishesids) {
+
+                var dishesnum = getdishesnum();
+                var ServiceRequest = { DayDate: curr_date.toDateString(), UserToken: $('#userid').val(), UserId: $('#userid').val(), Type: "confirmdelivery", DishesIds: dishesids };
+                $.post(serviceurl, ServiceRequest).done(function (data, statusText, xhr) {
+                    cb(data);
+                })
+                    .fail(function (xhr, code, error) {
+                        el_error.text(error);
+                        el_error.show();
+                    });
+            }
+            function requestfordeliveryQueue(cb) {
+
+                var dishesnum = getdishesnum();
+                var requesttype = 'askforqueue';
+                var categories = [];
+                var queuecount = getQueueCount();
+                categories.push(parseInt($('#complexcategories').children("option:selected").val()));
+                var ServiceRequest = { DayDate: curr_date.toDateString(), Type: requesttype, DishesNum: dishesnum, MaxQueue: max_queue - queuecount, LastQueueId: lastQueueid, ComplexCategoriesIds: categories };
+                $.post(serviceurl, ServiceRequest).done(function (data, statusText, xhr) {
+                    el_error.hide();
+                    cb(data);
+
+                })
+                    .fail(function (xhr, code, error) {
+                        el_error.text(error);
+                        el_error.show();
+                    });
+            }
+            function requestfordelivery(cb) {
+
+                var dishesnum = getdishesnum();
+                var requesttype = 'askfordelivery';
+                if (IsWelcomeMode()) {
+                    requesttype = 'askforregister';
+                    $('#delivery-welcome-content').empty();
+                    $('#delivery-welcome-content').append(gethtmlloading());
+                }
+                var categories = [];
+                categories.push(parseInt($('#complexcategories').children("option:selected").val()));
+
+                var ServiceRequest = { DayDate: curr_date.toDateString(), UserToken: $('#userid').val(), UserId: $('#userid').val(), Type: requesttype, DishesNum: dishesnum, ComplexCategoriesIds: categories };
+                $.post(serviceurl, ServiceRequest).done(function (data, statusText, xhr) {
+                    el_error.hide();
+                    cb(data);
+                })
+                    .fail(function (xhr, code, error) {
+                        el_error.text(error);
+                        el_error.show();
+                        if (IsWelcomeMode()) {
+                            $('#delivery-welcome-content').empty();
+                            $('#delivery-welcome-content').append(error);
+                        }
+                    });
+            }
+            function showNfcInfo(msg) {
+                $('#connectnfc').prop('disabled', false);
+                if (msg && msg.Isreaderconnected == true && msg.Ismonitoring == true) {
+                    elnfc_online.show();
+                    elnfc_offline.hide();
+
+                    $('#nfc_readername').text(msg.Readername);
+                    isNfcConnected = true;
+                }
+                else {
+                    elnfc_online.hide();
+                    elnfc_offline.show();
+                    isNfcConnected = false;
+                }
+                refreshState();
+            }
+
+
+
+        });
+    </script>
+</body>
+</html>

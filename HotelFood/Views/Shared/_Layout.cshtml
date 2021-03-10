@@ -24,6 +24,12 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
                         </li>
+                        <li>
+                            <a class="navbar-brand" href="/" style="max-width: 179px"><img src="~/img/logo.png" alt="Catering logo" style="width: 100%;"></a>
+
+                            @await Html.PartialAsync("_LoginPartialCabachok")
+                        </li>
+                           
                     </ul>
                 </div>
             </div>
@@ -45,4 +51,5 @@
     <script src="~/js/site.js" asp-append-version="true"></script>
     @RenderSection("Scripts", required: false)
 </body>
+@await Html.PartialAsync("_LoginPartialModal")
 </html>

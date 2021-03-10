@@ -89,8 +89,8 @@ namespace HotelFood.Data
             {
                 UserName = "admin",
                 Email = "admin@default.com",
-                HotelId=1
-                
+                HotelId=1,
+                Id = Guid.NewGuid().ToString(),
             };
 
             string adminPassword = "Password123";
@@ -117,8 +117,8 @@ namespace HotelFood.Data
             var usrGr5 = new UserGroups { Name = "Обед", HotelId = 1 };
 
 
-            var comp1 = new Hotel { Code = "BASE", Name = "Default" };
-            var comp2 = new Hotel { Code = "CABACHOK", Name = "Кабачок" };
+            var comp1 = new Hotel { Id=1,Code = "BASE", Name = "Default" };
+            var comp2 = new Hotel { Id = 2, Code = "CABACHOK", Name = "Кабачок" };
             var comps = new List<Hotel>() { comp1, comp2 };
             var cats = new List<Categories>()
             {

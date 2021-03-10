@@ -1,0 +1,253 @@
+@using Microsoft.AspNetCore.Identity
+@using Microsoft.AspNetCore.Identity.EntityFrameworkCore
+@using Microsoft.AspNetCore.Html
+@inject SignInManager<HotelUser> SignInManager
+@inject HotelFood.Core.SharedViewLocalizer Localizer
+@inject HotelFood.Repositories.ICompanyUserRepository com_rep
+@{
+    var current_user = await SignInManager.UserManager.GetUserAsync(User);
+    async Task<IHtmlContent> RenderMenuItem(string controller, string action, string description, string roles)
+    {
+        bool render = string.IsNullOrEmpty(roles);
+        if (!render)
+        {
+            var userroles = roles.Split(",");
+
+            foreach (var r in userroles)
+            {
+                if (User.IsInRole(r))
+                {
+                    render = true;
+                    break;
+                }
+            }
+        }
+        if (render)
+        {
+            <a class="dropdown-item" asp-controller="@controller" asp-action="@action">@description</a>
+        }
+        return HtmlString.Empty;
+    }
+}
+<button class="navbar-toggler pr-0  d-block d-md-none d-lg-none button-burger-for-click button-burger "
+        type="button"
+        onclick="$('.modal-burger').toggleClass('modal-burger-toggle'); $('.button-burger-for-click').toggleClass('button-burger')"
+        style="border: none; outline: none;">
+</button>
+<div class="col-lg-7 col-md-7 p-0 d-none d-md-flex d-lg-flex justify-content-center align-items-center">
+    <ul class="navbar-nav nav d-flex flex-grow-1 flex-row">
+        @if (!SignInManager.IsSignedIn(User))
+        {
+
+            <li class="nav-item ml-3">
+                <a id="registerLink" class="nav-link text-main-color-dark px-0 navbar-size-14" style="color: #232323; cursor: pointer; font-size: 14px;" asp-controller="Account" asp-action="Register">
+                    <img src="~/img/reg-icon.svg"
+                         alt="" class="px-2" />@Localizer["MenuRegister"]
+                    </a>
+                </li>
+                <li class="nav-item ml-3">
+                    <a id="loginLink" class="btn btn-xl btn-outline-danger  justify-content-center  font-weight-bold d-lg-flex d-md-flex d-none justify-content-between"
+                       style="width: 131px; background: rgb(255, 255, 255); border-color: rgb(54, 194, 51); outline: none; height: 48px; color: rgb(54, 194, 51); display: flex; align-items: center; justify-content: space-evenly; font-size: 14px;"
+                       asp-controller="Account" asp-action="Login">
+                        <img src="~/img/login-icon.svg" alt="" class="px-2" />@Localizer["MenuLogIn"]
+                    </a>
+                </li>
+            }
+            else
+            {
+                @if (User.IsInRole("Admin")
+          || User.IsInRole("CompanyAdmin")
+          || User.IsInRole("UserAdmin")
+          || User.IsInRole("KitchenAdmin")
+          || User.IsInRole("GroupAdmin")
+          || User.IsInRole("SubGroupAdmin")
+          || User.IsInRole("ServiceAdmin")
+          || User.IsInRole("SubGroupReportAdmin"))
+                {
+                    <li class="nav-item ml-3 dropdown">
+                        <div class="nav-link text-main-color-dark px-0 navbar-size-14 dropdown-toggle"
+                             id="dropdown-admin" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+                             style="color: #232323; cursor: pointer">
+                            <img src="~/img/admin-icon.svg"
+                                 alt="" class="px-2">@Localizer["MenuAdmin"]
+                            </div>
+
+                        <div class="dropdown-menu" aria-labelledby="dropdown-admin" id="dropdown-buttons-admin"
+                             style="box-shadow: 0px 4px 22px rgba(0, 0, 0, 0.15); border-radius: 4px; border: none;
+                                   min-width:650px; max-width: 745px; font-weight: 500; font-size: 14px;">
+
+                                <div class="row m-0">
+                                    <div class="col-sm-4 p-0">
+                                        @await RenderMenuItem("Dishes", "Index", Localizer["MenuDishes"], "Admin,CompanyAdmin,KitchenAdmin")
+                                    </div>
+                                    <div class="col-sm-4 p-0">
+                                        @await RenderMenuItem("Company", "Setting", Localizer["Setting"], "Admin,CompanyAdmin")
+                                    </div>
+                                    <div class="col-sm-4 p-0">
+                                        @await RenderMenuItem("Service", "Index", Localizer["Service"], "Admin,CompanyAdmin,UserAdmin,ServiceAdmin")
+                                    </div>
+                                </div>
+                                <div class="row m-0">
+                                    <div class="col-sm-4 p-0">
+                                        @await RenderMenuItem("Categories", "Index", Localizer["MenuCategories"], "Admin,CompanyAdmin,KitchenAdmin")
+                                    </div>
+                                    <div class="col-sm-4 p-0">
+                                        @await RenderMenuItem("Account", "Users", Localizer["MenuUsers"], "Admin,CompanyAdmin,UserAdmin,GroupAdmin,SubGroupAdmin")
+                                    </div>
+                                    <div class="col-sm-4 p-0">
+                                        @await RenderMenuItem("Service", "Cards", Localizer["UserCards"], "Admin,CompanyAdmin,UserAdmin,ServiceAdmin")
+                                    </div>
+                                </div>
+                                <div class="row m-0">
+                                    <div class="col-sm-4 p-0">
+                                        @await RenderMenuItem("Ingredients", "Index", Localizer["MenuIngredients"], "Admin,CompanyAdmin,KitchenAdmin")
+                                    </div>
+                                    <div class="col-sm-4 p-0">
+                                        @await RenderMenuItem("UserGroups", "Index", Localizer["MenuUsersGroups"], "Admin,CompanyAdmin,UserAdmin")
+                                    </div>
+                                    <div class="col-sm-4 p-0">
+                                       @* @await RenderMenuItem("Service", "IndexNew", Localizer["ServiceNew"], "Admin,CompanyAdmin,UserAdmin,ServiceAdmin")*@
+                                    </div>
+                                </div>
+                                
+                                <div class="row m-0">
+                                    <div class="col-sm-4 p-0">
+                                        @await RenderMenuItem("Complex", "Index", Localizer["MenuComplex"], "Admin,CompanyAdmin,KitchenAdmin")
+                                    </div>
+                                    
+                                </div>
+                               
+                                <div class="row m-0">
+                                    <div class="col-sm-4 p-0">
+                                        @await RenderMenuItem("DayDishes", "EditDay", Localizer["MenuDayDishes"], "Admin,CompanyAdmin,KitchenAdmin")
+                                    </div>
+                                    <div class="col-sm-4 p-0">
+
+                                    </div>
+                                    <div class="col-sm-4 p-0">
+
+                                    </div>
+                                </div>
+                                
+
+                                @*
+            <a class="dropdown-item" asp-controller="Dishes" asp-action="Index">@Localizer["MenuDishes"]</a>
+            <a class="dropdown-item" asp-controller="Categories" asp-action="Index">@Localizer["MenuCategories"]</a>
+            <a class="dropdown-item" asp-controller="Ingredients" asp-action="Index">@Localizer["MenuIngredients"]</a>
+            <a class="dropdown-item" asp-controller="IngredientCategories" asp-action="Index">@Localizer["IngredientCategories"]</a>
+            <a class="dropdown-item" asp-controller="Complex" asp-action="Index">@Localizer["MenuComplex"]</a>
+            <a class="dropdown-item" asp-controller="DishKind" asp-action="Index">@Localizer["DishKind"]</a>
+            <a class="dropdown-item" asp-controller="DayDishes" asp-action="EditDay">@Localizer["MenuDayDishes"]</a>
+            <a class="dropdown-item" asp-controller="Stock" asp-action="Index">@Localizer["MenuStock"]</a>
+            <a class="dropdown-item" asp-controller="Stock" asp-action="ConsignmentStock">@Localizer["MenuStockConsignment"]</a>
+            <a class="dropdown-item" asp-controller="Docs" asp-action="Index">@Localizer["MenuDocs"]</a>
+                                *@
+
+
+                            
+                            @*
+        @if (User.IsInRole("Admin") || User.IsInRole("CompanyAdmin") || User.IsInRole("SubGroupReportAdmin"))
+        {
+            <a class="dropdown-item" asp-controller="Report" asp-action="Index">@Localizer["Reports"]</a>
+        }
+                            *@
+                            @*
+        @if (User.IsInRole("Admin") || User.IsInRole("CompanyAdmin") || User.IsInRole("UserAdmin") || User.IsInRole("KitchenAdmin"))
+        {
+            <a class="dropdown-item" asp-controller="CustomerOrders" asp-action="Index">@Localizer["MenuCustomerOrders"]</a>
+        }
+                            *@
+                            @*
+        @if (User.IsInRole("Admin") || User.IsInRole("CompanyAdmin") || User.IsInRole("UserAdmin"))
+        {
+            <a class="dropdown-item" asp-controller="Company" asp-action="Setting">@Localizer["Setting"]</a>
+            <a class="dropdown-item" asp-controller="Account" asp-action="Users">@Localizer["MenuUsers"]</a>
+            <a class="dropdown-item" asp-controller="UserGroups" asp-action="Index">@Localizer["MenuUsersGroups"]</a>
+            <a class="dropdown-item" asp-controller="MassEmail" asp-action="Index">@Localizer["MassEmail"]</a>
+            <a class="dropdown-item" asp-controller="UserSubGroups" asp-action="Index">@Localizer["UserSubGroupsMenu"]</a>
+
+
+        }
+                            *@
+                            @*
+        @if (User.IsInRole("GroupAdmin"))
+        {
+            <a class="dropdown-item" asp-controller="Account" asp-action="Users">@Localizer["MenuUsers"]</a>
+        }
+                            *@
+                            @*
+        @if (User.IsInRole("Admin") || User.IsInRole("UserAdmin") || User.IsInRole("ServiceAdmin"))
+        {
+            <a class="dropdown-item" asp-controller="Service" asp-action="Index">@Localizer["Service"]</a>
+            <a class="dropdown-item" asp-controller="Service" asp-action="Cards">@Localizer["UserCards"]</a>
+
+        }
+                            *@
+                    @*
+                            @if (User.IsInRole("Admin"))
+                            {
+                                <a class="dropdown-item" asp-controller="Address" asp-action="Index">@Localizer["Address"]</a>
+                                <a class="dropdown-item" asp-controller="Discount" asp-action="Index">@Localizer["Discount"]</a>
+                            }
+                        *@
+                            <environment names="LocalProduction">
+                                @if (User.IsInRole("Admin") || User.IsInRole("UserAdmin") || User.IsInRole("ServiceAdmin"))
+                                {
+
+
+                                    <a class="nav-link dropdown-toggle text-main-color-dark px-0 navbar-size-14" href="#" id="navbarDropdownUserServiceLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        DatabaseSyncronization
+                                    </a>
+                                    <div class="dropdown-menu" aria-labelledby="navbarDropdownUserServiceLink">
+                                        <a class="dropdown-item" asp-controller="Service" asp-action="LocalModeInit">Initial Sync</a>
+                                        <a class="dropdown-item" asp-controller="Service" asp-action="LocalModeInit">Orders Sync</a>
+                                    </div>
+
+                                }
+                            </environment>
+
+                        </div>
+                        </li>
+                    }
+
+                <li class="nav-item ml-3 dropdown">
+                    @*<div class="nav-link text-main-color-dark px-0 navbar-size-14 dropdown-toggle"
+                         id="dropdown-userprofile" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+                         style="color: #232323; cursor: pointer">
+                        <img src="~/img/profile-icon.svg"
+                             alt="" class="px-2" />
+                        @(current_user.GetChildUserName())
+                    </div>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdownUserMenuLink" id="dropdown-userprofile">
+                        <a class="dropdown-item" asp-controller="Account" asp-action="Update">@Localizer["MenuUpdateUser"]</a>
+                        <a class="dropdown-item" asp-controller="Account" asp-action="AddBalance">@Localizer["AddBalance"]</a>
+                        @if (current_user.ChildrenCount > 1 || current_user.IsChild())
+                        {
+                            <a id="changechield" class="dropdown-item" href="#">@Localizer["MenuChangeChild"]</a>
+                        }
+
+                        @if (com_rep.GetUserCompanyCount(current_user.Id).Result > 1)
+                        {
+                            <a id="selectcompany" class="dropdown-item" data-userid="@current_user.Id" href="#">@Localizer["MenuChangeCompany"]</a>
+                        }
+                    </div>*@
+                </li>
+                <li class="nav-item ml-3">
+                    <a class="nav-link text-main-color-dark px-0 navbar-size-14" style="color: #232323; cursor: pointer; font-size: 14px;" asp-controller="UserDayDishes" asp-action="Index">
+                        <img src="~/img/basket-icon.svg"
+                             alt="" class="px-2" />@Localizer["MenuUserOrder"]
+                        </a>
+                    </li>
+
+                    <li class="nav-item ml-3">
+                        <a id="logoutLink" class="nav-link text-main-color-dark px-0 navbar-size-14" style="color: #232323; cursor: pointer; font-size: 14px;" asp-controller="Account" asp-action="LogOut">
+                            <img src="~/img/logout-icon.svg"
+                                 alt="" class="px-2">@Localizer["MenuLogOut"]
+                            </a>
+                        </li>
+
+                    }
+
+    </ul>
+
+</div>

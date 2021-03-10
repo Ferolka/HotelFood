@@ -71,11 +71,13 @@ namespace HotelFood.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+            modelBuilder.Entity<HotelUser>().Property(hu => hu.Id).HasMaxLength(100);
+            modelBuilder.Entity<HotelUser>().HasKey(hu => hu.Id);
             modelBuilder.Entity<HotelUser>()
                  .HasOne(u => u.UserGroup)
                  .WithMany(a => a.HotelUsers)
 
-                 .OnDelete(DeleteBehavior.Restrict);
+                 .OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<HotelGuests>()
                 .HasKey(cu => new { cu.HotelId, cu.HotelUserId });
@@ -96,7 +98,7 @@ namespace HotelFood.Data
                  .HasOne(c => c.Category)
                  .WithMany(a => a.Dishes)
                  .IsRequired()
-                 .OnDelete(DeleteBehavior.Restrict);
+                 .OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<Complex>()
                    .HasOne(c => c.Category)
@@ -112,13 +114,13 @@ namespace HotelFood.Data
                  .WithMany(a => a.DishComplex)
                  .IsRequired()
 
-                 .OnDelete(DeleteBehavior.Restrict);
+                 .OnDelete(DeleteBehavior.NoAction);
             modelBuilder.Entity<DishComplex>()
                  .HasOne(c => c.Complex)
                  .WithMany(a => a.DishComplex)
                  .IsRequired()
 
-                 .OnDelete(DeleteBehavior.Restrict);
+                 .OnDelete(DeleteBehavior.NoAction);
             
 
             modelBuilder.Entity<DayDish>()
@@ -151,14 +153,24 @@ namespace HotelFood.Data
             modelBuilder.Entity<UserDayDish>()
                    .Property(d => d.Date)
                    .HasColumnType("date");
-
+            modelBuilder.Entity<UserDayDish>()
+                .HasOne(uc => uc.Dish)
+                .WithMany(uc => uc.UserDayDish)
+                .OnDelete(DeleteBehavior.NoAction);
+            modelBuilder.Entity<UserDayDish>()
+                .HasOne(uc => uc.Hotel)
+                .WithMany(uc => uc.UserDayDish)
+                .OnDelete(DeleteBehavior.NoAction);
             modelBuilder.Entity<UserDayComplex>()
             .HasKey(o => new { o.UserId, o.Date, o.ComplexId, o.HotelId });
             //many to many Dish <-> catgories
             modelBuilder.Entity<UserDayComplex>()
                    .Property(d => d.Date)
                    .HasColumnType("date");
-
+            modelBuilder.Entity<UserDayComplex>()
+                .HasOne(uc => uc.Hotel)
+                .WithMany(uc => uc.UserDayComplex)
+                .OnDelete(DeleteBehavior.NoAction);
             modelBuilder.Entity<UserDay>()
              .HasKey(o => new { o.UserId, o.Date, o.HotelId });
             modelBuilder.Entity<UserDay>()
