@@ -1,0 +1,1695 @@
+﻿@model UserDayEditModel
+@using System.Globalization
+@using HotelFood.Core
+@inject HotelFood.Core.SharedViewLocalizer Localizer
+@inject HotelFood.Repositories.IUserDayDishesRepository udrepo;
+@inject Microsoft.Extensions.Options.IOptions<UIOption> pageOptions
+@{
+    ViewData["Title"] = "My Order";
+}
+@{
+    DateTime daydate = Model.DayDate;
+    //daydate = daydate.AddDays(2);
+    //if (daydate.DayOfWeek == DayOfWeek.Sunday)
+    //{
+    //daydate = daydate.AddDays(1);
+    //}
+    //if (daydate.DayOfWeek == DayOfWeek.Saturday || daydate.DayOfWeek == DayOfWeek.Sunday)
+    //{
+    //    daydate = daydate.AddDays(2);
+    //}
+    if (daydate.DayOfWeek == DayOfWeek.Saturday)
+    {
+        daydate = daydate.AddDays(1);
+    }
+    long ms_since1970 = (long)daydate.Subtract(DateTime.MinValue.AddYears(1969)).TotalMilliseconds;
+    CultureInfo ci = new CultureInfo("en-US");
+    // Get the DateTimeFormatInfo for the en-US culture.
+    DateTimeFormatInfo dtfi = ci.DateTimeFormat;
+    CultureInfo cultureCurrent = CultureInfo.CurrentUICulture;
+}
+@if (Layout == "_LayoutCabachok")
+{
+    <div class="container-xl container container-md container-sm container-lg">
+        <div class="col-12 align-items-center pb-3  ml-xl-0 ml-md-0 ml-sm-0 p-0 ml-0 mt-lg-5 mt-md-5 mt-2">
+            <div class="col-12 align-content-center mr-md-auto px-0 d-flex justify-content-between flex-md-row flex-lg-row flex-column">
+                <p class="h2 h2-mob pr-3" style="font-weight: 600;">
+                    @Localizer["OrderTitle"]
+                </p>
+
+            </div>
+            <div class="col-12 align-content-center mr-md-auto px-0 d-flex justify-content-between flex-md-row flex-lg-row flex-column-reverse mt-3">
+                <div class="col-lg-9 col-md-9 col-12 d-flex flex-column p-0 mt-2">
+                    <span class="change-color-grey change-weight" style="font-size: 16px">Обрати меню:</span>
+                    <div class="select-dishesKind">
+                        <div class="col-xl-8 col-lg-9 col-md-10 d-none p-0 justify-content-start mt-2"
+                             id="type-menu-food">
+                            @*<div class="col-xl-8 col-lg-9 col-md-10 d-none d-lg-flex d-md-flex p-0 justify-content-start mt-2"
+                                 id="type-menu-food">*@
+                                @*<button class="btn btn-for-type-menu btn-for-type-menu--active" type="button">
+                    Стандартне
+                </button>
+                <button class="btn btn-for-type-menu" type="button">Безлактозне</button>
+                <button class="btn btn-for-type-menu" type="button">Безглютенове</button>
+                <button class="btn btn-for-type-menu" type="button">Овочево-рибне</button>*@
+                                @foreach (var it in ViewBag.DishKindId)
+                                {
+                                    if (it.Value == ViewBag.DishKindId.SelectedValue.Value)
+                                    {
+                                        <button class="btn btn-for-type-menu btn-for-type-menu--active" type="button" value="@it.Value">
+                                            @it.Text
+                                        </button>
+                                        continue;
+                                    }
+                                    <button class="btn btn-for-type-menu" type="button" value="@it.Value">@it.Text</button>
+                                }
+                            </div>
+                            @*<select name="sources" id="sources" class="custom-select sources type-of-food"
+                    placeholder="Стандартне"
+                    style="border: none; z-index: 2000">
+                <option class="drpdown-btn-type selection" value="standart"
+                        style="border: none; box-shadow: 0 4px 22px rgba(0, 0, 0, 0.15);">
+                    Стандартне
+                </option>
+                <option class="drpdown-btn-type" value="no-lactose">Безлактозне</option>
+                <option class="drpdown-btn-type" value="no-gluten">Безглютенове</option>
+                <option class="drpdown-btn-type" value="fish-and-vegetables">Овочево-рибне</option>
+            </select>*@
+
+                            <select class="custom-select sources type-of-food col-lg-5"
+                                    placeholder="@ViewBag.DishKindId.SelectedValue.Text"
+                                    style="border: none;"
+                                    id="dishKind">
+                                @foreach (var it in ViewBag.DishKindId)
+                                {
+                                    if (it.Value == ViewBag.DishKindId.SelectedValue.Value)
+                                    {
+                                        <option class="drpdown-btn-type selection" value="@it.Value">@it.Text</option>
+                                        continue;
+                                    }
+                                    <option class="drpdown-btn-type" value="@it.Value">@it.Text</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+                <button type="button"
+                        class="getDetails col-lg-3 col-md-3 pr-3 col-12 btn btn-xl btn-outline-danger   align-self-end  font-weight-bold  d-flex justify-content-between"
+                        style=" background: rgb(255, 255, 255); border-color: rgb(54, 194, 51); outline: none; height: 48px; color: rgb(54, 194, 51); display: flex; align-items: center; justify-content: space-evenly; font-size: 14px; text-transform: uppercase">
+                    <img src="../img/week-report.svg" alt=""><span class="d-flex align-content-center"
+                                                                   style="margin-right: 23%">@Localizer["GetWeekInfo"]</span>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                    <div id="days-of-week-carousel" class="carousel slide container px-0 order-carousel mt-3" data-ride="carousel">
+                                                        <div class="carousel-inner" style="position: relative;">
+                                                            <div style="position: absolute; z-index: 5; right: -5px; width: 60px; height: 70px;background: linear-gradient(270deg, #FFFFFF 15.1%, rgba(255, 255, 255, 0) 100%);"></div>
+                                                            <div class="carousel-item active">
+                                                                <input type="hidden" asp-for="@ms_since1970" id="currentdate" />
+                                                                <ul class="nav nav-tabs justify-content-lg-around justify-content-md-around justify-content-between weeks-tab "
+                                                                    id="weeks-tab" role="tablist">
+
+                                                                    @{
+                                                                        DateTime current_head = daydate.StartOfWeek(DayOfWeek.Monday);
+
+                                                                    }
+                                                                    @for (int i = 0; i < 7; i++)
+                                                                    {
+                                                                        <li class="nav-item">
+                                                                            <a class="nav-link day-of-week p-lg-0 p-md-0 nav-item nav-day @(i == (int)daydate.DayOfWeek ? " active" : "")"
+                                                                               style="width: 100%;"
+                                                                               id="nav-tab-@i" data-toggle="tab" href="#nav-content-@i" role="tab" aria-controls="nav-content-@i" data-i="@i"
+                                                                               aria-selected="false"
+                                                                               @*aria-selected="true"*@>
+                                                                                <div class="col-12 p-0 d-flex flex-lg-column flex-md-column flex-column-reverse date-container">
+                                                                                    <div class="col-12 d-lg-none d-md-none d-flex p-0 justify-content-center align-items-center arrow-down-mob"
+                                                                                         style=" min-width: 55px;">
+                                                                                        <img src="../img/mob-arrow-active.svg" alt="">
+                                                                                    </div>
+                                                                                    <div class="col-12 d-flex justify-content-center day-of" data-i="@i"></div>
+                                                                                    <div class="col-12 number-of d-md-block d-lg-block d-none shorttabdate"
+                                                                                         style="font-size: 14px; font-family: Open-Sans, sans-serif;">@current_head.ToShortDateString()</div>
+                                                                                        <div class="col-12 month-rus month-rus__active d-lg-none d-md-none d-flex p-0 justify-content-center align-items-center date-day"
+                                                                                             style=" font-size: 14px; font-family: Open-Sans, sans-serif; min-width: 55px; line-height: 29px;">@current_head.Day</div>
+                                                                                        </div>
+                                                                                    </a>
+                                                                                    @if (udrepo.IsAllowDayEdit(current_head, User.GetHotelID()))
+                                                                                    {
+                                                                                        <div class="col-2 disabled-hovered p-0  flex-column justify-content-center align-items-center px-3"
+                                                                                             style="left: calc(14px); ">
+                                                                                            На цей день замовлення закритi.
+                                                                                            @*<br>Зверніться до <span style="color: #36C233; text-decoration: underline">адміністратора</span>
+                                                                                                для замовлення*@
+                                                                                        </div>
+                                                                                    }
+                                                                                </li>
+                                                                                current_head = current_head.AddDays(1);
+                                                                            }
+
+                                                                </ul>
+                                                            </div>
+
+                                                        </div>
+                                                        <a class="carousel-control-prev  d-lg-flex d-md-flex align-items-start mt-3 dayselectback"
+                                                           style="width: auto; z-index: 6" href="#days-of-week-carousel" role="button" data-slide="prev">
+                                                            <span class="carousel-control-prev-icon d-flex justify-content-start align-items-center"
+                                                                  aria-hidden="true"
+                                                                  style="width: 20px; height: 20px; border: 2px solid #F05E25; border-radius: 50%">
+                                                                <div style="border: 4px solid transparent;border-right: 5px solid #F05E25;display: block;width: 0;height: 0;"></div>
+                                                            </span>
+                                                            <span class="sr-only">Previous</span>
+                                                        </a>
+                                                        <a class="carousel-control-next d-flex align-items-start mt-3 dayselectforward" style="width: auto; z-index: 6;max-height:30px;"
+                                                           href="#days-of-week-carousel" role="button" data-slide="next">
+                                                            <span class="carousel-control-next-icon d-flex justify-content-end align-items-center"
+                                                                  aria-hidden="true"
+                                                                  style="width: 20px; height: 20px; border: 2px solid #F05E25; border-radius: 50%">
+                                                                <div style="border: 4px solid transparent;border-left: 5px solid #F05E25;display: block;width: 0;height: 0;"></div>
+                                                            </span>
+                                                            <span class="sr-only">Next</span>
+                                                        </a>
+
+                                                    </div>
+                                                    <div class="col-12 p-0" style="margin-top: -105px;z-index: 10">
+                                                        @*<div class="row ml-0 mr-0 justify-content-start align-content-center d-lg-flex d-none d-md-flex d-sm-none mt-3"
+                                                                 style="height: 40px; font-weight: 500; font-size: 18px; color: #232323; background: #F7F7F7;">
+
+                                                                <div class="col-1 col-lg-1 col-md-2">
+                                                                </div>
+                                                                <div class="col-lg-11 p-0 pl-2 col-md-10 d-flex flex-lg-row flex-md-row">
+                                                                    <div class="col-lg-2 col-md-2 pl-0" style="cursor: pointer">
+                                                                        <span class="sort-span">Назва</span>
+                                                                    </div>
+                                                                    <div class="col-5 pl-5" style="cursor: pointer"><span class="sort-span">Категорія</span></div>
+                                                                    <div class="col-lg-2 col-md-2" style="cursor: pointer">
+                                                                        <span class="sort-span">Title</span>
+                                                                    </div>
+                                                                    <div class="col-lg-2 col-md-2 justify-content-end" style="cursor: pointer">
+                                                                        <span class="sort-span justify-content-center">Вартість</span>
+                                                                    </div>
+                                                                    <div class="col-lg-1 col-md-1">
+                                                                    </div>
+                                                                </div>
+
+                                                            </div>*@
+
+                                                        @*<div class="col-12 p-0 justify-content-center mt-4 d-flex">
+                                                                <span style="font-weight: 600; font-size: 28px; color: #232323">Комплексні страви</span>
+                                                            </div>*@
+                                                    </div>
+                                                    @{
+                                                        DateTime current_content = daydate.StartOfWeek(DayOfWeek.Monday);
+                                                    }
+                                                    <div class="tab-content mt-lg-2 pt-lg-3 mt-md-2 pt-md-3 mt-1 pt-0" id="week-day-content">
+                                                        @for (int i = 0; i < 7; i++)
+                                                        {
+                                                            <div class="tab-pane fade@(i == (int)daydate.DayOfWeek ? "  show active" : "")" id="nav-content-@i" role="tabpanel" data-dayindex="@i" aria-labelledby="nav-tab-@i">
+                                                                @*@if (!udrepo.IsAllowDayEdit(current_content, User.GetCompanyID()))
+                                                                    {
+                                                                        <div class="container day-closed-msg">
+                                                                            <h3> @Localizer["DayClosedForOrder"] </h3>
+                                                                        </div>
+                                                                    }*@
+                                                                @*@await Component.InvokeAsync("UserDayOrderedComponent", current_content)
+                                                                    @if (Model.ShowComplex)
+                                                                    {
+                                                                        @await Component.InvokeAsync("UserDayComplexComponent", new DayMenu() { Date = current_content, DishKind = 0 })
+                                                                    }*@
+                                                            </div>
+                                                            current_content = current_content.AddDays(1);
+                                                        }
+                                                    </div>
+
+
+                                                </div>
+                                                <div id="modOrderSuccess" class="modal" tabindex="-1" role="dialog">
+                                                    <div class="modal-dialog" role="document">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header">
+                                                                <h5 class="modal-title">@Localizer["Message"]</h5>
+                                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                                    <span aria-hidden="true">&times;</span>
+                                                                </button>
+                                                            </div>
+                                                            <div class="modal-body">
+                                                                @*<p>@Localizer["OrderAccepted"]</p>*@
+                                                                <p>@Localizer["OrdeAcceptedDetail"]</p>
+
+                                                            </div>
+                                                            <div class="modal-footer">
+
+                                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">@Localizer["Close"]</button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div id="modOrderFailOutDate" class="modal" tabindex="-1" role="dialog">
+                                                    <div class="modal-dialog" role="document">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header">
+                                                                <h5 class="modal-title">@Localizer["Message"]</h5>
+                                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                                    <span aria-hidden="true">&times;</span>
+                                                                </button>
+                                                            </div>
+                                                            <div class="modal-body">
+                                                                <p>@Localizer["OrderNotAccepted"]</p>
+                                                                <p>@Localizer["OrderNotAcceptedOutDate"]</p>
+
+                                                            </div>
+                                                            <div class="modal-footer">
+
+                                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">@Localizer["Close"]</button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div id="modOrderEmpty" class="modal" tabindex="-1" role="dialog">
+                                                    <div class="modal-dialog" role="document">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header">
+                                                                <h5 class="modal-title">@Localizer["Message"]</h5>
+                                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                                    <span aria-hidden="true">&times;</span>
+                                                                </button>
+                                                            </div>
+                                                            <div class="modal-body">
+                                                                <p>@Localizer["OrderNotAccepted"]</p>
+                                                                <p>@Localizer["OrderEmpty"]</p>
+
+                                                            </div>
+                                                            <div class="modal-footer">
+
+                                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">@Localizer["Close"]</button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div id="modOrderNoMoney" class="modal" tabindex="-1" role="dialog">
+                                                    <div class="modal-dialog" role="document">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header">
+                                                                <h5 class="modal-title">@Localizer["Message"]</h5>
+                                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                                    <span aria-hidden="true">&times;</span>
+                                                                </button>
+                                                            </div>
+                                                            <div class="modal-body">
+                                                                <p>@Localizer["OrderNotAccepted"]</p>
+                                                                <p>@Localizer["NoMoney"]</p>
+
+                                                            </div>
+                                                            <div class="modal-footer">
+
+                                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">@Localizer["Close"]</button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div id="deleteOrder" class="modal">
+                                                    <div id="dialogContent" class="modal-dialog">
+                                                    </div>
+                                                </div>
+                                                <div id="editOrder" class="modal">
+                                                    <div id="editdialogContent" class="modal-dialog">
+                                                    </div>
+                                                </div>
+                                                <div id="OrderWeekDetails" class="modal" role="dialog">
+                                                    <div id="dialogOrderWeek" class="modal-dialog modal-lg" style="max-width: 966px">
+
+
+                                                        <div class="modal-content col-lg-12 col-12 px-0">
+                                                            <div class="modal-header align-items-center col-12 pl-0 pl-lg-3 pl-md-3 pr-0" style="padding-top:20px">
+                                                                <h5 class="modal-title px-3 px-lg-3 px-md-3 " id="exampleModalLabel"
+                                                                    style="font-size: 34px; line-height: 40px; font-weight: bold">
+                                                                    @Localizer["GetWeekInfo"]
+                                                                </h5>
+                                                                <button type="button" class="close mr-3" data-dismiss="modal" aria-label="Close">
+                                                                    <img src="../img/close-modal.svg" aria-hidden="true" alt="">
+                                                                </button>
+                                                            </div>
+                                                            @*<div class="modal-header">
+                                                                    <button class="btn btn-primary sendWeek">@Localizer["SendEmail"]</button>
+                                                                    <button class="close" data-dismiss="modal" area-hidden="true">
+                                                                        <span aria-hidden="true">&times;</span>
+                                                                    </button>
+
+                                                                </div>*@
+
+                                                            @*<div class=" modal-body details-content  col-auto p-0 mt-2 ">
+
+                                                                </div>*@
+                                                            <div class="modal-footer details-content justify-content-center border-0"
+                                                                 style="font-size: 14px; font-weight: bold; line-height: 16px; padding: 40px 0 58px">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div id="modOrderFail" class="modal" tabindex="-1" role="dialog">
+                                                    <div class="modal-dialog" role="document">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header">
+                                                                <h5 class="modal-title">@Localizer["Message"]</h5>
+                                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                                    <span aria-hidden="true">&times;</span>
+                                                                </button>
+                                                            </div>
+                                                            <div class="modal-body">
+                                                                <p>@Localizer["OrderNotAccepted"]</p>
+                                                                <p>@Localizer["InternalError"]</p>
+
+                                                            </div>
+                                                            <div class="modal-footer">
+
+                                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">@Localizer["Close"]</button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div id="modOrderDbError" class="modal" tabindex="-1" role="dialog">
+                                                    <div class="modal-dialog" role="document">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header">
+                                                                <h5 class="modal-title">@Localizer["Message"]</h5>
+                                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                                    <span aria-hidden="true">&times;</span>
+                                                                </button>
+                                                            </div>
+                                                            <div class="modal-body">
+                                                                <p>@Localizer["DbError"]</p>
+                                                                <p>@Localizer["InternalError"]</p>
+
+                                                            </div>
+                                                            <div class="modal-footer">
+
+                                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">@Localizer["Close"]</button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="modal d-md-none d-lg-none" id="dish-stock" tabindex="-1" role="dialog"
+                                                     aria-labelledby="exampleModalLabel" aria-modal="true" style="margin-top: 100px">
+                                                    <div class="modal-dialog" style="max-width: 966px">
+                                                        <div class="modal-content col-lg-12 col-12">
+                                                            <div class="modal-header align-items-center col-12 px-0 px-md-3 px-lg-3" style="padding-top:20px">
+                                                                <h5 class="modal-title p-0" id="name-of-dish"
+                                                                    style="font-size: 34px; line-height: 40px; font-weight: bold">
+                                                                    Склад
+                                                                </h5>
+                                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                                    <img src="../img/close-modal.svg" aria-hidden="true" alt="">
+                                                                </button>
+                                                            </div>
+                                                            <div class="modal-body col-auto p-0 mt-2 d-flex flex-column">
+                                                                <div class="col-12 p-0 d-flex flex-lg-row flex-md-row align-items-md-center align-items-lg-center align-items-start pb-lg-2 pb-md-2 pb-3">
+                                                                    <div class="col-lg-2 col-md-2 col-3 px-0">
+                                                                        <img class="modal-dish-item-image" src="#" alt="Image week dish"
+                                                                             style="width: inherit; ">
+                                                                    </div>
+                                                                    <div class="col-lg-10 p-0 pl-2 col-md-10 col-9 d-flex flex-lg-row flex-md-row flex-column align-items-lg-center align-items-md-center align-items-start justify-content-start">
+                                                                        <div class="col-lg-2 col-md-2 col-12 px-md-0 px-lg-0 bolder-change modal-dish-item-name"
+                                                                             style="font-size: 16px;"> </div>
+                                                                        <div class="col-5 d-lg-block d-md-block d-none pr-3" style="font-size: 16px;">
+                                                                            <div class="pl-4 "></div>
+                                                                        </div>
+                                                                        <div class="col-lg-2 col-md-2 col-12 d-flex justify-content-lg-start justify-content-md-start lighter-change"
+                                                                             style="font-family: Open-Sans, sans-serif; font-size: 16px;">
+                                                                            <span class="modal-dish-item-readyweight"></span>
+                                                                            <span class="d-inline d-md-none d-lg-none"></span>
+                                                                            <span class="d-inline d-md-none d-lg-none"></span>
+                                                                        </div>
+                                                                        <div class="col-lg-2 col-md-2 col-12 justify-content-center d-lg-flex d-none d-md-flex"
+                                                                             style="font-family: Open-Sans, sans-serif; font-size: 16px;">
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-12 p-0"><p style="font-style: normal; font-weight: normal; font-size: 16px; color: #232323" class="modal-dish-item-description"></p></div>
+
+                                                            </div>
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+                                                @*
+                                                    <div id="modPayment" class="modal" tabindex="-1" role="dialog">
+                                                        <div class="modal-dialog" role="document">
+                                                            <div class="modal-content">
+                                                                <div class="modal-header">
+                                                                    <h5 class="modal-title">Сплата LiqPay</h5>
+                                                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                                        <span aria-hidden="true">&times;</span>
+                                                                    </button>
+                                                                </div>
+                                                                <form method="POST" class="payment-form" action="https://www.liqpay.ua/api/3/checkout" accept-charset="utf-8">
+                                                                    <input type="hidden" name="data" value="eyJwdWJsaWNfa2V5IjoiaTAwMDAwMDAwIiwidmVyc2lvbiI6IjMiLCJhY3Rpb24iOiJwYXkiLCJhbW91bnQiOiIzIiwiY3VycmVuY3kiOiJVQUgiLCJkZXNjcmlwdGlvbiI6InRlc3QiLCJvcmRlcl9pZCI6IjAwMDAwMSJ9" />
+                                                                    <input type="hidden" name="signature" value="wR+UZDC4jjeL/qUOvIsofIWpZh8=" />
+                                                                    <label for="numorder" class="control-label">Code</label>
+                                                                    <input type="text" name="amount" id="numorder" class="form-control" />
+                                                                    <p />
+                                                                    <label for="amount" class="control-label">Сума ₴</label>
+                                                                    <input type="number" name="amount" id="amount" class="form-control" />
+                                                                    <p />
+                                                                    <input type="image" src="//static.liqpay.ua/buttons/p1ru.radius.png" />
+                                                                </form>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                *@
+                                            }
+                                            else
+                                            {
+
+
+
+                                                <h2 class="text-center">@Localizer["OrderTitle"]</h2>
+                                                <select class="form-control col-10 col-lg-8 col-md-8 complex-dishkind"
+                                                        asp-items="ViewBag.DishKindId" id="dishKind"
+                                                        style="height: 34px; border: 1px solid #ced4da; border-radius: 4px">
+                                                </select>
+                                                <div class="container">
+
+                                                    <div class="row  justify-content-center">
+                                                        <div class="col input-group justify-content-centers">
+                                                            <div class="input-group-prepend dayselector dayselectback">
+                                                                <span><i class="fa fa-angle-double-left input-group-text"></i></span>
+
+                                                            </div>
+
+                                                            <input type="hidden" asp-for="@ms_since1970" id="currentdate" />
+                                                            <div id="weekselector" class="weekselector">
+
+                                                            </div>
+
+
+                                                            <div class="input-group-append dayselector  dayselectforward">
+                                                                <span><i class="fa fa-angle-double-right input-group-text"></i></span>
+
+                                                            </div>
+                                                        </div>
+                                                        <div class="col ">
+                                                            <button class="getDetails btn btn-primary"> @Localizer["GetWeekInfo"]</button>
+
+                                                        </div>
+                                                    </div>
+                                                    <div class="row" style="height:10px">
+
+                                                    </div>
+
+                                                </div>
+                                                <nav>
+                                                    <div class="nav nav-tabs" id="nav-tab" role="tablist">
+
+                                                        @{
+                                                            DateTime current_head = daydate.StartOfWeek(DayOfWeek.Monday);
+
+                                                        }
+                                                        @for (int i = 0; i < 7; i++)
+                                                        {
+
+                                                            <a class="nav-item nav-link nav-day @(i == (int)daydate.DayOfWeek ? " active" : "") @(udrepo.IsAllowDayEdit(current_head, User.GetHotelID()) ? "" : "day-closed")" id="nav-tab-@i" data-toggle="tab" href="#nav-content-@i" role="tab" aria-controls="nav-content-@i" aria-selected="false">
+                                                                @if (i == 6)
+                                                                {
+                                                                    @System.Globalization.CultureInfo.CurrentUICulture.DateTimeFormat.GetDayName((DayOfWeek)0)<br />
+                                                                }
+                                                                else
+                                                                {
+                                                                    @System.Globalization.CultureInfo.CurrentUICulture.DateTimeFormat.GetDayName((DayOfWeek)i + 1)<br />
+                                                                }
+                                                                <span class="shorttabdate">@current_head.Day</span>
+                                                            </a>
+
+                                                            current_head = current_head.AddDays(1);
+                                                        }
+                                                    </div>
+                                                </nav>
+                                                <div class="tab-content day-content" id="nav-tabContent">
+                                                    @{
+                                                        DateTime current_content = daydate.StartOfWeek(DayOfWeek.Monday);
+                                                    }
+                                                    @for (int i = 0; i < 7; i++)
+                                                    {
+                                                        <div class="tab-pane fade@(i == (int)daydate.DayOfWeek ? "  show active" : "")" id="nav-content-@i" role="tabpanel" data-dayindex="@i" aria-labelledby="nav-tab-@i">
+                                                            @if (!udrepo.IsAllowDayEdit(current_content, User.GetHotelID()))
+                                                            {
+                                                                <div class="container day-closed-msg">
+                                                                    <h3> @Localizer["DayClosedForOrder"] </h3>
+                                                                </div>
+                                                            }
+                                                            @await Component.InvokeAsync("UserDayOrderedComponent", current_content)
+                                                            @*@if (Model.ShowComplex)
+                                                                {
+                                                                    @await Component.InvokeAsync("UserDayComplexComponent", new DayMenu() { Date = current_content, DishKind = 0 })
+                                                                }*@
+                                                            @if (Model.ShowDishes)
+                                                            {
+                                                                @await Component.InvokeAsync("UserDayDishComponent", current_content)
+                                                            }
+
+                                                        </div>
+
+                                                        current_content = current_content.AddDays(1);
+                                                    }
+                                                </div>
+                                                <div id="modOrderSuccess" class="modal" tabindex="-1" role="dialog">
+                                                    <div class="modal-dialog" role="document">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header">
+                                                                <h5 class="modal-title">@Localizer["Message"]</h5>
+                                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                                    <span aria-hidden="true">&times;</span>
+                                                                </button>
+                                                            </div>
+                                                            <div class="modal-body">
+                                                                @*<p>@Localizer["OrderAccepted"]</p>*@
+                                                                <p>@Localizer["OrdeAcceptedDetail"]</p>
+
+                                                            </div>
+                                                            <div class="modal-footer">
+
+                                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">@Localizer["Close"]</button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div id="modOrderFailOutDate" class="modal" tabindex="-1" role="dialog">
+                                                    <div class="modal-dialog" role="document">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header">
+                                                                <h5 class="modal-title">@Localizer["Message"]</h5>
+                                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                                    <span aria-hidden="true">&times;</span>
+                                                                </button>
+                                                            </div>
+                                                            <div class="modal-body">
+                                                                <p>@Localizer["OrderNotAccepted"]</p>
+                                                                <p>@Localizer["OrderNotAcceptedOutDate"]</p>
+
+                                                            </div>
+                                                            <div class="modal-footer">
+
+                                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">@Localizer["Close"]</button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div id="modOrderEmpty" class="modal" tabindex="-1" role="dialog">
+                                                    <div class="modal-dialog" role="document">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header">
+                                                                <h5 class="modal-title">@Localizer["Message"]</h5>
+                                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                                    <span aria-hidden="true">&times;</span>
+                                                                </button>
+                                                            </div>
+                                                            <div class="modal-body">
+                                                                <p>@Localizer["OrderNotAccepted"]</p>
+                                                                <p>@Localizer["OrderEmpty"]</p>
+
+                                                            </div>
+                                                            <div class="modal-footer">
+
+                                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">@Localizer["Close"]</button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div id="deleteOrder" class="modal">
+                                                    <div id="dialogContent" class="modal-dialog">
+                                                    </div>
+                                                </div>
+                                                <div id="editOrder" class="modal">
+                                                    <div id="editdialogContent" class="modal-dialog">
+                                                    </div>
+                                                </div>
+                                                <div id="OrderWeekDetails" class="modal" role="dialog">
+                                                    <div id="dialogOrderWeek" class="modal-dialog modal-lg" style="max-width: 966px">
+
+
+                                                        <div class="modal-content col-lg-12 col-12 px-0">
+                                                            <div class="modal-header align-items-center col-12 pl-0 pl-lg-3 pl-md-3 pr-0" style="padding-top:20px">
+                                                                <h5 class="modal-title px-3 px-lg-3 px-md-3 " id="exampleModalLabel"
+                                                                    style="font-size: 34px; line-height: 40px; font-weight: bold">
+                                                                    @Localizer["GetWeekInfo"]
+                                                                </h5>
+                                                                <button type="button" class="close mr-3" data-dismiss="modal" aria-label="Close">
+                                                                    <img src="../img/close-modal.svg" aria-hidden="true" alt="">
+                                                                </button>
+                                                            </div>
+                                                            @*<div class="modal-header">
+                                                                    <button class="btn btn-primary sendWeek">@Localizer["SendEmail"]</button>
+                                                                    <button class="close" data-dismiss="modal" area-hidden="true">
+                                                                        <span aria-hidden="true">&times;</span>
+                                                                    </button>
+
+                                                                </div>*@
+
+                                                            @*<div class=" modal-body details-content  col-auto p-0 mt-2 ">
+
+                                                                </div>*@
+                                                            <div class="modal-footer details-content justify-content-center border-0"
+                                                                 style="font-size: 14px; font-weight: bold; line-height: 16px; padding: 40px 0 58px">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div id="modOrderFail" class="modal" tabindex="-1" role="dialog">
+                                                    <div class="modal-dialog" role="document">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header">
+                                                                <h5 class="modal-title">@Localizer["Message"]</h5>
+                                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                                    <span aria-hidden="true">&times;</span>
+                                                                </button>
+                                                            </div>
+                                                            <div class="modal-body">
+                                                                <p>@Localizer["OrderNotAccepted"]</p>
+                                                                <p>@Localizer["InternalError"]</p>
+
+                                                            </div>
+                                                            <div class="modal-footer">
+
+                                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">@Localizer["Close"]</button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div id="modOrderDbError" class="modal" tabindex="-1" role="dialog">
+                                                    <div class="modal-dialog" role="document">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header">
+                                                                <h5 class="modal-title">@Localizer["Message"]</h5>
+                                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                                    <span aria-hidden="true">&times;</span>
+                                                                </button>
+                                                            </div>
+                                                            <div class="modal-body">
+                                                                <p>@Localizer["DbError"]</p>
+                                                                <p>@Localizer["InternalError"]</p>
+
+                                                            </div>
+                                                            <div class="modal-footer">
+
+                                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">@Localizer["Close"]</button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div id="modPayment" class="modal" tabindex="-1" role="dialog">
+                                                    <div class="modal-dialog" role="document">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header">
+                                                                <h5 class="modal-title">Сплата LiqPay</h5>
+                                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                                    <span aria-hidden="true">&times;</span>
+                                                                </button>
+                                                            </div>
+                                                            <form method="POST" class="payment-form" action="https://www.liqpay.ua/api/3/checkout" accept-charset="utf-8">
+                                                                <input type="hidden" name="data" value="eyJwdWJsaWNfa2V5IjoiaTAwMDAwMDAwIiwidmVyc2lvbiI6IjMiLCJhY3Rpb24iOiJwYXkiLCJhbW91bnQiOiIzIiwiY3VycmVuY3kiOiJVQUgiLCJkZXNjcmlwdGlvbiI6InRlc3QiLCJvcmRlcl9pZCI6IjAwMDAwMSJ9" />
+                                                                <input type="hidden" name="signature" value="wR+UZDC4jjeL/qUOvIsofIWpZh8=" />
+                                                                <label for="numorder" class="control-label">Code</label>
+                                                                <input type="text" name="amount" id="numorder" class="form-control" />
+                                                                <p />
+                                                                <label for="amount" class="control-label">Сума ₴</label>
+                                                                <input type="number" name="amount" id="amount" class="form-control" />
+                                                                <p />
+                                                                <input type="image" src="//static.liqpay.ua/buttons/p1ru.radius.png" />
+                                                            </form>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            }
+@section Scripts {
+
+    <script type="text/javascript" src="~/js/bootstrap-input-spinner.js" defer></script>
+
+    <script>
+        $(function () {
+
+            $("input.numberspinner[type='number']").inputSpinner();
+           // $("#weekselected").inputSpinner();
+            var html_loading = gethtmlloading();//'<div class="spinner-container"> <div>Loading</div><div class="spinner-border" role="status"> <span class="sr-only">Loading...</span> </div></div>';
+
+            var reloadDay = function (dayindex,callback) {
+                var ms = parseInt($('#currentdate').val());
+                var dt = new Date(ms);
+                dt.setDate(dt.getDate() - dt.getDay() + dayindex+1);
+                var navcontent = $('#nav-content-' + dayindex);
+                navcontent.html(html_loading);
+                var dishKind = $("#dishKind").val();
+                if (dishKind==null) {
+                    dishKind = 1;
+                }
+                //navcontent.load('/UserDayDishes/EditUserDay?daydate=' + encodeURI(dt.toDateString());
+                navcontent.load('/UserDayDishes/EditUserDay?daydate=' + encodeURI(dt.toDateString() + "&dishKind=" + encodeURI(dishKind.toString())),
+                    function (response, status, xhr) {
+                        navcontent.find("input.numberspinner[type='number']").inputSpinner();
+                        setClosedDaystyle(dayindex);
+                        if (callback)
+                            callback();
+                    }
+                    );
+                var daytabtext = dateToshortString(dt);
+               // daytabtext = ""+dt.getDate();
+                $('#nav-tab-' + dayindex).find('.shorttabdate').text(daytabtext);
+                daytabtext = "" + dt.getDate();
+                $('#nav-tab-' + dayindex).find('.date-day').text(daytabtext);
+
+                // $('#collapse' + dayindex).html(html_loading);
+                // $('#collapse' + dayindex).load('/UserDayDishes/EditUserDayComponent?daydate=' + encodeURI(dt.toDateString()));
+            }
+            var currentDate = () => {
+                var ms = parseInt($('#currentdate').val());
+                var dt = new Date(ms);
+                return dt;
+            };
+            var firstWeekDayDate = () => {
+                var first = currentDate();
+                first.setDate(first.getDate() - first.getDay());
+                return first;
+            }
+            var setClosedDaystyle = function (dayindex ) {
+
+
+                var navcontent = $('#nav-content-' + dayindex);
+                if (navcontent.find(".day-closed-msg").length > 0) {
+                    $('#nav-tab-' + dayindex).addClass("day-closed");
+                }
+                else {
+                    $('#nav-tab-' + dayindex).removeClass("day-closed");
+                }
+
+
+            }
+            var dateToshortString = (dt) => {
+                var dd = dt.getDate();
+                var mm = dt.getMonth() + 1;
+                if (dd < 10) { dd = '0' + dd }
+                if (mm < 10) { mm = '0' + mm }
+                var yyyy = dt.getFullYear();
+                return dd + '.' + mm + '.' + yyyy;
+            }
+            var weektext = function () {
+                var ms = parseInt($('#currentdate').val());
+                var dt = new Date(ms);
+                var firstweekday = new Date(dt.getTime());
+                var lasttweekday = new Date(dt.getTime());
+                firstweekday.setDate(dt.getDate() - dt.getDay()+1);
+                lasttweekday.setDate(dt.getDate() + (7 - dt.getDay()));
+                var locale = "@cultureCurrent.Name";
+                var res = firstweekday.getDate();
+                res += " - ";
+                res += lasttweekday.getDate();
+                res += "  ";
+                res += lasttweekday.toLocaleString(locale, { month: "long" });
+                res += " "+lasttweekday.getFullYear();
+                return res;
+                //return firstweekday.toLocaleDateString() + " - " + lasttweekday.toLocaleDateString();
+
+            }
+            var calctotal = (tab, dayindex) => {
+                // var daytab = $('#nav-tabContent').find('[data-dayindex=' + dayindex + ']');
+                var totalQuantity = 0;
+                var totalAmount = 0.0;
+                var totalcomplexQuantity = 0;
+                var totalcomplexAmount = 0.0;
+                $(tab).find('[datafield="Quantity"]').each(function (idx, element) {
+                    var quantity = Number.parseInt($(element).val());
+                    var parentform = $(element).parents('[data-form="userdaydish"]');
+                    var price = Number.parseFloat(parentform.find('[datafield="Price"]').val());
+                    if (!isNaN(price)) {
+                        totalQuantity += quantity;
+                        totalAmount += quantity * price;
+                    }
+                    var parentformcomplex = $(element).parents('[data-form="userdaycomplex"]');
+                    var pricecomplex = Number.parseFloat(parentformcomplex.find('[datafield="Price"]').val());
+                    if (!isNaN(pricecomplex)) {
+                        totalcomplexQuantity += quantity;
+                        totalcomplexAmount += quantity * pricecomplex;
+                    }
+                });
+
+                $(tab).find(".total-quantity").text(totalQuantity);
+                $(tab).find(".total-amount").text(totalAmount.toFixed(2));
+                $(tab).find(".totalcomplex-quantity").text(totalcomplexQuantity);
+                $(tab).find(".totalcomplex-amount").text(totalcomplexAmount.toFixed(2));
+            };
+
+            $(document).on('change', "input.numberspinner[type='number']", function (event) {
+                var parenttab = $(this).parents('.tab-pane');
+                var dayindex = Number.parseInt(parenttab.attr('data-dayindex'));
+                calctotal(parenttab, dayindex);
+            })
+            $('#weekselector').text(weektext());
+            $('#weekselected').text(weektext());
+            var incrementday = function (d) {
+                var ms = parseInt($('#currentdate').val());
+                var dt = new Date(ms);
+                //console.log("before" + dt);
+                dt.setDate(dt.getDate() + d);
+                //console.log("after" + dt);
+                $('#currentdate').val(dt.getTime());
+                $('#weekselector').text(weektext());
+                $('#weekselected').text(weektext());
+                //for (var i = 0; i < 7; i++)
+               //    reloadDay(i);
+
+                var index = parseInt($(".nav-day.active").attr("data-i"));
+                var start = 0
+                var cb = function() {
+                    if (start < 7) {
+                        //start++;
+                        //reloadDay(start, cb);
+                        if (index == start) {
+                            if (start == 6) {
+                                return;
+                            }
+                            start++;
+                        }
+                        reloadDay(start, cb);
+                        start++;
+                    }
+                }
+                if (d != 0) {
+                    var dishKind = $(".select-dishesKind");
+                    var dishKindVal = $("#dishKind").val();
+                    if (dishKindVal == null) {
+                        dishKindVal = 0;
+                    }
+                    dishKind.empty();
+
+                    dt.setDate(dt.getDate() - dt.getDay() + 1);
+                   console.log("day" + dt);
+                    dishKind.load('/UserDayDishes/GetDishesKind?daydate=' + encodeURI(dt.toDateString()) + "&dishKind=" + encodeURI(dishKindVal.toString()),
+                        function (response, status, xhr) {
+                            var select = $(".custom-select");
+                            //if (dishKindVal != 0) {
+
+                            //}
+                            $(".drpdown-btn-type").each(function () {
+                                if ($(this).val() == dishKindVal) {
+                                    $(select).val(dishKindVal);
+                                }
+                            });
+
+                            setupDishKinds();
+                            reloadDay(index, cb);
+                        }
+                    );
+                } else {
+
+                    reloadDay(index, cb);
+                }
+                setClosedDaystyle();
+            }
+            $('.dayselectback').click((e) => {
+                e.preventDefault();
+                incrementday(-7);
+            });
+            $('.dayselectforward').click((e) => {
+                e.preventDefault();
+                incrementday(7);
+            });
+            setupDishKinds();
+            incrementday(0);
+            var showOrderResult = function (data) {
+                if (!data || !data.res) {
+                    $('#modOrderFail').modal('show');
+                    return;
+                }
+                if (data.res == "FAIL" && data.reason == "OutDate") {
+                    $('#modOrderFailOutDate').modal('show');
+                    return;
+                }
+                 if (data.res == "FAIL" && data.reason == "Empty") {
+                    $('#modOrderEmpty').modal('show');
+                    return;
+                }
+                if (data.res == "FAIL" && (data.reason == "Deleting in db" | data.reason == "Adding to db")) {
+                    $('#modOrderDbError').modal('show');
+                    return;
+                }
+                if (data.res == "FAIL" && data.reason == "Not enough money") {
+                    $('#modOrderNoMoney').modal('show');
+                    return;
+                }
+                if (data.res == "OK" ) {
+                    $('#modOrderSuccess').modal('show');
+                    return;
+                }
+
+                $('#modOrderFail').modal('show');
+            }
+            $(document).on('click', '[data-action="saveuserday"]', function (event) {
+                event.preventDefault();
+                var divform = $(this).parents(".userdaydish").find('[data-form="userday"]');
+                var daydishes = [];
+                divform.find('[data-form="userdaydish"]').each(function (index, day) { //each day
+                    var daydish = {}
+                    $(day).find('[datafield]').each(function (idx, element) {
+                        daydish[$(element).attr("datafield")] = $(element).val();
+                    })
+                    daydishes.push(daydish)
+                });
+
+                $.ajax({
+                    type: "POST",
+                    data: res = { daydishes },
+
+                    url: "/UserDayDishes/SaveDay",
+                    success: function (data) {
+                        // alert(data);
+                       // $('#modOrderSuccess').modal('show');
+                        showOrderResult(data);
+                    }
+                });
+            });
+             $(document).on('click', '[data-action="saveuserdaycomplex"]', function (event) {
+                event.preventDefault();
+                var divform = $(this).parents(".userdaycomplex").find('[data-form="userdaycomplex"]');
+                var daycomplexes = [];
+                divform.find('[data-form="userdaycomplexitem"]').each(function (index, day) { //each day
+                    var daydish = {}
+                    $(day).find('[datafield]').each(function (idx, element) {
+                        daydish[$(element).attr("datafield")] = $(element).val();
+                    })
+                    daycomplexes.push(daydish)
+                });
+
+                $.ajax({
+                    type: "POST",
+                    data: res = { daycomplexes },
+
+                    url: "/UserDayDishes/SaveDayComplex",
+                    success: function (data) {
+                        // alert(data);
+                       // $('#modOrderSuccess').modal('show');
+                         showOrderResult(data);
+                    }
+                });
+            });
+            $(document).on('click', '[data-action="payuserday"]', function (event) {
+                event.preventDefault();
+                var divform = $(this).parents(".userdaydish").find('[data-form="userday"]');
+                var daydishes = [];
+                var amount = 0.0
+                divform.find('[data-form="userdaydish"]').each(function (index, day) { //each day
+                    var daydish = {}
+                    $(day).find('[datafield]').each(function (idx, element) {
+                        daydish[$(element).attr("datafield")] = $(element).val();
+                    })
+                    daydishes.push(daydish)
+                    amount += Number.parseFloat(daydish.Price) * Number.parseFloat(daydish.Quantity);
+                });
+                $('#modPayment').find('#amount').val(amount);
+                $('#modPayment').find('#numorder').val('xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx');
+                $('#modPayment').modal('show');
+            })
+            //roll up shoping cart
+            $(document).on('click', ".show-details", function () {
+                $(this).parent(".dayComplexBag").parent(".userDayComplexBag").children(".bagDayComplexItem").slideToggle(300);
+            });
+
+
+            $(document).on('change', ".dish-quantity", function () {
+                const multi = 1000;
+                var val = parseInt($(this).val() * multi);
+                var step = parseInt($(this).attr("step") * multi);
+                //console.log("val % step="+val % step);
+                //console.log("val=" + val);
+                //console.log("step=" + step);
+                if (val % step !=0) {
+                    $(this).val((val - (val % step)) / multi);
+                    }
+            });
+            //delete ordered complex
+
+            $(document).on('click', '.delete-complex', function (event) {
+               // console.log("Delete");
+
+                var com = $(this).attr("complexId");
+                var date = $(this).attr("date");
+                var quan = $(this).attr("quantity");
+                var UserDayComplex = { ComplexId: com, Date: date, Quantity: quan };
+                $.ajax({
+                    type: "POST",
+                    data: res = { UserDayComplex },
+
+                    url: "/UserDayDishes/DeleteCom",
+                    success: function (data) {
+                        //console.log(data);
+                        $("#dialogContent").html(data);
+                        $("#deleteOrder").modal('show');
+
+                    }
+                });
+
+
+
+            });
+            $(document).on('click', '.delete-Ordcomplex', function (event) {
+               // console.log("Post");
+                $(this).css({
+                    "cursor": "wait",
+                    "pointer-events": "none"
+                });
+                var form = $("#deleteOrd");
+                $.ajax({
+                    url: '/UserDayDishes/DeleteDayComplex',
+                    type: 'post',
+                    dataType: 'json',
+                    data: form.serialize(),
+                    success: function (data) {
+                        $("#deleteOrder").modal('hide');
+                        $("#dialogContent").empty();
+                        if (data.res == "OK") {
+                            incrementday(0);
+                            return;
+                        }
+                        showOrderResult(data);
+
+                    }
+                });
+
+            });
+            //delete ordered dish
+
+            $(document).on('click', '.delete-dish', function (event) {
+                // console.log("Delete");
+
+                var dish = $(this).attr("dishId");
+                var category = $(this).attr("categoryId");
+                var dishKind = $(this).attr("dishKindId");
+                var date = $(this).attr("date");
+                var quan = $(this).attr("quantity");
+                var UserDayDish = { DishId: dish, CategoriesId: category, DishKindId: dishKind, Date: date, Quantity: quan };
+                $.ajax({
+                    type: "POST",
+                    data: res = { UserDayDish },
+
+                    url: "/UserDayDishes/DeleteDish",
+                    success: function (data) {
+                        //console.log(data);
+                        $("#dialogContent").html(data);
+                        $("#deleteOrder").modal('show');
+
+                    }
+                });
+
+
+
+            });
+            $(document).on('click', '.delete-OrdDish', function (event) {
+                // console.log("Post");
+                $(this).css({
+                    "cursor": "wait",
+                    "pointer-events": "none"
+                });
+                var form = $("#deleteOrd");
+                $.ajax({
+                    url: '/UserDayDishes/DeleteDayDish',
+                    type: 'post',
+                    dataType: 'json',
+                    data: form.serialize(),
+                    success: function (data) {
+                        $("#deleteOrder").modal('hide');
+                        $("#dialogContent").empty();
+                        if (data.res == "OK") {
+                            incrementday(0);
+                            return;
+                        }
+                        showOrderResult(data);
+
+                    }
+                });
+
+            });
+            //edit ordered complex
+            $(document).on('click', '.edit-complex', function (event) {
+                // console.log("Delete");
+
+                var com = $(this).attr("complexId");
+                var date = $(this).attr("date");
+                var quan = $(this).attr("quantity");
+                var UserDayComplex = { ComplexId: com, Date: date, Quantity: quan };
+                $.ajax({
+                    type: "POST",
+                    data: res = { UserDayComplex },
+
+                    url: "/UserDayDishes/EditCom",
+                    success: function (data) {
+                        //console.log(data);
+                        $("#editdialogContent").html(data);
+                        $("#editOrder").modal('show');
+
+                    }
+                });
+
+
+
+            });
+            $(document).on('click', '.edit-Ordcomplex', function (event) {
+                // console.log("Post");
+                $(this).css({
+                    "cursor": "wait",
+                    "pointer-events": "none"
+                });
+                var form = $("#editOrd");
+                $.ajax({
+                    url: '/UserDayDishes/EditDayComplex',
+                    type: 'post',
+                    dataType: 'json',
+                    data: form.serialize(),
+                    success: function (data) {
+                        $("#editOrder").modal('hide');
+                        $("#editdialogContent").empty();
+                        if (data.res == "OK") {
+                            incrementday(0);
+                            return;
+                        }
+                        showOrderResult(data);
+
+                    }
+                });
+
+            });
+            //edit ordered Dish
+            $(document).on('click', '.edit-dish', function (event) {
+                // console.log("Delete");
+
+                var dish = $(this).attr("dishId");
+                var category = $(this).attr("categoryId");
+                var dishKind = $(this).attr("dishKindId");
+                var date = $(this).attr("date");
+                var quan = $(this).attr("quantity");
+                var UserDayDish = { DishId: dish, CategoriesId: category, DishKindId: dishKind, Date: date, Quantity: quan };
+                $.ajax({
+                    type: "POST",
+                    data: res = { UserDayDish },
+
+                    url: "/UserDayDishes/EditDish",
+                    success: function (data) {
+                        //console.log(data);
+                        $("#editdialogContent").html(data);
+                        $("#editOrder").modal('show');
+
+                    }
+                });
+
+
+
+            });
+            $(document).on('click', '.edit-OrdDish', function (event) {
+                // console.log("Post");
+                $(this).css({
+                    "cursor": "wait",
+                    "pointer-events": "none"
+                });
+                var form = $("#editOrd");
+                var flag = false;
+                var quan = $(form).find(".dish-quantity");
+
+                quan.each(function (i) {
+                    var value = parseFloat(($(this).val()));
+                    const multi = 1000;
+                    var val = parseInt($(this).val() * multi);
+                    var step = parseInt($(this).attr("step") * multi);
+                    if (value != 0 && $(this).attr("minWeight") > value) {
+                        dialog_error("@Localizer["Order must be bigger!"] " + $(this).attr("minWeight"));
+                        flag = true;
+                    }
+                    if (val % step!=0) {
+                        dialog_error("@Localizer["Order must be divided!"]");
+                        flag = true;
+                    }
+                    if (!flag) {
+                        var res = $(this).val().replace(".", ",");
+                        $(this).attr("type", "text");
+                        $(this).val(res);
+                    }
+
+                });
+                if (flag) {
+                     $(".sendDishes").html("@Localizer["MyOrdersSave"]").css({
+                    "cursor": "",
+                             "pointer-events": ""
+                         });
+                    return;
+                }
+
+                $.ajax({
+                    url: '/UserDayDishes/EditDayDish',
+                    type: 'post',
+                    dataType: 'json',
+                    data: form.serialize(),
+                    success: function (data) {
+                        $("#editOrder").modal('hide');
+                        $("#editdialogContent").empty();
+                        if (data.res == "OK") {
+                            incrementday(0);
+                            return;
+                        }
+                        showOrderResult(data);
+
+                    }
+                });
+
+            });
+            //get week details
+
+            $(document).on('click', '.getDetails', function (event) {
+                $("#OrderWeekDetails").modal('show');
+                //$(".details-content").html(html_loading);
+                $(".details-content").before(html_loading);
+                var ms = parseInt($('#currentdate').val());
+                var dt = new Date(ms);
+                dt.setDate(dt.getDate() - dt.getDay()+1);
+                //console.log(dt);
+                /*dt = dt.StartOfWeek(DayOfWeek.Sunday)*/;
+                $.ajax({
+                    url: '/UserDayDishes/GetWeekOrderDetails?day=' + encodeURI(dt.toDateString()),
+                    type: 'get',
+                    success: function (data) {
+                        //console.log(data);
+                        //$("#OrderWeekDetails").modal('show');
+                        //$(".details-content").html(data);
+                        $(".spinner-container").remove();
+                        $(".details-content").before(data);
+                        //showOrderResult(data);
+
+                    }
+
+                })
+                    .fail(function (xhr, code, error) {
+                        dialog_error(error);
+                       // console.log(error);
+                    });
+
+            });
+            $('#OrderWeekDetails').on('hide.bs.modal', function (e) {
+                $(".week-details").remove();
+            })
+            $(document).on('click', '.sendWeek', function (event) {
+                $(".details-content").before(html_loading);
+                var ms = parseInt($('#currentdate').val());
+                var dt = new Date(ms);
+                dt.setDate(dt.getDate() - dt.getDay()+1);
+                $(".details-content").html(html_loading);
+                $.ajax({
+                    url: '/UserDayDishes/SendWeekInvoice?day=' + encodeURI(dt.toDateString()),
+                    type: 'get',
+                    success: function (data) {
+                        $("#OrderWeekDetails").modal('hide');
+                        $(".spinner-container").remove();
+                        $(".details-content").empty();
+
+                            showOrderResult(data);
+
+                    }
+
+                })
+             });
+
+
+            //for one option menu
+
+            $(document).on('click', '.complex-check', function (event) {
+                if (!$(this).is(":checked")) {
+                    var day = $(this).attr("day");
+                    var com = $(this).attr("complex");
+                    var dishes = $("[complexdish='" + com + "'][day='" + day + "']");
+                    $(dishes).prop('checked', false);
+                }
+                else {
+                    var day = $(this).attr("day");
+                    var com = $(this).attr("complex");
+                    var dishes = $("[complexdish='" + com + "'][day='" + day + "']");
+                    var courses = [];
+                    $(dishes).each(function () {
+                        courses.push(parseInt($(this).attr("course")));
+                    });
+                   // console.log(courses);
+                    var max = Math.max.apply(Math,courses);
+                   // console.log(max);
+                    for (var i = 0; i <= max; i++) {
+                       //var dish = $("[complexdish='" + com + "'][day='" + day + "'][course='" + i + "']");
+                       // $(dish).prop('checked', true);
+                        var dish = $("[complexdish='" + com + "'][day='" + day + "'][course='" + i + "'][default=\'true\']");
+                        //console.log($(dish).attr('default'));
+                        if (dish.length == 0) {
+                            //console.log("in if");
+                            dish = $("[complexdish='" + com + "'][day='" + day + "'][course='" + i + "']");
+                        }
+                        $(dish).prop('checked', true);
+                    }
+                }
+            });
+
+            $(document).on('click', '.dish-check', function (event) {
+                if ($(this).is(":checked")) {
+                    var day = $(this).attr("day");
+                    var com = $(this).attr("complexdish");
+                    var chCourse = parseInt($(this).attr("course"));
+                    var complex = $("[complex='" + com + "'][day='" + day + "']");
+                    if (!$(complex).is(":checked")) {
+                        $(complex).prop('checked', true);
+
+                        var dishes = $("[complexdish='" + com + "'][day='" + day + "']");
+                        var courses = [];
+                        $(dishes).each(function () {
+                            courses.push(parseInt($(this).attr("course")));
+                        });
+                       // console.log(courses);
+                        var max = Math.max.apply(Math, courses);
+                        //console.log(max);
+                        for (var i = 0; i <= max; i++) {
+                            if (i == chCourse)
+                                continue;
+                            var dish = $("[complexdish='" + com + "'][day='" + day + "'][course='" + i + "'][default=\'true\']");
+                            //console.log($(dish).attr('default'));
+                            if (dish.length == 0) {
+                                //console.log("in if");
+                                dish = $("[complexdish='" + com + "'][day='" + day + "'][course='" + i + "']");
+                            }
+                            $(dish).prop('checked', true);
+                        }
+                    }
+                }
+            });
+
+            //post one day complex
+            $(document).on('click', '.send', function (event) {
+                if ($(this).css('cursor') == "wait") {
+                    return;
+                }
+                $(this).html("Обробка...").css({
+                    "cursor": "wait",
+                    "pointer-events": "none"
+                });
+
+                var fullDate = $(this).attr("date-fullDate");
+                var date = $(this).attr("data-date");
+                var form = $("#orderForm-" + date);
+                var complexes = $(form).find(".complex-check");
+                var UserDayDish = [];
+                var UserDayComplex = [];
+                var flag = true;
+                var categories = [];
+                //console.log(complexes);
+                $(complexes).each(function (ind) {
+                    //console.log($(this).is(":checked"));
+                    if ($(this).is(":checked")) {
+                        //console.log("In if");
+                        var com = $(this).attr("complex");
+                        var dishOrdered = 0;
+                        var dishCourses = 0;
+                        var complex = {};
+                        complex.ComplexId = com;
+                        complex.Price = $(this).attr("price");
+                        complex.Date = fullDate;
+                        complex.Quantity = 1;
+                        if (categories.indexOf($(this).attr("category")) > -1) {
+                            dialog_error("Не можна замовити 2 комплекси з однаковою категорією");
+                             $(".send").html("@Localizer["MyOrdersSave"]").css({
+                    "cursor": "",
+                    "pointer-events": ""
+                });
+                            flag = false;
+                            return;
+                        }
+                        categories.push($(this).attr("category"))
+                        UserDayComplex.push(complex);
+                        var dishes = $("[complexdish='" + com + "'][day='" + date + "']");
+                        $(dishes).each(function (i) {
+
+                            //console.log("Dish");
+                            var check = $(this).is(":checked");
+                            var comp = $(this).attr("complexdish");
+                            var dish = $(this).val();
+                            dishCourses = parseInt($(this).attr("course")) + 1;
+                            if (check) {
+                                dishOrdered++;
+                                var dishP = {};
+                                dishP.Quantity = 1;
+                                dishP.DishId = dish;
+                                dishP.Date = fullDate;
+                                dishP.ComplexId = comp;
+                                dishP.IsComplex = true;
+                                dishP.DishCourse = $(this).attr("course");
+                                UserDayDish.push(dishP);
+                            }
+                            // console.log(comp+"   "+dish + "   " + check);
+                        });
+
+                        if (dishOrdered != dishCourses) {
+                            //console.log(dishOrdered + "   " + dishCourses);
+                            alert("Please choose all dishes in complex");
+                            flag = false;
+                            return;
+                        }
+                    }
+                    //var com = $(this).attr("complex");
+                    //console.log(com + "  " + val);
+                });
+                if (flag) {
+                    //console.log(UserDayDish);
+                    //console.log(UserDayComplex);
+
+                    $.ajax({
+                        type: "POST",
+                        data: res = { UserDayDish, UserDayComplex },
+
+                        url: "/UserDayDishes/SaveDayComplex",
+                        success: function (data) {
+                            if (data.res != "OK") {
+                                showOrderResult(data);
+                            }
+                            incrementday(0);
+                        }
+                    }).fail(function (xhr, code, error) {
+                        $(".send").html("@Localizer["MyOrdersSave"]").css({
+                    "cursor": "",
+                    "pointer-events": ""
+                });
+                        dialog_error(error);
+                        // console.log(error);
+                    });
+                }
+
+
+            });
+            $(document).on("change", "#dishKind", function (e) {
+                incrementday(0);
+            });
+            //Design Fithches
+            $(document).on('click', '.hide-cart', function (event) {
+                var date = $(this).attr("data-date");
+                $('.cart-for-hide-' + date).toggleClass('d-flex');
+                $('.image-hide-cart-'+date).toggleClass('rotate-image-cart')
+            });
+            $(document).on("click", ".btn-for-type-menu", function () {
+                var dishKind = $(this).attr("value");
+                $(".btn-for-type-menu").each(function (e) {
+                    $(this).removeClass("btn-for-type-menu--active");
+                });
+                $(this).toggleClass("btn-for-type-menu--active");
+
+                var select = $(".custom-select-wrapper").find("select");
+                $(select).val(dishKind);
+                $(select).trigger("change");
+
+            });
+            function setupDishKinds() {
+                $('#dishKind').each(function () {
+                    let classes = $(this).attr("class"),
+                        id = $(this).attr("id"),
+                        name = $(this).attr("name");
+                    let template = '<div class="' + classes + '">';
+                    template += '<span class="custom-select-trigger">' + $(this).attr("placeholder") + '</span>';
+                    template += '<div class="custom-options">';
+                    $(this).find("option").each(function () {
+                        template += '<span class="custom-option ' + $(this).attr("class") + '" data-value="' + $(this).attr("value") + '">' + $(this).html() + '</span>';
+                    });
+                    template += '</div></div>';
+                    $(this).wrap('<div class="custom-select-wrapper d-block " ></div>');
+                   // $(this).wrap('<div class="custom-select-wrapper d-block d-lg-none d-md-none" ></div>');
+                    $(this).hide();
+                    $(this).after(template);
+                });
+                $(".custom-option:first-of-type").hover(function () {
+                    $(this).parents(".custom-options").addClass("option-hover");
+                }, function () {
+                    $(this).parents(".custom-options").removeClass("option-hover");
+                });
+                $(".custom-select-trigger").on("click", function () {
+                    $('html').one('click', function () {
+                        $(".custom-select").removeClass("opened");
+                    });
+                    $(this).parents(".custom-select").toggleClass("opened");
+                    event.stopPropagation();
+                });
+                $(".custom-option").on("click", function () {
+                    var cus = $(this).attr("data-value");
+                    var select = $(this).parents(".custom-select-wrapper").find("select");
+                    $(select).val(cus);
+                    $(select).trigger("change");
+
+
+                    $(this).parents(".custom-options").find(".custom-option").removeClass("selection");
+                    $(this).addClass("selection");
+                    $(this).parents(".custom-select").removeClass("opened");
+                    $(this).parents(".custom-select").find(".custom-select-trigger").text($(this).text());
+                });
+            }
+            //end
+            function setDays() {
+
+                $(".day-of").each(function () {
+                    var day = getWeekDay(parseInt($(this).attr("data-i")));
+                    $(this).html(day);
+                });
+            }
+            setDays();
+            //for many complex order
+            $(document).on('change', '.complex-quantity', function (event) {
+                let comId = $(this).attr("complexId");
+                let quan = $(this).val();
+                console.log(quan + "   " + comId);
+                $("[dishcomplex=" + comId + "]").each(function () {
+                    $(this).val(quan);
+                });
+            });
+            $(document).on('click', '.change-complex-quan', function (event) {
+                let name = $(this).attr('data-name');
+                let date = $(this).attr('date');
+                $("[name='" + name + "'][date='" + date + "']").trigger('change');
+            });
+            $(document).on('click', '.sendMany', function (event) {
+                console.log("Post");
+                var form = $(this).attr("data-form");
+                console.log("Post" + form);
+                $(this).html("Обробка...").css({
+                    "cursor": "wait",
+                    "pointer-events": "none"
+                });
+                //console.log($("[data-form='"+form+"']"));
+                $.ajax({
+                    url: '/UserDayDishes/SaveDayComplex',
+                    type: 'post',
+                    dataType: 'json',
+                    data: $("[data-form='" + form + "']").serialize(),
+                    success: function (data) {
+                        if (data.res != "OK") {
+                            showOrderResult(data);
+                        }
+                         $(".sendMany").html("@Localizer["MyOrdersSave"]").css({
+                    "cursor": "",
+                             "pointer-events": ""
+                         });
+                        //showOrderResult(data);
+                        incrementday(0);
+                    }
+                }).fail(function (xhr, code, error) {
+                     $(".sendMany").html("@Localizer["MyOrdersSave"]").css({
+                    "cursor": "",
+                    "pointer-events": ""
+                });
+                    dialog_error(error);
+                    console.log(error);
+                    console.log("Code "+code);
+                    console.log("Xhr "+xhr);
+                });;
+
+            });
+            //end of many complex order
+            //order dishes
+            $(document).on('click', '.sendDishes', function (event) {
+                console.log("Post");
+                var form = $(this).attr("data-form");
+                console.log("Post" + form);
+                $(this).html("Обробка...").css({
+                    "cursor": "wait",
+                    "pointer-events": "none"
+                });
+                var flag = false;
+                var quan = $("[data-form='" + form + "']").find(".dish-quantity");
+
+                quan.each(function (i) {
+                    var value = parseFloat(($(this).val()));
+                    if (value != 0 && $(this).attr("minWeight") > value) {
+                        //console.log("min " + $(this).attr("minWeight"));
+                        //console.log("val " + $(this).val() + "  " + ($(this).attr("minWeight") == $(this).val()) );
+                        dialog_error("@Localizer["Order must be bigger!"] "+$(this).attr("minWeight"));
+                        flag = true;
+                    }
+                    const multi = 1000;
+                    var val = parseInt($(this).val() * multi);
+                    var step = parseInt($(this).attr("step") * multi);
+                    if (val % step!=0) {
+                        dialog_error("@Localizer["Order must be divided!"]");
+                        flag = true;
+                    }
+                    if (!flag) {
+                        var res = $(this).val().replace(".", ",");
+                        $(this).attr("type", "text");
+                        $(this).val(res);
+                    }
+                });
+                if (flag) {
+                     $(".sendDishes").html("@Localizer["MyOrdersSave"]").css({
+                    "cursor": "",
+                             "pointer-events": ""
+                         });
+                    return;
+                }
+                //console.log($("[data-form='"+form+"']"));
+                $.ajax({
+                    url: '/UserDayDishes/SaveDayDish',
+                    type: 'post',
+                    dataType: 'json',
+                    data: $("[data-form='" + form + "']").serialize(),
+                    success: function (data) {
+                        if (data.res != "OK") {
+                            showOrderResult(data);
+                        }
+                        $(".sendDishes").html("@Localizer["MyOrdersSave"]").css({
+                    "cursor": "",
+                             "pointer-events": ""
+                         });
+                        //showOrderResult(data);
+                        incrementday(0);
+                    }
+                }).fail(function (xhr, code, error) {
+                    $(".sendDishes").html("@Localizer["MyOrdersSave"]").css({
+                    "cursor": "",
+                    "pointer-events": ""
+                });
+                    dialog_error(error);
+                    console.log(error);
+                    console.log("Code "+code);
+                    console.log("Xhr "+xhr);
+                });;
+
+            });
+            //end dishes order
+            $(document).on('click', '[data-target="#dish-stock"]', function (e) {
+                const dish_container = $(this).parents('.complex-dish-item-container');
+               // console.log(dish_container);
+                const dish_stock_container = $('#dish-stock');
+               // console.log(dish_container);
+
+                dish_stock_container.find('.modal-dish-item-image').attr('src', dish_container.find('.complex-dish-item-image').attr('data-src'));
+                dish_stock_container.find('.modal-dish-item-name').text(dish_container.find('.complex-dish-item-name').text());
+                dish_stock_container.find('.modal-dish-item-description').text(dish_container.find('.complex-dish-item-description').text());
+                dish_stock_container.find('.modal-dish-item-readyweight').text(dish_container.find('.complex-dish-item-readyweight').text());
+            });
+
+        });
+
+
+
+
+    </script>
+}
+

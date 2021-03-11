@@ -1,0 +1,119 @@
+﻿@model IEnumerable<HotelFood.Models.DishComplex>
+@inject HotelFood.Core.SharedViewLocalizer Localizer
+@{
+    ViewData["Title"] = "Edit";
+    Layout = null;
+    int i = 0;
+    if (ViewData["courseindex"] != null)
+        i = (int)(ViewData["courseindex"]);
+    else if (Model.Count() > 0)
+        i = Model.First().DishCourse;
+}
+@if (true)
+{
+
+    <div class="col-12 complex d-flex flex-column px-0 mb-3 complex-line" id="complex-line$@i"
+         style="border: 1px solid #B1B1B1; border-radius: 4px;">
+        <div class="d-flex justify-content-between align-items-center col-12 py-0"
+             style="padding-top:20px; border-bottom: 1px solid #B1B1B1;">
+            <button type="button" class="modal-title  px-0 d-flex align-items-center"
+                    style="font-size: 18px; line-height: 40px; font-weight: 500; color: #232323; text-decoration: none; width: 110px; outline: none; border: none; background: #ffffff">
+                <img src="../img/roll-up.svg" class="mr-1 d-block d-md-none d-lg-none"
+                     alt="">@Localizer["Course" + (i + 1)]
+                </button>
+                <button type="button" class="close delete-line" onclick="this.closest('.complex').remove()">
+                    <img src="../img/close-modal.svg" aria-hidden="true" alt="">
+                </button>
+            </div>
+            @foreach (var it in Model)
+            {
+                <div class="col-12  my-2 d-flex align-items-center justify-content-between parent-delete dish-line" dish-id="@it.DishId">
+                    <div class="">
+                        <img src="@Url.Action("GetPicture", "Pictures", new { id = it.Dish.PictureId, width = 40, height = 40 })" alt="Complex image"
+                             style="width: 40px; height: 40px">
+                    </div>
+                    <div class="col-7" style="font-size: 16px; color: #232323">
+                        @Html.DisplayFor(modelItem => it.Dish.Name)
+                    </div>
+                    <div class="col-2 pr-0 d-flex justify-content-end">
+
+                        <input class="default-dish" course="@i" dish-id="@it.DishId"
+                               type="radio" name="Course(@i)" @if (it.IsDefault != null && (bool)it.IsDefault) { @: checked
+                               } @*value="@(it.IsDefault!=null ? it.IsDefault : false)"*@>
+                        @*<label class="container-for-radio ml-3">
+                                <input class="custom-control-input"
+                                       type="radio" name="Course(@i)"
+                                       value="@(it.IsDefault!=null ? it.IsDefault : false)">
+                                <span class="checkmark-for-radio"></span>
+                            </label>*@<label class="container-for-radio ml-3">
+                            <input class="custom-control-input"
+                                   type="radio" name="Course(@i)"
+                                   value="@(it.IsDefault!=null ? it.IsDefault : false)">
+                            <span class="checkmark-for-radio"></span>
+                        </label>
+
+                    </div>
+                    <div class="col-2 pr-0 d-flex justify-content-end">
+                        <button class="btn delete-parent pr-0 delete-item"
+                                style="background: none; border: none">
+                            <img src="../img/delete-icon.svg" alt="Delete item">
+                        </button>
+                    </div>
+                </div>
+            }
+            <div id="course-footer @i" class="course-footer-@i"></div>
+            <button type="button" class="col-12 my-2 d-flex align-items-center add-complex-line" course="@i"
+                    style="outline: none; border: none; background: none; color: #36c233">
+                <div class="add-new-complex"
+                     style="border: 1px dashed #36C233; width: 40px; height: 40px;">
+
+                </div>
+                <div class="col-10 d-flex justify-content-start "
+                     style="font-size: 16px; color: #36C233">
+                    Створити нову страву
+                </div>
+            </button>
+
+
+        </div>
+    }
+    else
+    {
+        <div class="complex-line container border mb-4" id="complex-line$@i">
+            <div class="row course-dish">
+                <div class="col-sm-4">
+                    <label class="control-label">@*@(i+1)-@Localizer["DishCourse"]*@ @Localizer["Course" + (i + 1)]</label>
+                </div>
+                <div class="col-4">
+                    <a class="add-complex-line fa fa-plus-square-o fa-2x" course="@i"></a>
+                </div>
+                <div class="col-1 delete-line">
+                    <span class="fa fa-trash fa-2x" aria-hidden="true"></span>
+
+                </div>
+            </div>
+            @foreach (var it in Model)
+            {
+
+                <div class="row dish-line" dish-id="@it.DishId">
+
+                    @*<input type="hidden" name="DishComplexes[@count].ComplexId" asp-for="@it.ComplexId" />
+                        <input type="hidden" name="DishComplexes[@count].DishCourse" asp-for="@it.DishCourse" />
+                        <input type="hidden" name="DishComplexes[@count].DishId" asp-for="@it.DishId" />*@
+                    <div class="col-sm-4">
+                        <img src="@Url.Action(" GetPicture", "Pictures" , new { id=it.Dish.PictureId, width=40, height=40 })" style="width:40px;height:40px;" />
+                    </div>
+                    <div class="col-sm-2">
+                        @Html.DisplayFor(modelItem => it.Dish.Name)
+                    </div>
+                    <div class="col-sm-1">
+                        <a class="dialog-edit-icon delete-item"> <span class="fa fa-trash" aria-hidden="true"></span></a>
+                    </div>
+                </div>
+
+
+
+            }
+            <div id="course-footer @i" class="course-footer-@i"></div>
+        </div>
+    }

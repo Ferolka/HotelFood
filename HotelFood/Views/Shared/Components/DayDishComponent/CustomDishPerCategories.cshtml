@@ -1,0 +1,110 @@
+@model IEnumerable<HotelFood.Models.DayDishViewModelPerGategory>
+@inject HotelFood.Core.SharedViewLocalizer Localizer
+@{
+    ViewData["Title"] = "EditDay";
+}
+@{
+    DateTime daydate = DateTime.Now;
+}
+
+
+
+@{
+    int idx = 0;
+}
+
+@foreach (var itemcategory in Model)
+{
+
+    <div class="container daydish-category-content border rounded">
+        <div class="row">
+            <div class="col col-lg-12 col-md-12 row-daydish-header">
+                @Html.DisplayFor(modelItem => itemcategory.CategoryName)
+            </div>
+        </div>
+        <div class="category-content" categoryDate="@(itemcategory.CategoryId.ToString() + "_"+ itemcategory.CategoryDate)">
+            @foreach (var item in itemcategory.DayDishes)
+            {
+                @*string id_checkbox = item.DishId.ToString() + "_" + daydate.Millisecond.ToString() + "_" + idx;
+            <div class="row row-daydish dish-line" dish-id="@item.DishId">
+                <div class="col col-md-2">
+
+                </div>
+                <div class="col col-md-1">
+                    <div class="checkbox checkbox-info">
+
+                        @if (item.Enabled)
+                        {
+                            <input type="checkbox" class="checkbox styled" checked="checked" cp-name="dayselect" id="@id_checkbox" />
+                        }
+                        else
+                        {
+                            <input type="checkbox" class="checkbox styled" cp-name="dayselect" id="@id_checkbox" />
+                        }
+                        <label for="@id_checkbox">
+
+                        </label>
+                        @Html.HiddenFor(modelItem => item.DishId)
+                        @Html.HiddenFor(modelItem => item.Date)
+                    </div>
+                </div>
+                <div class="col col-lg-4 col-md-4">
+                    @Html.DisplayFor(modelItem => item.DishName)
+                    @Html.DisplayFor(modelItem => item.IsWeight)
+                </div>
+            </div>*@
+                <div class="col-12  my-2 d-flex align-items-center justify-content-between parent-delete dish-line" dish-id="@item.DishId">
+                    <div class="">
+                        <img src="@Url.Action("GetPicture", "Pictures", new { id = item.PictureId, width = 40, height = 40 })" alt="Complex image"
+                             style="width: 40px; height: 40px">
+                    </div>
+                    <div class="col-7" style="font-size: 16px; color: #232323">
+                        @Html.DisplayFor(modelItem => item.DishName)
+                    </div>
+                    <div class="col-2 pr-0 d-flex justify-content-end">
+
+                        <div class="d-flex align-items-center px-lg-5 px-md-5 px-3 align-self-lg-end align-self-md-end my-2">
+                            <span>@Localizer["Weighted"]</span>
+                            <label class="container-for-radio ml-3">
+                                @if (item.IsWeight)
+                                {
+                                    <input type="checkbox" checked="checked" class="custom-control-input" disabled>
+                                }
+                                else
+                                {
+                                    <input type="checkbox" class="custom-control-input" disabled>
+                                }
+
+                                <span class="checkmark-for-radio"></span>
+                            </label>
+                        </div>
+
+                    </div>
+                    <div class="col-2 pr-0 d-flex justify-content-end">
+                        <button class="btn delete-parent pr-0 delete-item" dish-id="@item.DishId"
+                                style="background: none; border: none">
+                            <img src="../img/delete-icon.svg" alt="Delete item">
+                        </button>
+                    </div>
+                </div>
+                idx++;
+            }
+
+            <div class="row dayfoot category-footer" categoryDate="@(itemcategory.CategoryId.ToString()+ "_" + itemcategory.CategoryDate)">
+                <button type="button" class="col-12 my-2 d-flex align-items-center add-complex-line" categoryDate="@(itemcategory.CategoryId.ToString() + "_"+ itemcategory.CategoryDate)"
+                        style="outline: none; border: none; background: none; color: #36c233">
+                    <div class="add-new-complex"
+                         style="border: 1px dashed #36C233; width: 40px; height: 40px;">
+
+                    </div>
+                    <div class="col-10 d-flex justify-content-start "
+                         style="font-size: 16px; color: #36C233">
+                        @Localizer["AddDish"]
+                    </div>
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+}

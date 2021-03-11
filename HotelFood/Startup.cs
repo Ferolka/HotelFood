@@ -86,7 +86,7 @@ namespace HotelFood
             //services.AddTransient<IUserFinRepository, UserFinRepository>();
             services.AddTransient<IServiceRepository, ServiceRepository>();
             services.AddTransient<IGenericModelRepository<Categories>, GenericModelRepository<Categories>>();
-            services.AddTransient<IGenericModelRepository<Categories>, GenericModelRepository<Categories>>();
+            services.AddTransient<IDishRepository, DishRepository>();
             services.AddTransient<SharedViewLocalizer>();
             //services.AddTransient<URLHelperContextLess>();
             services.AddScoped<IUserClaimsPrincipalFactory<HotelUser>, CustomClaimsPrincipalFactory>();

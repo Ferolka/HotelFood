@@ -1,0 +1,29 @@
+﻿@model DayMenu
+@using System.Globalization
+@using HotelFood.Core
+
+@inject HotelFood.Core.SharedViewLocalizer Localizer
+@{
+    Layout = null;
+}
+@{
+    DateTime daydate = Model.Date;
+    long ms_since1970 = (long)daydate.Subtract(DateTime.MinValue.AddYears(1969)).TotalMilliseconds;
+    CultureInfo ci = new CultureInfo("en-US");
+    // Get the DateTimeFormatInfo for the en-US culture.
+    DateTimeFormatInfo dtfi = ci.DateTimeFormat;
+}
+@if (Model.MenuType == OrderTypeEnum.OneComplexType || Model.MenuType == OrderTypeEnum.Complex)
+{
+        <div class="row">
+            @await Component.InvokeAsync("DayComplexComponent", Model)
+        </div>
+}
+@if(Model.MenuType == OrderTypeEnum.Dishes)
+{
+        <div class="row">
+            @await Component.InvokeAsync("DayDishComponent", Model)
+        </div>
+}
+
+ 

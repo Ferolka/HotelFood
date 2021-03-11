@@ -1,0 +1,152 @@
+﻿@model IEnumerable<HotelFood.Models.Dish>
+
+@using HotelFood.Core
+@{
+    QueryModel querymodel = ViewData["QueryModel"] as QueryModel;
+    if (querymodel == null)
+    {
+        querymodel = new QueryModel();
+    }
+
+
+}
+@if (true)
+{
+    @*<div class="col-12">
+       
+        <input class="form-control  w-100" id="search-dishes" type="search" placeholder="Search..." aria-label="Search"
+               style="font-size: 16px; color:#797979; height: 48px; background: url('../img/search-icon.svg') no-repeat 95%; font-family: Open-Sans, sans-serif">
+    </div>*@
+    <div class="col-12 px-lg-0 px-md-0 d-flex flex-column">
+        <div class="row ml-0 mr-0 justify-content-start w-100 align-content-center d-lg-flex d-none d-md-flex d-sm-none mt-3"
+             style="height: 40px; font-weight: 500; font-size: 18px; color: #232323; background: #F7F7F7;">
+            <div class="col-2 pl-md-0 pl-lg-0"></div>
+            @Html.DisplayListHeaderForEx(model => model.Category.Name, new { colnumbers = 4 })
+            @Html.DisplayListHeaderForEx(model => model.Name, new { colnumbers = 5 })
+            @*<div class="col-4 d-flex" style="cursor: pointer">
+                <span class="sort-span">
+                    @await this.InvokeComponentAsync(Component, "TableColumn", model => model.Category.Name, querymodel, (object)ViewBag.CategoriesId)
+                </span>
+            </div>
+            <div class="col-5" style="cursor: pointer">
+                <span class="sort-span pl-4">
+                    @await this.InvokeComponentAsync(Component, "TableColumn", model => model.Name, querymodel)
+                </span>
+            </div>*@
+            <div class="col-2 pl-md-0 pl-lg-0"></div>
+
+
+        </div>
+        @foreach (var item in Model)
+        {
+            <div class="col-12 p-0 parent-delete d-flex  brd-bot-line brd-bot-line-reverse mb-3 mb-lg-0 mb-md-0 search-items"
+                 style="min-height: 52px; color: #232323">
+                <div class="col-12 p-0 d-flex  my-3"
+                     style="min-height: 52px; color: #232323">
+                    <div class="col-12 px-0  d-flex flex-row align-items-center mt-2 mt-lg-0 mt-md-0">
+                        <div class="col-lg-2 col-md-3 col-5 col-sm-4 pr-4 pl-0 pl-md-3 pl-lg-3">
+                            @if (item.PictureId.HasValue)
+                            {
+                                <img src="@Url.Action("GetPicture", "Pictures", new { id = item.PictureId, width = 40, height = 40 })" alt="Complex image" style="width: inherit">
+                                
+                            }
+                            else
+                            {
+                                <img src="~/images/nophoto.jpg" alt="Complex image" style="width: inherit">
+                               
+                            }
+                           
+                        </div>
+                        <div class="col-lg-10 col-md-9 col-7 col-sm-8 p-0 d-flex flex-lg-row flex-md-row flex-column align-items-center align-self-start h-100 justify-content-between">
+                            <div class="col-md-5 col-lg-5 col-sm-4 col-9 d-flex justify-content-start align-self-start align-self-lg-center align-self-md-center mt-1 px-0 px-lg-3 px-md-3 flex-zero"
+                                 style="font-size: 16px;">
+                                <span class="col-12  change-bg-grey"
+                                      style="padding: 0 4px">@Html.DisplayFor(modelItem => item.Category.Name)</span>
+                            </div>
+                            <div class="col-md-5 col-lg-5 col-12 d-flex justify-content-start mt-1 px-0 px-lg-3 px-md-3 flex-zero"
+                                 style="font-size: 16px;">
+                                <span class="w-100 p-0 change-weight">@Html.DisplayFor(modelItem => item.Name)</span>
+                            </div>
+
+                            <div class="col-12 col-lg-2 col-md-2 d-flex mb-lg-0 mb-md-0 mb-2  justify-content-md-end justify-content-lg-end justify-content-start pl-0"
+                                 style="flex: 0">
+                                <button class="btn button-add-complex d-none d-md-flex d-lg-flex dialog-edit-icon add-item" data-id=@item.Id
+                                        type="button"
+                                        @*onclick="$(this).toggleClass('button-add-complex--checked')"*@>
+                                </button>
+                                <label class="custom-control custom-checkbox m-0 p-0 d-flex justify-content-between align-items-center px-2 d-md-none d-lg-none mt-4"
+                                       style="height: 36px; font-size: 14px; color: #36C233; width: 120px; border-radius: 4px; border: 1px solid #36C233;">
+                                    <input type="checkbox" class="custom-control-input">
+                                    <span class="custom-control-indicator align-self-start"></span>
+                                    <span class="custom-control-description mr-1">ДОДАТИ</span>
+                                </label>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+
+
+        </div>
+}
+else
+{
+    <div class="table-fix-head">
+        <table class="table search-items">
+            <thead>
+                <tr class="bg-white text-secondary">
+                    <th width="20%">
+
+                    </th>
+                    <th width="40%">
+                        @await this.InvokeComponentAsync(Component, "TableColumn", model => model.Category.Name, querymodel, (object)ViewBag.CategoriesId)
+                    </th>
+                    <th width="40%">
+                        @await this.InvokeComponentAsync(Component, "TableColumn", model => model.Name, querymodel)
+                    </th>
+
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>
+                            @if (item.PictureId.HasValue)
+                            {
+                                <img src="@Url.Action("GetPicture", "Pictures", new { id = item.PictureId, width = 40, height = 40 })" style="width:40px;height:40px;" />
+                            }
+                            else
+                            {
+                                <img src="~/images/nophoto.jpg" style="width:40px;height:40px;" />
+                            }
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Category.Name)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Name)
+                        </td>
+
+                        <td>
+                            <a class="dialog-edit-icon add-item" data-id=@item.Id><span class="fa fa-plus" data-id=@item.Id></span></a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+            @*<tfoot>
+                    <tr class="bg-white text-success rounded border">
+                        <td colspan="5">
+                            @await this.InvokeComponentAsync(Component, "TablePager", model => model.Description, querymodel)
+                        </td>
+                    </tr>
+                </tfoot>*@
+        </table>
+    </div>
+    <script>
+
+    </script>
+}

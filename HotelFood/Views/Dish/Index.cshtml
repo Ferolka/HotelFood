@@ -1,0 +1,515 @@
+﻿@model IEnumerable<HotelFood.Models.Dish>
+
+@using  HotelFood.Core
+@inject HotelFood.Core.SharedViewLocalizer Localizer
+
+@{
+    var ModelName = Localizer["Dishes"];
+
+    ViewData["Title"] = "Dishes";
+    QueryModel querymodel = ViewData["QueryModel"] as QueryModel;
+    if (querymodel == null)
+    {
+        querymodel = new QueryModel();
+    }
+
+}
+
+
+@if (Layout == "_LayoutCabachok")
+{
+    <div class="container-xl container container-md container-sm container-lg">
+        <div class="row align-items-center pb-3  ml-xl-0 ml-md-0 ml-sm-0 p-0 ml-0" style="margin-top: 48px">
+            <div class="col-7 col-xl-9 col-md-6 col-sm-6 align-content-center mr-md-auto pl-0">
+                <p class="h2" style="font-weight: 600">
+                    @ModelName
+                </p>
+            </div>
+        </div>
+        <div class="row pb-3 ml-xl-0 ml-md-0 ml-sm-0 p-lg-0 p-md-0 align-items-center m-0 flex-md-column flex-lg-row flex-column container p-0">
+
+            @Html.DisplaySortField(model => model.Name).AddSortField(model => model.Category.Name).Display(querymodel)
+
+            @*
+                <div class="col-lg-4 col-12 p-0 ">
+                    <div class="col-12 p-0 justify-content-lg-start justify-content-center"
+                         style="display: flex; flex-wrap: nowrap">
+                        <p class="h6 align-self-center mb-0" style="padding-bottom: 2px">Сортирувати:</p>
+
+                        <select name="sources" id="sort" class="custom-select sources" placeholder="по ціні"
+                                style="border: none">
+                            <option class="drpdwn-btn selection" value="price"
+                                    style="border: none; box-shadow: 0 4px 22px rgba(0, 0, 0, 0.15);">
+                                по ціні
+                            </option>
+                            <option class="drpdwn-btn" value="popular">по популярності</option>
+                            <option class="drpdwn-btn" value="/Dishes/ListItems?sortfield=Name&sortorder=asc" style="border: none; box-shadow: 0 4px 22px rgba(0, 0, 0, 0.15);">@Html.DisplayListHeaderForEx(model => model.Name) А-Я</option>
+                            <option class="drpdwn-btn" value="/Dishes/ListItems?sortfield=Name&sortorder=desc">@Html.DisplayListHeaderForEx(model => model.Name) Я-А</option>
+                            <option class="drpdwn-btn" value="/Dishes/ListItems?sortfield=Category.Name&sortorder=asc">@Html.DisplayListHeaderForEx(model => model.Category.Name) А-Я</option>
+                            <option class="drpdwn-btn" value="/Dishes/ListItems?sortfield=Category.Name&sortorder=desc">@Html.DisplayListHeaderForEx(model => model.Category.Name) Я-А</option>
+                        </select>
+
+                    </div>
+                </div>
+            *@
+            <div class="col-lg-4 col-12 p-0 ">
+                <div class="col-12 p-0 justify-content-center w-100" style="display: flex">
+                    <form id="search-form" class="form-inline col-12 p-0" style=" display: flex;">
+                        <input id="search-val" class="form-control  w-100" type="search" placeholder="Пошук..." aria-label="Search"
+                               style="font-size: 16px; color:#797979; height: 48px; background:  url('/img/search-icon.svg') no-repeat; background-position: 95%">
+                    </form>
+                </div>
+            </div>
+            <div class="col-lg-4 col-12 p-0 d-none d-md-block">
+                <div class="col-12 p-0 justify-content-center" style="height: 48px">
+                    <button type="button" id="create-btn"
+                            class=" btn btn-xl btn-outline-danger float-lg-right justify-content-center float-md-none font-weight-bold btn-block col-lg-6"
+                            onmousemove="this.style.background='#36C233'; this.style.color='#ffffff'"
+                            onmouseout="this.style.background='#ffffff'; this.style.color='#36C233'"
+                            style="background: #ffffff; border-color: #36C233; outline: none; height: 48px; color: #36C233; display: flex; align-items: center; justify-content: space-evenly; margin: 28px 0 23px; font-size: 14px;">
+                        &#65291; @*СТВОРИТИ*@ @Localizer["Create"]
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="row ml-0 mr-0 justify-content-start w-100 align-content-center d-lg-flex d-none d-md-flex d-sm-none "
+             style="height: 40px; font-weight: 500; font-size: 18px; color: #232323; background: #F7F7F7;">
+            <div class="col-1">
+            </div>
+            @Html.DisplayListHeaderForEx(model => model.Category.Name)
+            @Html.DisplayListHeaderForEx(model => model.Name)
+            @Html.DisplayListHeaderForEx(model => model.Description, new { colnumbers = 4 })
+            @Html.DisplayListHeaderForEx(model => model.Price)
+            @* <div class="col-2" style="cursor: pointer"><span class="sort-span">Комплекс</span></div>
+                <div class="col-2" style="cursor: pointer"><span class="sort-span">Страва</span></div>
+                <div class="col-4" style="cursor: pointer"><span class="sort-span">Опис</span></div>
+                <div class="col-2" style="cursor: pointer"><span class="sort-span">Вартість</span></div>*@
+            <div class="col-2"></div>
+
+        </div>
+        <div id="table-content" data-sortfield="@querymodel.SortField" data-sortorder="@querymodel.SortOrder" data-filter="@querymodel.SearchCriteria" class="row ml-0 mr-0 mt-0 justify-content-center w-100 table-content">
+
+        </div>
+    </div>
+    <div class="modal fade" @*id="change-item-modal"*@ id="modDialog" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog" id="dialogContent" style="max-width: 850px">
+        </div>
+    </div>
+
+    <div id="modDialogingredientline" class="modal modal-search fade ingredient-line">
+        <div id="dialogContentingredientline" class="modal-dialog modal-search-dialog">
+            <div class="modal-content modal-content-search">
+                <div class="modal-header">
+
+                    <div class="container">
+                        <div class="row">
+                            <h3>Додати Інгрідієнт</h3>
+                            <button type="button" class="close" data-toggle="modal" data-target="#modDialogingredientline">X</button>
+                        </div>
+                        <div class="row">
+                            <input type="text" id="search-ingredient" class="form-control input-lg" placeholder="...." />
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-body modal-search-body">
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    @*<div id="modDialog" class="modal dishes-modal fade">
+            <div id="dialogContent" class="modal-dialog"></div>
+        </div>*@
+}
+else
+{
+    <div class="container">
+        <div class="row justify-content-end">
+            <div class="col-md-6 right">
+                <h2>@ModelName</h2>
+            </div>
+            <div class="col-md-6 right">
+                <div id="custom-search-input">
+                    <div class="input-group">
+                        <input type="text" id="search-val" class="form-control input-lg" placeholder="@ModelName" />
+                        <span class="input-group-btn">
+                            <button class="btn btn-info btn-lg" id="search-btn" type="button">
+                                <span class="fa fa-search" aria-hidden="true"></span>
+                            </button>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 col-md-12 col-lg-12">
+                <div id="table-content" class="table-content">
+
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 col-md-12 col-lg-12  table-footer bg-white text-success">
+                <div id="create-btn" class="col-lg-3 col-md-3 create">
+                    <span>@Localizer["Create"]</span>
+                    <span class="fa fa-plus" aria-hidden="true"></span>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="modDialog" class="modal dishes-modal fade">
+        <div id="dialogContent" class="modal-dialog"></div>
+    </div>
+   
+}
+@section Styles
+{
+
+    <link type="text/css" href="~/css/summernote.min.css" rel="stylesheet" />
+
+}
+@section scripts
+{
+    <script type="text/javascript" src="~/js/summernote.min.js"></script>
+    <script type="text/javascript">
+
+        $(function () {
+
+            var reload = function (href) {
+                if (!href)
+                    href = '/Dish/ListItems?';
+                else
+                    href += "&";
+                var getstr = `searchcriteria=${$("#table-content").attr("data-filter")}&sortfield=${$("#table-content").attr("data-sortfield")}&sortorder=${ $("#table-content").attr("data-sortorder")}`;
+                href += getstr;
+                //var searchcriteria = 'Бануш з';
+                //if ($('#search-val').length > 0)
+               //     searchcriteria = $('#search-val').val()
+                $('#table-content').load(href, function () {
+                    var done = true;
+                });
+
+            }
+
+                // sort
+            /*
+            $("#sort").change(function () {
+                var selectedSort = $(this).children("option:selected").val();
+                reload(selectedSort);
+            });
+            */
+            $(".custom-option").on("click", function () {
+                reload($(this).data('value'));
+               // console.log($('#table-content').data('sortfield'));
+                var url = $(this).data('value').split('?').pop();
+                const urlParams = new URLSearchParams(url);
+                const field = urlParams.get('sortfield');
+                const order = urlParams.get('sortorder');
+
+                $('#table-content').attr('data-sortfield', field);
+                $('#table-content').attr('data-sortorder', order);
+            });
+            $.ajaxSetup({ cache: false });
+            //$('#table-content').load('@Url.Action("ListItems","Dish", new { searchcriteria = "" })');
+
+
+            reload($(".selection").val());
+            $('#search-btn').click(function (e) {
+
+                reload();
+            });
+           // $('#search-val').change(function (e) {
+           //     $("#table-content").data("filter", $(this).value())
+           // });
+            $('#search-val').keydown((event) => {
+                if (event.which == 13) {
+                    event.preventDefault();
+                   $("#table-content").attr("data-filter", encodeURIComponent($('#search-val').val()));
+                   // console.log($("span.selection").attr("data-value"));
+                    reload();
+                }
+            });
+            $("#search-form").submit(function (e) {
+                return false;
+            });
+            $('#create-btn').click(function (e) {
+                e.preventDefault();
+                var url = '@Url.Content("~/Dish/CreateModal")';
+                $.get(url, function (data) {
+                    $('#dialogContent').html(data);
+                    $('#modDialog').modal('show');
+                    
+                });
+            });
+            $(document).on("click", "a.ahead", function (e) {
+                e.preventDefault();
+                reload(this.href);
+            });
+            $(document).on("click", "a.apagebottom", function (e) {
+                e.preventDefault();
+                reload(this.href);
+            });
+            $(document).on("change", "select.col-select-filter", function (e) {
+                e.preventDefault();
+                var href = $(this).next().attr('href');
+
+                if (href.includes("?")) {
+                    href += "&relationfilter=" + $(this).val();
+                }
+                else {
+                     href += "?relationfilter=" + $(this).val();
+                }
+
+                reload(href);
+            });
+            function setupChangesChecker(dlg) {
+                $(dlg).attr("_changed", false);
+                $(dlg).find("input,textarea").change(function () {
+                    $(dlg).attr("_changed", true);
+                });
+                function hidehandler(e) {
+                    if ($(dlg).attr("_changed") == "true") {
+                        //if (!confirm("There are unsaved changes, please confirm. your input will be lost"))
+                        e.preventDefault();
+                        dialog_yes_no($.text_resource.confirm_close,
+                            function () { //yes
+                                $(dlg).attr("_changed", false);
+                                $('#modDialog').modal('hide');
+                                $('#modDialog').find('#dialogContent').empty();
+                                $(dlg).off('hide.bs.modal', hidehandler);
+                            },
+                            function () { //no
+                            });
+                        return;
+                        if (!confirm(get_text_res().confirm_close))
+                            e.preventDefault();
+                        $(dlg).attr("_changed", false);
+                    }
+                }
+
+                $(dlg).on('hide.bs.modal', hidehandler);
+
+            }
+
+            $(document).on( "click", "a.dishitem", function(e) {
+               e.preventDefault();
+
+                $.get(this.href, function (data) {
+                    $('#dialogContent').html(data);
+                    //console.log(data);
+                    $('#modDialog').attr("data-backdrop", false);
+                    $('#modDialog').css("background-color", "rgba(117, 117, 117, 0.5)");
+                    $('#modDialog').modal('show');
+                    setupChangesChecker($('#modDialog'));
+
+                    var id = $('#dialogContent').find("#Id").val();
+                   
+                    setupCookTechnology($('#dialogContent'))
+
+                   // $('#dialogContent').find("#nav-tab").tab();
+                });
+            });
+            function setupCookTechnology(dlg) {
+                const elem = dlg.find("#cooktechnology");
+                elem.summernote({
+                    dialogsInBody: true,
+
+
+                    callbacks: {
+                        onBlur: function () {
+                            //onsave();
+                        }
+                    }
+                });
+
+                //$('#summernote').summernote('code', $('#Text').text());
+            }
+            $(document).on("click", "a.cmd-delete-old", function (e) {
+                e.preventDefault();
+                $.get(this.href, function (data) {
+
+                    $('#dialogContent').html(data);
+                    $('#modDialog').attr("data-backdrop", false);
+                    $('#modDialog').css("background-color", "rgba(117, 117, 117, 0.5)");
+                    $('#modDialog').modal('show');
+                  //  if (self.options.onloadedcb)
+                  //      self.options.onloadedcb();
+                });
+            });
+           
+           
+            //$(document).on("click", "#add-ingredients-dishes-line", function (e) {
+            //    console.log("Click");
+            //    //setup_search_ingredients();
+            //});
+            
+            $(document).on('hidden.bs.modal', '.modal', function () {
+                $('.modal:visible').length && $(document.body).addClass('modal-open');
+            });
+            
+            function isFileImage(file) {
+                const acceptedImageTypes = ['image/jpeg', 'image/png'];
+
+                return file && acceptedImageTypes.includes(file['type'])
+            }
+             function readURL(input) {
+                 if (input.files && input.files[0]) {
+                     if (!isFileImage(input.files[0])) {
+                         $("#filepicture").val('');
+                         return;
+                     }
+                    var reader = new FileReader();
+
+                    reader.onload = function(e) {
+                      $('#imgfilepicture').attr('src', e.target.result);
+                    }
+
+                    reader.readAsDataURL(input.files[0]);
+                  }
+                }
+             $(document).on("change","#filepicture",function() {
+                  readURL(this);
+              });
+              $(document).on('click', '[data-save="modal"]', function (event) {
+                  event.preventDefault();
+                  console.log("send");
+                  //old design
+                 // var form = $(this).parents('.modal-body').find('form');
+                  //new design
+                  var form = $(this).parents('.modal-content').find('form');
+                  console.log(form);
+                    var actionUrl = form.attr('action');
+                    //var dataToSend = form.serialize();
+                    // var formData = new FormData(form[0]);
+                   var formdata = false;
+                    if (window.FormData){
+                        formdata = new FormData(form[0]);
+                    }
+
+                  var formAction = form.attr('action');
+
+
+                    $.ajax({
+                        url         : formAction,
+                        data        : formdata ? formdata : form.serialize(),
+                        cache       : false,
+                        contentType : false,
+                        processData : false,
+                        type        : 'POST',
+                        success     : function(data, textStatus, jqXHR){
+                            var isValid = false;
+
+                          if (data && data.res && data.res== "OK")
+                                    isValid = true;
+
+                            if (isValid) {
+                                      $('#modDialog').attr("_changed", false);
+                                      $('#modDialog').modal('hide');
+                                      $('#dialogContent').empty();
+                                reload($(".selection").val());
+                                  }
+                                  else {
+                                      var newBody = $('.modal-body', data);
+                                $(document).find('.modal-body').replaceWith(newBody);
+                                var id = $('#dialogContent').find("#Id").val();
+                                
+                                  }
+                        }
+
+                    }).fail( function (xhr, status, error) {
+                        dialog_error("ERROR !" + error);
+                        //alert("ERROR !" + error);
+                    });
+
+
+              });
+            function showeditdayalert(options) {
+                var alert = "#responseS";
+
+                $(alert).animate({
+                    height: '+=72px'
+                }, 300);
+
+                $(`<div class="alert ${options.class}">` +
+                    '<button type="button" class="close" data-dismiss="alert">' +
+                    `x</button>${options.text}</div>`)
+                    .hide().appendTo(alert).fadeIn(1000);
+
+                $(".alert").delay(3000).fadeOut(
+                    "normal",
+                    function () {
+                        $(this).remove();
+                    });
+
+                $(alert).delay(4000).animate({
+                    height: '-=72px'
+                }, 300);
+
+
+            }
+            $(document).on("click", "a.cmd-delete", function (e) {
+                e.preventDefault();
+                fetch(this.href, { method: 'GET' })
+                    .then(response => response.text())
+                    .then(data => {
+                        $('#dialogContent').html(data);
+                        $('#modDialog').modal('show');
+                        const form = $('#modDialog').find('form');
+                        form.submit(function (e) { e.preventDefault(); });
+
+                        var promise = new Promise((resolve, reject) => {
+                            $('#modDialog').find('input[type="submit"]').click(function (e) {
+                                e.preventDefault();
+                                resolve(form);
+
+                            });
+                            $('#modDialog').find('button[type="button"]').click(function (e) {
+
+                                reject();
+
+                            });
+                        });
+                        return promise;
+                    })
+                    .then((form) => {
+                        return fetch(form.attr('action'), {
+                            method: 'POST',
+                            headers: {
+
+                                'RequestVerificationToken': form.find("[name='__RequestVerificationToken'").val()
+                            },
+                            body: form.serialize()
+                        })
+                    })
+                    .then(response => {
+                        if (response.ok != true) {
+                            if (response.status == 424) {
+                                throw $.text_resource.deleteeditusingerror
+                            }
+                            else {
+                                throw response.statusText;
+                            }
+
+                        }
+
+                    })
+                    .catch(error => {
+                        if (error)
+                            dialog_error(error);
+
+                    })
+                    .finally(function () {
+                        $('#modDialog').modal('hide');
+                        $('#dialogContent').empty();
+                        reload();
+                    });
+
+
+            });
+        })
+    </script>
+}

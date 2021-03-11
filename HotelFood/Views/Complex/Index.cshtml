@@ -1,0 +1,510 @@
+﻿@model IEnumerable<Complex>
+@using  HotelFood.Core
+@inject HotelFood.Core.SharedViewLocalizer Localizer
+@{
+    var ModelName = "Complex";
+    ViewData["Title"] = ModelName;
+    QueryModel querymodel = ViewData["QueryModel"] as QueryModel;
+    if (querymodel == null)
+    {
+        querymodel = new QueryModel();
+    }
+}
+@if (Layout == "_LayoutCabachok")
+{
+    <div class="container-xl container container-md container-sm container-lg">
+        <div class="row align-items-center pb-3  ml-xl-0 ml-md-0 ml-sm-0 p-0 ml-0" style="margin-top: 48px">
+            <div class="col-7 col-xl-9 col-md-6 col-sm-6 align-content-center mr-md-auto pl-0">
+                <p class="h2 h2-mob"
+                   style="font-weight: 600">
+                    @Localizer["Complex"]
+                </p>
+            </div>
+        </div>
+        <div class="row pb-3 ml-xl-0 ml-md-0 ml-sm-0 p-lg-0 p-md-0 align-items-center  justify-content-end m-0 flex-md-column flex-lg-row flex-column container p-0">
+            @Html.DisplaySortField(model => model.Name).AddSortField(model => model.Category.Name).AddSortField(model => model.Price).AddSortField(model => model.DishesQuantity).Display(querymodel)
+            <div class="col-lg-4 col-12 p-0 ">
+                <div class="col-12 p-0 justify-content-center w-100" style="display: flex">
+                    <div class="form-inline col-12 p-0" style=" display: flex;">
+                        <input id="search-val" class="form-control  w-100" type="search" placeholder=" @Localizer["Complex"]..." aria-label="Search"
+                               style="font-size: 16px; color:#797979; height: 48px; background: url('../img/search-icon.svg') no-repeat 95%">
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 col-12 p-0 d-none d-md-block">
+                <div class="col-12 p-0 justify-content-center" style="height: 48px">
+                    <button type="button" id="create-btn"
+                            class="create btn btn-xl btn-outline-danger float-lg-right justify-content-center float-md-none font-weight-bold btn-block col-lg-6"
+                            onmousemove="this.style.background='#36C233'; this.style.color='#ffffff'"
+                            onmouseout="this.style.background='#ffffff'; this.style.color='#36C233'"
+                            style="background: #ffffff; border-color: #36C233; outline: none; height: 48px; color: #36C233; display: flex; align-items: center; justify-content: space-evenly; margin: 28px 0 23px; font-size: 14px;">
+                        &#65291; @Localizer["Add"]
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="row ml-0 mr-0 justify-content-start w-100 align-content-center d-lg-flex d-none d-md-flex d-sm-none mt-3"
+             style="height: 40px; font-weight: 500; font-size: 18px; color: #232323; background: #F7F7F7;">
+
+            @Html.DisplayListHeaderForEx(model => model.Name, new { colnumbers = 3 })
+            @Html.DisplayListHeaderForEx(model => model.Price, new { colnumbers = 3 })
+            @Html.DisplayListHeaderForEx(model => model.Category.Name, new { colnumbers = 2 })
+            @Html.DisplayListHeaderForEx(model => model.DishesQuantity, new { colnumbers = 2 })
+            @*<div class="col-3" style="cursor: pointer"><span class="sort-span">Назва</span></div>
+                <div class="col-3" style="cursor: pointer"><span class="sort-span">Вартість</span></div>
+                <div class="col-2" style="cursor: pointer"><span class="sort-span">Категорія</span></div>
+                <div class="col-2" style="cursor: pointer"><span class="sort-span">Кількість страв</span></div>*@
+            <div class="col-2"></div>
+
+
+        </div>
+        <div id="table-content" data-sortfield="@querymodel.SortField" data-sortorder="@querymodel.SortOrder" data-filter="@querymodel.SearchCriteria" class="table-content row mx-0 justify-content-start w-100 align-content-center">
+
+        </div>
+
+        <div class="col-lg-4 p-0 col-12 d-lg-none d-md-none d-block position-sticky sticky-class align-content-center "
+             style="display: flex; bottom: -2px; height: 70px; background: #ffffff; box-shadow: 0 -11px 22px -15px rgba(0, 0, 0, 0.25);">
+            <div class="container p-0 h-100">
+                <div class="col-12 p-0 justify-content-center h-100 align-items-center d-flex">
+                    <button type="button" id="create-btn"
+                            class="create btn btn-xl btn-outline-danger float-lg-right justify-content-center float-md-none font-weight-bold btn-block col-lg-6"
+                            onmousemove="this.style.background='#36C233'; this.style.color='#ffffff'"
+                            onmouseout="this.style.background='#ffffff'; this.style.color='#36C233'"
+                            style="background: #ffffff; border-color: #36C233; outline: none; height: 48px; color: #36C233; display: flex; align-items: center; justify-content: space-evenly; font-size: 14px;">
+                        &#65291; @Localizer["Add"]
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 d-lg-none d-md-none d-block" style="z-index: 10; background: #ffffff">
+            <div class="col-12 p-0 justify-content-center h-100 align-items-end d-flex mt-4">
+                @*<button type="button"
+                            class="btn btn-xl btn-outline-danger float-lg-right justify-content-center float-md-none  btn-block col-5"
+                            onmousemove="this.style.background='#36C233'; this.style.color='#ffffff'"
+                            onmouseout="this.style.background='#ffffff'; this.style.color='#36C233'"
+                            style="background: #ffffff; border-color: #36C233; outline: none; height: 48px; color: #36C233; display: flex; align-items: center; justify-content: space-evenly; font-size: 16px; font-weight: 500">
+                        Показать ще
+                    </button>*@
+            </div>
+        </div>
+
+
+    </div>
+    <div id="modDialog" class="modal fade complex-form" tabindex="-1" role="dialog" aria-hidden="true" style="padding-right: 0">
+        <div id="dialogContent" class="modal-dialog" style="max-width: 966px">
+
+        </div>
+
+    </div>
+    <div id="modDialogcomplexline" class="modal modal-search fade complex-line">
+        <div id="dialogContentcomplexline" class="modal-dialog modal-search-dialog  d-flex justify-content-end"
+             style="max-width: 966px">
+            <div class="modal-content modal-content-search position-relative  col-lg-7 col-md-7 col-12 p-0 "
+                 style="min-height: 867px">
+                <div id="responseS" class="row"></div>
+                <div class="modal-header">
+                    <div class="modal-title  px-0 d-flex align-items-center"
+                         style="font-size: 28px; line-height: 40px; font-weight: 600; color: #232323; text-decoration: none; width: 250px; outline: none; border: none; background: #ffffff">
+                        <img src="../img/back-report.svg" class="mr-3 d-block d-md-none d-lg-none" alt="">Додати страву
+                    </div>
+                    <button type="button" class="close d-none d-lg-block d-md-block" data-target="#modDialogcomplexline" data-toggle="modal"
+                            aria-label="Close">
+                        <img src="../img/close-article.svg" aria-hidden="true" alt="">
+                    </button>
+                    @*<button type="button" class="close" data-toggle="modal" data-target="#modDialogcomplexline">X</button>*@
+                </div>
+                <div class="col-12">
+
+                    <input class="form-control  w-100" id="search-dishes" type="search" placeholder="Search..." aria-label="Search"
+                           style="font-size: 16px; color:#797979; height: 48px; background: url('../img/search-icon.svg') no-repeat 95%; font-family: Open-Sans, sans-serif">
+                </div>
+                <div class="modal-body col-auto mt-2 px-0">
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+}
+else
+{
+
+    <div class="container">
+        <div class="row justify-content-end">
+            <div class="col-md-6 right">
+                <h2>@Localizer["Complex"]</h2>
+            </div>
+            <div class="col-md-6 right">
+                <div id="custom-search-input">
+                    <div class="input-group">
+                        <input type="text" id="search-val" class="form-control input-lg" placeholder="@Localizer["Complex"]" />
+                        <span class="input-group-btn">
+                            <button class="btn btn-info btn-lg" id="search-btn" type="button">
+                                <span class="fa fa-search" aria-hidden="true"></span>
+                            </button>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 col-md-12 col-lg-12">
+                <div id="table-content" class="table-content">
+
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 col-md-12 col-lg-12  table-footer bg-white text-success">
+                <div id="create-btn" class="col-lg-3 col-md-3 create">
+
+                    <span class="fa fa-cart-plus fa-2x" aria-hidden="true"></span>
+                    <span aria-hidden="true">@Localizer["Add"]</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="modDialog" class="modal fade complex-form">
+        <div id="dialogContent" class="modal-dialog d-flex justify-content-end" style="max-width: 966px">
+
+        </div>
+
+    </div>
+    <div id="modDialogcomplexline" class="modal modal-search fade complex-line">
+        <div id="dialogContentcomplexline" class="modal-dialog modal-search-dialog">
+            <div class="modal-content modal-content-search">
+                <div id="responseS" class="row"></div>
+                <div class="modal-header">
+                    <input type="text" id="search-dishes" class="form-control input-lg" placeholder="...." />
+                    <button type="button" class="close" data-toggle="modal" data-target="#modDialogcomplexline">X</button>
+                </div>
+                <div class="modal-body modal-search-body">
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+}
+@section Scripts
+{
+    <script type="text/javascript">
+        var course;
+        $(function () {
+            $(document).on('hidden.bs.modal', '.modal', function () {
+                $('.modal:visible').length && $(document.body).addClass('modal-open');
+            });
+            var html_loading = '<div class="spinner-container"> <div>Loading</div><div class="spinner-border" role="status"> <span class="sr-only">Loading...</span> </div></div>';
+            var pagehandler=setup_listitems({
+                href: '@Url.Content("~/Complex")',
+                onloadedcb:loaddishes
+            });
+            function delay(callback, ms) {
+                var timer = 0;
+                return function () {
+                    var context = this, args = arguments;
+                    clearTimeout(timer);
+                    timer = setTimeout(function () {
+                        callback.apply(context, args);
+                    }, ms || 0);
+                };
+            };
+            //$('#search-dishes').keyup(function (e) {
+            //    console.log(e);
+           // });
+            $(document).on("keyup", '#search-dishes', delay(function (e) {
+            //$('#search-dishes').keyup(delay(function (e) {
+               //console.log('Time elapsed!', this.value);
+                var url = '@Url.Content("~/Dish/SearchView")' + `?SearchCriteria=${this.value}`;
+                $('#modDialogcomplexline').find(".modal-body").html(html_loading);
+                $.get(url, function (data) {
+                    $('#modDialogcomplexline').find(".modal-body").html(data);
+                    //$('#modDialog').modal('hide');
+                    //$('#modDialogcomplexline').modal('show');
+                    $('#modDialogcomplexline').modal('handleUpdate');
+                    setupDishSearch($('#modDialogcomplexline'), course, function () {
+                        //  $('#modDialog').modal('show');
+
+                    });
+                });
+            }, 500));
+            $(document).on('click', '.add-complex-line', function (event) {
+                event.preventDefault();
+                course = $(this).attr("course");
+
+                var url = '@Url.Content("~/Dish/SearchView")' + `?course=${course}`;
+                $('#modDialogcomplexline').find(".modal-body").html(html_loading);
+                //$('#modDialog').modal('hide');
+                $('#modDialogcomplexline').modal('show');
+                $.get(url, function (data) {
+                    $('#modDialogcomplexline').find(".modal-body").html(data);
+                    //$('#modDialog').modal('hide');
+                    //$('#modDialogcomplexline').modal('show');
+                   // $('#modDialogcomplexline').modal('handleUpdate');
+                    setupDishSearch($('#modDialogcomplexline'), course, function () {
+                      //  $('#modDialog').modal('show');
+                        //$('#modDialog').modal('handleUpdate');
+                        });
+                });
+
+            });
+            function setupDishSearch(dlg,course,closecb) {
+                $(dlg).find('.add-item').click(function (e) {
+                //$(dlg).find('.table.search-items tr').click(function (e) {
+
+                        // console.log("add dish");
+                        e.preventDefault();
+                         //var dlg = $("#complex");
+
+                         var id = $(this).attr("data-id");
+
+                       // var id = $(this).find('.add-item').attr("data-id");
+                         console.log(id );
+                         var url = '@Url.Content("~/Dishes/Info/")' + `${id}`;
+                        //console.log(url);
+                    var flag = true;
+                        $.get(url, function (data) {
+
+
+                            //dlg.find("#complex-line "+i).find("#course-footer "+i).before(data);
+                            var complexLines = $(".complex-content").find(".complex-line");
+                            $(complexLines).each(function (i) {
+                                var dishLine = $(this).find(".dish-line");
+                                // sendObj.DishComplexes.push() = [];
+                                $(dishLine).each(function (ind) {
+                                    //console.log("Sear" + $(data).attr("dish-id"));
+                                    if ($(this).attr("dish-id") == $(data).attr("dish-id")) {
+                                        //$("#modDialogcomplexline").modal('hide');
+                                        //$("#IncorrectModal").modal('show');
+                                        showeditdayalert({ class: 'alert-danger', text: "@Localizer["SameDish"]" });
+                                       // alert("You can't add the same dish");
+                                        flag = false;
+                                    }
+                                    // sendObj["DishesIdes" + i].push($(this).attr("dish-id"));
+                                });
+
+                            });
+                            if (flag) {
+                                var strCourse = "Course(" + course+")";
+                                $(data).insertBefore(".course-footer-" + course);
+                                var dishDef = $('.default-dish[dish-id=' + $(data).attr("dish-id") + ']');
+                                console.log(dishDef.attr("name"));
+                                dishDef.attr('name',strCourse);
+                            }
+                            //$(".modal-dialog").scroll();
+                            $('#modDialog').modal('handleUpdate');
+                            //var el_complexid = $(`<input type='hidden' name='DishComplexes[0].DishId' value='${id}'/>`);  // Create with jQuery
+                            //var el_course = $(`<input type='hidden' name='DishComplexes[0].DishCourse' value='${course}'/>`);
+                            //var elid = $("input[name='dishid']");
+                            //$(elid).after(el_complexid);
+                            //$(elid).after(el_course);
+                        });
+                    //$('#modDialog').modal('handleUpdate');
+                });
+                $(dlg).on('hide.bs.modal', function (e) {
+                    console.log('close search');
+
+                    $('#modDialogcomplexline').find(".modal-body").empty();
+                    if (closecb)
+                        closecb();
+                    //$('#modDialog').modal('show');
+                })
+            }
+            function loaddishes(id) {
+                if (!id)
+                    id = $('#dialogContent').find("#Id").val();
+               // var url = '@Url.Content("~/Complex/EditDishes/")' + id;
+                var url = '@Url.Content("~/Complex/CreateNewCourse?complexId=")' + id +"&course=0";
+                $.get(url, function (data) {
+                    $('#dialogContent').find(".dishes-content").html(data);
+
+
+                });
+            }
+            //edit Modal
+            $(document).on("click", "#sendBut", function send() {
+               // console.log("Post ");
+                var complexLines = $(".complex-content").find(".complex-line");
+                //console.log($(complexLines[1]).find("dish-line"));
+                //for(let line in complexLines ) {
+                //    console.log(line);
+                //}
+
+                var selectedCategory = $("select.complex-category").children("option:selected").val();
+                var selectedDishKind = $("select.complex-dishkind").children("option:selected").val();
+                //console.log("category" + selectedCategory);
+
+                var flag = true;
+                var sendObj = {};
+                sendObj.DishComplexes = [];
+                $(complexLines).each(function (i) {
+                    var dishLine = $(this).find(".dish-line");
+                    // sendObj.DishComplexes.push() = [];
+                    console.log($(dishLine).length);
+                    if ($(dishLine).length == 0) {
+                        showeditdayalert({ class: 'alert-danger', text: " @Localizer["NoDishes"]" });
+                       // alert("Course can't be without dishes.");
+                        flag = false;
+                    }
+                    $(dishLine).each(function (ind) {
+                        console.log("course " + i + " dish " + $(this).attr("dish-id"));
+                        var id = $(this).attr("dish-id");
+                        var dish = {
+                            DishId: id, DishCourse: i, ComplexId: $("#Id").val(),
+                            IsDefault: $('.default-dish[dish-id='+id+']').is(":checked") };
+                        sendObj.DishComplexes.push(dish);
+                        // sendObj["DishesIdes" + i].push($(this).attr("dish-id"));
+                    });
+
+                });
+                sendObj.Id = $("#Id").val();
+                sendObj.Name = $("#Name").val();
+                sendObj.Price = $("#Price").val();
+                sendObj.DishesQuantity = $("#quantity").val();
+                sendObj.CategoriesId = selectedCategory;
+                sendObj.DishKindId = selectedDishKind;
+                 console.log(sendObj);
+                if (flag) {
+                    $.ajax({
+                        type: "POST",
+                        data: sendObj,
+                        url: "/Complex/EditModal",
+                        success: function (data) {
+                            //console.log(data);
+                            var newBody = $('.complex-body', data);
+                            $(document).find('.complex-body').replaceWith(newBody);
+                            var valid = $(".validation-summary-valid").find("li");
+                            var isValid = $(data).find("#error");
+                            console.log(newBody.html());
+                            //console.log(valid[0].html + "  " + $(valid[0]).is(":empty"));
+                            //if ($(valid[0]).is(":empty")) {
+                            if (!isValid.length) {
+                                    $('#modDialog').attr("_changed", false);
+                                    $('#modDialog').modal('hide');
+                                    $('#dialogContent').empty();
+                                    //console.log(data);
+                                    // $('#modDialog').attr("_changed", false);
+                                    pagehandler.reload();
+                                    return;
+                            }
+                            //$("#dialogContent").empty();
+
+
+                        }
+
+                    })
+                        .fail(function (xhr, status, error) {
+                           // console.log(error);
+                            showeditdayalert({ class: 'alert-danger', text: "@Localizer["DbError"]" });
+                        //alert("ERROR !" + error);
+                    });
+                }
+               // $('#modDialog').modal('hide');
+
+            });
+   $(document).on("click", "#create-dishline",
+    //$("#create-dishline").unbind().click(
+    function (e) {
+            console.log("create new line");
+            e.preventDefault();
+            var dlg = $("#complex");
+            var quan = parseInt($("#quantity").val());
+            $("#quantity").val(quan + 1);
+
+                      var id = dlg.attr("data-id");
+            var course = dlg.find(".complex-content").find(".complex-line").length;
+
+                     // var url = '@Url.Content("~/Complex/CreateNewCourse")' + `?dishId=${id}&course=${course}`;
+                      var url = '@Url.Content("~/Complex/CreateNewCourse")' + `?complexId=${id}&course=${course}`;
+                  console.log(url);
+            $.get(url, function (data) {
+                //document.getElementById("dishContainer").appendChild(data);
+                //console.log(data);
+                dlg.find(".complex-content").find("#dish-footer").before(data);
+                //$('select').selectpicker({
+                //    liveSearch: true,
+                //    showSubtext: true
+                //});
+                });
+        });
+
+    $(document).on("click", ".delete-line",
+        function (e) {
+            console.log("delete line");
+            e.preventDefault();
+            var dlg = $(this).parents("#complex");
+            var docline = $(this).parents(".complex-line");
+            docline.remove();
+            var quan = parseInt( $("#quantity").val());
+            $("#quantity").val(quan - 1);
+            var maxidx = dlg.find(".complex-line").length;
+            console.log(maxidx);
+            dlg.find(".complex-line").each(function (lidx, lel) {
+                $(lel).find('input[name*="["]').each(function (idx, el) {
+                    var name = $(el).attr('name');
+                    console.log(name);
+                    var newname = name.replace(/\[\d+\]/g, `[${lidx}]`);
+                    $(el).attr('name', newname);
+                    console.log(newname);
+                });
+            })
+
+        });
+    $(document).on("click", ".delete-item",
+        function (e) {
+            console.log("delete item");
+            e.preventDefault();
+            var dlg = $(this).parents("#complex");
+            var docline = $(this).parents(".dish-line");
+            docline.remove();
+
+            var maxidx = dlg.find(".dish-line").length;
+            console.log(maxidx);
+            dlg.find(".dish-line").each(function (lidx, lel) {
+                $(lel).find('input[name*="["]').each(function (idx, el) {
+                    var name = $(el).attr('name');
+                    console.log(name);
+                    var newname = name.replace(/\[\d+\]/g, `[${lidx}]`);
+                    $(el).attr('name', newname);
+                    console.log(newname);
+                });
+            })
+
+        });
+            // response from server
+            function showeditdayalert(options) {
+                var alert;
+                if ($('#modDialogcomplexline').hasClass('show')) {
+                    alert = "#responseS";
+                } else {
+                    alert = "#response";
+                }
+                $(alert).animate({
+                    height: '+=72px'
+                }, 300);
+
+                $(`<div class="alert ${options.class}">` +
+                    '<button type="button" class="close" data-dismiss="alert">' +
+                    `x</button>${options.text}</div>`)
+                    .hide().appendTo(alert).fadeIn(1000);
+
+                $(".alert").delay(3000).fadeOut(
+                    "normal",
+                    function () {
+                        $(this).remove();
+                    });
+
+                $(alert).delay(4000).animate({
+                    height: '-=72px'
+                }, 300);
+
+
+            }
+            //end of edit modal
+        })
+
+
+    </script>
+}

@@ -1,0 +1,125 @@
+﻿@model IEnumerable<HotelFood.Models.Complex>
+
+@using HotelFood.Core
+
+
+@{
+    QueryModel querymodel = ViewData["QueryModel"] as QueryModel;
+    if (querymodel == null)
+    {
+        querymodel = new QueryModel();
+    }
+
+}
+@if (true)
+{
+    <div class="col-12 p-0  mt-2">
+        @foreach (var item in Model)
+        {
+            <div class="col-12 p-0 d-flex box-shadow-container brd-bot-line mb-3 mb-lg-0 mb-md-0"
+                 style="min-height: 52px; color: #232323">
+                <div class="col-12 p-0  d-flex flex-lg-row flex-md-row flex-column align-items-center mt-2 mt-lg-0 mt-md-0">
+                    <div class="col-md-3 col-lg-3 col-12 d-flex justify-content-start mt-1 d-flex flex-column flex-md-row flex-lg-row"
+                         style="font-size: 16px">
+                        <span class="change-bg-grey d-md-none d-lg-none d-inline d-flex justify-content-center"
+                              style="font-size: 14px; width: 38px">@Html.DisplayFor(modelItem => item.Category.Name)</span>
+                        <span class="col-12 p-0 d-md-none d-lg-none d-inline mt-2 mt-lg-0 mt-md-0"
+                              style="font-size: 14px; font-weight: bold">
+                            @Html.DisplayFor(modelItem => item.Name)<span class="d-md-none d-lg-none d-inline"
+      style="color: #36C233; font-family: Open-Sans, sans-serif; font-weight: normal"> (@Html.DisplayFor(modelItem => item.DishesQuantity))</span>
+                        </span>
+                        <span class="col-lg-12 col-md-12 col-6 p-0 d-none d-lg-inline d-md-inline">@Html.DisplayFor(modelItem => item.Name)</span>
+                    </div>
+                    <div class="col-md-3 col-lg-3 col-12 d-flex justify-content-start mt-1"
+                         style="font-size: 16px">
+                        <span class="col-4 p-0 d-md-none d-lg-none d-inline mt-2"
+                              style="font-size: 14px; font-weight: bold; font-family: Open-Sans, sans-serif">@Html.DisplayFor(modelItem => item.Price) ₴</span><span class="col-lg-12 col-md-12 col-6 p-0 d-none d-lg-inline d-md-inline"
+      style="font-family: Open-Sans, sans-serif;">@Html.DisplayFor(modelItem => item.Price)</span>
+                    </div>
+                    <div class="col-md-2 col-lg-2 col-12 d-lg-flex d-md-flex d-none justify-content-start mt-1"
+                         style="font-size: 16px">
+                        <span class="col-lg-12 col-md-12 col-6 p-0">@Html.DisplayFor(modelItem => item.Category.Name)</span>
+                    </div>
+                    <div class="col-md-2 col-lg-2 col-12 d-lg-flex d-md-flex d-none justify-content-start mt-1"
+                         style="font-size: 16px">
+                        <span class="col-lg-12 col-md-12 col-6 p-0"
+                              style="font-family: Open-Sans, sans-serif">@Html.DisplayFor(modelItem => item.DishesQuantity)</span>
+                    </div>
+
+                    <div class="col-12 col-lg-2 col-md-2 d-flex mb-2  justify-content-end">
+                        
+                            <a href="@Url.Action("EditModal","Complex",
+                                  new { id = item.Id }, null)" class="cmd-edit dialog-edit-icon btn ">
+                                <img src="/img/pen-icon.svg" alt="Change item">
+                            </a>
+                        
+                        <a asp-action="Delete" asp-route-id="@item.Id" class="cmd-delete dialog-edit-icon btn ml-3"><img src="/img/delete-icon.svg" alt="Delete item"></a>
+                    </div>
+                </div>
+            </div>
+        }
+            
+
+
+        </div>
+        @Html.DisplayFor(model => querymodel, "PageNavigation", null)
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr class="bg-white text-success">
+                <th>
+
+                    @await this.InvokeComponentAsync(Component, "TableColumn", model => model.Name, querymodel)
+                </th>
+                <th>
+                    @await this.InvokeComponentAsync(Component, "TableColumn", model => model.Price, querymodel)
+
+                </th>
+                <th>
+                    @await this.InvokeComponentAsync(Component, "TableColumn", model => model.Category.Name, querymodel, (object)ViewBag.CategoriesId)
+
+                </th>
+                <th>
+                    @await this.InvokeComponentAsync(Component, "TableColumn", model => model.DishesQuantity, querymodel)
+
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr class="bg-white text-secondary">
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Name)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Price)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Category.Name)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.DishesQuantity)
+                    </td>
+                    <td>
+
+
+                        <a asp-action="Delete" asp-route-id="@item.Id" class="cmd-delete dialog-edit-icon"> <span class="fa fa-trash" aria-hidden="true"></span></a>
+                        @Html.ActionLink("", "EditModal",
+                                  new { id = item.Id }, new { @class = "cmd-edit dialog-edit-icon fa fa-pencil-square-o" })
+                    </td>
+                </tr>
+            }
+        </tbody>
+        <tfoot>
+            <tr class="bg-white text-success rounded border">
+                <td colspan="5">
+                    @await this.InvokeComponentAsync(Component, "TablePager", model => model.Name, querymodel)
+                </td>
+            </tr>
+        </tfoot>
+    </table>
+}

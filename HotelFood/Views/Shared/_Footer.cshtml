@@ -1,0 +1,120 @@
+﻿@using Microsoft.AspNetCore.Identity
+@inject SignInManager<HotelUser> SignInManager
+@inject HotelFood.Repositories.ICompanyUserRepository cu_repo
+@*
+    <footer class="footer">
+        <div class="footer-bottom">
+            <div class="container clearfix">
+                <p class="float-right"><a href="#">Back to top</a></p>
+                <p>© 2017-2018 Company, Inc. · <a href="#">Privacy</a> · <a href="#">Terms</a></p>
+            </div>
+        </div>
+    </footer>
+*@
+@if (true)
+{
+    @*
+                               <div class="col-11 p-0 d-flex justify-content-between align-items-center" style="color: #ffff66;background:#222222">
+                            Шановні бітьки, надсилайте ваші проблеми на Вайбер +38(093)577-4000
+                        </div>
+                        <div class="col-1 p-0 d-flex justify-content-between align-items-center" style="color: #ffff66">
+                            <a href="viber://chat?number= +380935774000"><img src="~/images/Viber-logo.png"/></a>
+                        </div>
+        *@
+        <footer class="footer row m-0" style="background: #222222">
+            <div class="w-100 p-0 first-footer d-flex align-items-center">
+                <div class="container">
+
+                <div class="col-12 p-0 d-flex justify-content-between align-items-center">
+                    <div class="col-lg-9 col-md-9 col-6 p-0 justify-content-center align-items-center">
+                        <nav class="nav col-12 p-0 d-flex justify-content-between">
+                            <div class=" p-0 justify-content-between d-none d-lg-flex d-md-flex non-visible-mob"
+                                 style="width: 120px; ">
+                                <a style="height: 50px; width: 50px; border: 1px solid #B1B1B1; border-radius: 50%; text-decoration: none;" href="https://www.facebook.com/kabachokUA/"></a>
+                                <a style="height: 50px; width: 50px; border: 1px solid #B1B1B1; border-radius: 50%; text-decoration: none;" href="https://www.instagram.com/kabachok_ua/"></a>
+                            </div>
+                            <div class=" justify-content-between d-flex d-lg-none d-md-none visible-mob"
+                                 style="width: 70px; ">
+                                <a style="height: 20px; width: 20px;  text-decoration: none;" href="https://www.facebook.com/kabachokUA/"></a>
+                                <a style="height: 20px; width: 20px;  text-decoration: none;" href="https://www.instagram.com/kabachok_ua/"></a>
+                            </div>
+                            <div class="col-9 justify-content-between align-items-center d-sm-flex d-lg-flex d-md-flex flex-grow-1 mail-non-visible">
+                                <div class="col-5 p-0" style="font-size: 16px; color: #ffffff">
+                                    <img src="~/img/phone-footer-pc.svg" alt="" style="margin-right: 6px">
+                                    <a href="tel:0935774000" style="color: white">+38(093)5774000@*(XXX) XXX-XXXX*@</a>
+                                </div>
+                                <div class="col-7 col-sm-12 p-0" style="font-size: 16px; color: #ffffff">
+                                    <img src="~/img/mail-footer-pc.svg" alt="" style="margin-right: 6px">
+                                    <a href="mailto:admin@kabachok.group" style="color: white">admin@kabachok.group</a>
+                                </div>
+                            </div>
+                        </nav>
+                    </div>
+
+                    <div class="col-md-3 col-lg-3 col-6 p-0 justify-content-center" style="height: 24px">
+                        <nav class="nav justify-content-end">
+                            <a class="nav-link p-0 align-self-center" href="/Home/About"
+                               style="color: #36C233; font-size: 14px; line-height: 16px;">About Us</a>
+                            <div class="align-self-center px-3" style="color: #36C233">|</div>
+                            <a class="nav-link p-0  align-self-center" href="/Home/Privacy"
+                               style="color: #36C233; font-size: 14px; line-height: 16px;">Privacy</a>
+                            <div class="align-self-center px-3" style="color: #36C233">|</div>
+                            <a class="nav-link p-0 align-self-center" href="/Home/Privacy"
+                               style="color: #36C233; font-size: 14px; line-height: 16px;">Terms</a>
+                        </nav>
+                    </div>
+                </div>
+
+            </div>
+    </div>
+    <div class="p-0 w-100 d-flex align-items-center second-footer" style="height: 38px;">
+        <div class="container container-sm container-md container-lg">
+            <div class="col-12 p-0 d-flex justify-content-center"
+                 style="color: #ffffff; font-size: 14px; line-height: 16px;">
+                @if (SignInManager.IsSignedIn(User))
+                {
+                    <span>© 2020 @cu_repo.GetCurrentCompany()</span>
+                }
+                else
+                {
+                    <span>© 2020 Company, Inc.</span>
+                }
+            </div>
+        </div>
+    </div>
+    </footer>
+
+
+}
+else
+{
+    <footer class="footer"
+            style="min-height: 91px; background: #222222; display:flex; align-items: center; margin-top: 56px">
+        <div class="container" style="height: 100%">
+            <div class="row justify-content-between">
+                <div class="col-4">
+
+                    @if (SignInManager.IsSignedIn(User))
+                    {
+
+
+                        <span class="h5" style="color: #ffffff; font-size: 14px; line-height: 16px">© 2017-2018 @cu_repo.GetCurrentCompany()</span>
+                    }
+                    else
+                    {
+                        <span class="h5" style="color: #ffffff; font-size: 14px; line-height: 16px">© 2017-2018 Company, Inc.</span>
+                    }
+                </div>
+                <div class="col-4 ">
+                    <nav class="nav justify-content-end">
+                        <a class="nav-link p-0 pl-3 pr-3 align-self-center" href="#"
+                           style="color: #F15E25; font-size: 14px; line-height: 16px;">Privacy</a>
+                        <div class="align-self-center" style="color: #f15e25">|</div>
+                        <a class="nav-link p-0 pl-3 pr-3 align-self-center" href="#"
+                           style="color: #F15E25; font-size: 14px; line-height: 16px;">Terms</a>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </footer>
+}

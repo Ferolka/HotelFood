@@ -1,0 +1,162 @@
+﻿@model HotelFood.Models.Categories
+@inject HotelFood.Core.SharedViewLocalizer Localizer
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+@if (true)
+{
+    <div class="modal-content col-lg-12 col-12">
+        <div class="modal-header align-items-center pl-lg-4 pl-2" style="padding-top:20px">
+            <h5 class="modal-title p-0" id="exampleModalLabel"
+                style="font-size: 34px; line-height: 40px; font-weight: bold">
+                @Localizer["Categories"]
+            </h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <img src="./img/close-modal.svg" aria-hidden="true" alt="">
+            </button>
+        </div>
+        <div class="modal-body col-auto">
+            <form asp-action="EditModal" enctype="multipart/form-data">
+                <div class="row justify-content-around flex-column flex-lg-row flex-md-row flex-sm-column align-content-sm-center align-content-center align-items-sm-center align-items-center"
+                     style=" min-height: 350px">
+
+                    <div class="col-12  justify-content-md-center justify-content-center mt-3 mt-md-0 mt-lg-0">
+
+                        <div class="row">
+                            <div class="col-12 p-0 ">
+                                <input type="hidden" asp-for="Id" />
+
+                                <div class="row col-12 justify-content-between p-0 m-0 align-items-center mb-2"
+                                     style="margin-bottom: 6px">
+                                    <label class="col-4" asp-for="Name"
+                                           style="margin-bottom: 0; text-align: center; display: flex; justify-content: left; padding-left: 0">@*Страва*@</label>
+                                        <div class="col-8 flex-grow-1 justify-content-end p-0">
+                                            <input asp-for="Name" class="form-control"
+                                                   placeholder="Страва"
+                                                   style="max-width: 245px; height: 34px" />
+
+                                        </div>
+                                        <span asp-validation-for="Name" class="text-danger"></span>
+                                    </div>
+                                <div class="row col-12 justify-content-between p-0 m-0 align-items-center mb-2"
+                                     style="margin-bottom: 6px">
+                                    <label class="col-4" asp-for="Code"
+                                           style="margin-bottom: 0; text-align: center; display: flex; justify-content: left; padding-left: 0">@*Страва*@</label>
+                                        <div class="col-8 flex-grow-1 justify-content-end p-0">
+                                            <input asp-for="Code" class="form-control"
+                                                   placeholder="Страва"
+                                                   style="max-width: 245px; height: 34px" />
+
+                                        </div>
+                                        <span asp-validation-for="Code" class="text-danger"></span>
+                                    </div>
+                                    <div class="row col-12 justify-content-between p-0 m-0 align-items-center mb-2"
+                                         style="margin-bottom: 6px">
+                                        <label class="col-4" asp-for="Description"
+                                               style="margin-bottom: 0; text-align: center; display: flex; justify-content: left; padding-left: 0">@*Страва*@</label>
+                                            <div class="col-8 flex-grow-1 justify-content-end p-0">
+                                                <input asp-for="Description" class="form-control"
+                                                       placeholder="Страва"
+                                                       style="max-width: 245px; height: 34px" />
+
+                                            </div>
+                                            <span asp-validation-for="Description" class="text-danger"></span>
+                                        </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                        </form>
+                    </div>
+                    <div class="modal-footer justify-content-center"
+                         style="font-size: 14px; font-weight: bold; line-height: 16px; padding: 40px 0 58px">
+                        <button type="button" button class="btn btn-primary m-2 col-sm-4 col-xl-4 col-12"
+                                style="background: #36C233; border: 1px solid #36C233; height: 48px" data-save="modal">
+                            @Localizer["Save"]
+                        </button>
+
+                        <button type="button" class="btn btn-secondary m-2 col-sm-4 col-xl-4 col-12 "
+                                style="background: #ffffff; border: 1px solid #F15E25; height: 48px; color: #f15e25"
+                                data-dismiss="modal">
+                            @Localizer["Cancel"]
+                        </button>
+                    </div>
+                </div>
+}
+else
+{
+<style>
+    form dt {
+        float: left;
+        display: block;
+        width: 30%;
+    }
+
+    dd select {
+        width: 50%;
+    }
+
+    dd textarea {
+        width: 100%;
+    }
+</style>
+<div class="modal-content">
+    <div class="modal-header">
+        <h5 class="modal-title">@Localizer["Category"]</h5>
+        <button class="close" data-dismiss="modal" area-hidden="true">
+            <span aria-hidden="true">&times;</span>
+        </button>
+
+    </div>
+    <div class="modal-body">
+        <form asp-action="EditModal">
+            <dl class="">
+                <dd><input type="hidden" asp-for="Id" /></dd>
+
+                <dt>  <label asp-for="Code" class="control-label"></label></dt>
+                <dd>
+                    <input asp-for="Code" class="form-control" />
+                    <span asp-validation-for="Code" class="text-danger"></span>
+                </dd>
+
+
+                <dt>  <label asp-for="Name" class="control-label"></label></dt>
+                <dd>
+                    <input asp-for="Name" class="form-control" />
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </dd>
+                <dt> <label asp-for="Description" class="control-label"></label> </dt>
+                <dd>@Html.EditorFor(model => model.Description)</dd>
+
+            </dl>
+            @Html.ValidationSummary(true)
+            @Html.AntiForgeryToken()
+        </form>
+        <div class="row">
+            <div class="col-sm-1">
+            </div>
+            <div class="col-sm-2">
+                <button type="button" button class="btn btn-primary" data-save="modal">@Localizer["Save"]</button>
+            </div>
+            <div class="col-sm-1">
+            </div>
+            <div class="col-sm-2">
+                <button type="button" button class="btn btn-primary" data-dismiss="modal">@Localizer["Cancel"]</button>
+            </div>
+
+            <div class="col-sm-1">
+            </div>
+
+        </div>
+    </div>
+</div>
+
+}
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

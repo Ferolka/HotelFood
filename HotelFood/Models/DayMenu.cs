@@ -10,8 +10,8 @@ namespace HotelFood.Models
     {
         
         public DateTime Date { get; set; }
-        public int DishKind { get; set; }
-        //public OrderTypeEnum MenuType { get; set; }
+       // public int DishKind { get; set; }
+        public OrderTypeEnum MenuType { get; set; }
         
     }
    

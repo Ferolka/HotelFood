@@ -197,7 +197,7 @@ namespace HotelFood.Repositories
                 var entry = _context.Entry(entity);
                 if (entry.State == EntityState.Modified)
                 {
-                    if (entry.OriginalValues.GetValue<int>("CompanyId") != companyId)  //something wrong with hack
+                    if (entry.OriginalValues.GetValue<int>("HotelId") != companyId)  //something wrong with hack
                     {
                         throw new Exception("Fobidden");
                     }

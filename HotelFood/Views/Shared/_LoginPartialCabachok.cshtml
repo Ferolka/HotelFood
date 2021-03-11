@@ -78,7 +78,7 @@
 
                                 <div class="row m-0">
                                     <div class="col-sm-4 p-0">
-                                        @await RenderMenuItem("Dishes", "Index", Localizer["MenuDishes"], "Admin,CompanyAdmin,KitchenAdmin")
+                                        @await RenderMenuItem("Dish", "Index", Localizer["MenuDishes"], "Admin,CompanyAdmin,KitchenAdmin")
                                     </div>
                                     <div class="col-sm-4 p-0">
                                         @await RenderMenuItem("Company", "Setting", Localizer["Setting"], "Admin,CompanyAdmin")
@@ -99,9 +99,9 @@
                                     </div>
                                 </div>
                                 <div class="row m-0">
-                                    <div class="col-sm-4 p-0">
+                                    @*<div class="col-sm-4 p-0">
                                         @await RenderMenuItem("Ingredients", "Index", Localizer["MenuIngredients"], "Admin,CompanyAdmin,KitchenAdmin")
-                                    </div>
+                                    </div>*@
                                     <div class="col-sm-4 p-0">
                                         @await RenderMenuItem("UserGroups", "Index", Localizer["MenuUsersGroups"], "Admin,CompanyAdmin,UserAdmin")
                                     </div>

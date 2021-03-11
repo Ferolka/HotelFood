@@ -1,55 +1,248 @@
-﻿<!DOCTYPE html>
+﻿@*<!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>@ViewData["Title"] - HotelFood</title>
+        <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+        <link rel="stylesheet" href="~/css/site.css" />
+        @RenderSection("Styles", required: false)
+    </head>
+    <body>
+        <header>
+            <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+                <div class="container">
+                    <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">HotelFood</a>
+                    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                            aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div class="navbar-collapse collapse d-sm-inline-flex flex-sm-row-reverse">
+                        <ul class="navbar-nav flex-grow-1">
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                            </li>
+                            <li>
+                                <a class="navbar-brand" href="/" style="max-width: 179px"><img src="~/img/logo.png" alt="Catering logo" style="width: 100%;"></a>
+
+                                @await Html.PartialAsync("_LoginPartialCabachok")
+                            </li>
+
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+        </header>
+        <div class="container">
+            <main role="main" class="pb-3">
+                @RenderBody()
+            </main>
+        </div>
+
+        <footer class="border-top footer text-muted">
+            <div class="container">
+                &copy; 2021 - HotelFood - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            </div>
+        </footer>
+        <script src="~/lib/jquery/dist/jquery.min.js"></script>
+        <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="~/js/site.js" asp-append-version="true"></script>
+        <script src="~/js/jquery.min.js"></script>
+        <script src="~/js/jquery-ui.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+                crossorigin="anonymous"></script>
+        <script src="~/js/bootstrap.min.js"
+                crossorigin="anonymous"></script>
+        <script src="~/js/resources.js" asp-append-version="false"></script>
+        <script src="~/js/site.js" asp-append-version="true"></script>
+        <script src="~/js/animation-bg-main-page.js"></script>
+        <script>
+            $('#sources').each(function () {
+                let classes = $(this).attr("class"),
+                    id = $(this).attr("id"),
+                    name = $(this).attr("name");
+                let template = '<div class="' + classes + '">';
+                template += '<span class="custom-select-trigger">' + $(this).attr("placeholder") + '</span>';
+                template += '<div class="custom-options">';
+                $(this).find("option").each(function () {
+                    template += '<span class="custom-option ' + $(this).attr("class") + '" data-value="' + $(this).attr("value") + '">' + $(this).html() + '</span>';
+                });
+                template += '</div></div>';
+
+                $(this).wrap('<div class="custom-select-wrapper"></div>');
+                $(this).hide();
+                $(this).after(template);
+            });
+            $(".custom-option:first-of-type").hover(function () {
+                $(this).parents(".custom-options").addClass("option-hover");
+            }, function () {
+                $(this).parents(".custom-options").removeClass("option-hover");
+            });
+            $(".custom-select-trigger").on("click", function () {
+                $('html').one('click', function () {
+                    $(".custom-select").removeClass("opened");
+                });
+                $(this).parents(".custom-select").toggleClass("opened");
+                event.stopPropagation();
+            });
+            $(".custom-option").on("click", function () {
+                $(this).parents(".custom-select-wrapper").find("select").val($(this).data("value"));
+                $(this).parents(".custom-options").find(".custom-option").removeClass("selection");
+                $(this).addClass("selection");
+                $(this).parents(".custom-select").removeClass("opened");
+                $(this).parents(".custom-select").find(".custom-select-trigger").text($(this).text());
+            });
+
+            $('.delete-parent').click(function () {
+                $(this).closest('.parent-delete').remove();
+            });
+
+
+        </script>
+        @RenderSection("Scripts", required: false)
+    </body>
+    @await Html.PartialAsync("_LoginPartialModal")
+    </html>*@
+
+
+
+
+@using Microsoft.AspNetCore.Identity
+
+@inject SignInManager<HotelUser> SignInManager
+@inject HotelFood.Core.SharedViewLocalizer Localizer
+@inject HotelFood.Repositories.ICompanyUserRepository cu_repo
+@{
+
+    //  string[] newDesignPathes = { "Dishes","UserGroups", "IngredientCategories", "Categories", "Docs","MassEmail", "DayDishes","Complex","MyOrders", "Account", "Service" };
+    bool isNewDesign = true;// Context.Request.Path.ToString().Split("/").Any(s => newDesignPathes.Contains(s)) || Context.Request.Path=="/";
+                            // string test = "";
+
+    //bool isIndex = ViewData["IsIndex"] != null ;
+    //var ModelName = ViewData["ModelName"];
+}
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - HotelFood</title>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <title>Кабачок</title>
+    <environment names="Development,Staging,Production,LocalProduction">
+        <link rel="stylesheet" href="~/css/bootstrap.min.css"
+              crossorigin="anonymous" />
+        <link rel="stylesheet" href="~/css/style.css" />
+        <link rel="stylesheet" href="~/css/custom-select.css" />
+        @if (!isNewDesign)
+        {
+            <link rel="stylesheet" href="~/lib/font-awesome/css/font-awesome.css" />
+            <link rel="stylesheet" href="~/lib/awesome-bootstrap-checkbox/awesome-bootstrap-checkbox.css" />
+
+            <link rel="stylesheet" href="~/css/jquery-ui.css" />
+            <link rel="stylesheet" href="~/css/site.css" />
+            <link rel="stylesheet" href="~/css/custom-select.css" />
+        }
+        @RenderSection("Styles", required: false)
+    </environment>
 </head>
-<body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">HotelFood</a>
-                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex flex-sm-row-reverse">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                        <li>
-                            <a class="navbar-brand" href="/" style="max-width: 179px"><img src="~/img/logo.png" alt="Catering logo" style="width: 100%;"></a>
 
-                            @await Html.PartialAsync("_LoginPartialCabachok")
-                        </li>
-                           
-                    </ul>
-                </div>
-            </div>
-        </nav>
-    </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
-    </div>
+<body style="display: flex; flex-direction: column; min-height: 100%; position: relative">
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2021 - HotelFood - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+    @RenderSection("BodyStart", required: false)
+
+    <header style="position: relative;">
+        <div class="container-xl container-md container-sm container" style="height: 90px; ">
+            <div id="cookies"></div>
+            <nav class="navbar navbar-light navbar-expand-lg navbar-expand-md flex-grow-0 px-0 justify-content-between">
+                <a class="navbar-brand" href="/" style="max-width: 179px"><img src="~/img/logo.png" alt="Catering logo" style="width: 100%;"></a>
+
+                @await Html.PartialAsync("_LoginPartialCabachok")
+            </nav>
         </div>
-    </footer>
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
+    </header>
+    @*<div class="modal-burger">
+        @await Html.PartialAsync("_LoginPartialMenuBurgerCabachok")
+    </div>*@
+    <main class="row mr-0 ml-0">
+        @*
+            @if (isIndex)
+            {
+                @await Html.PartialAsync("IndexTemplate")
+
+            }
+        *@
+        @RenderBody()
+    </main>
+
+
+    @await Html.PartialAsync("_Footer")
+    <environment names="Development,Staging,Production,LocalProduction">
+        <!-- Optional JavaScript -->
+        <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+        @*
+            <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+                    integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+                    crossorigin="anonymous"></script>
+        *@
+        <script src="~/js/jquery.min.js"></script>
+        <script src="~/js/jquery-ui.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+                crossorigin="anonymous"></script>
+        <script src="~/js/bootstrap.min.js"
+                crossorigin="anonymous"></script>
+        <script src="~/js/resources.js" asp-append-version="false"></script>
+        <script src="~/js/site.js" asp-append-version="true"></script>
+        <script src="~/js/animation-bg-main-page.js"></script>
+        <script>
+            $('#sources').each(function () {
+                let classes = $(this).attr("class"),
+                    id = $(this).attr("id"),
+                    name = $(this).attr("name");
+                let template = '<div class="' + classes + '">';
+                template += '<span class="custom-select-trigger">' + $(this).attr("placeholder") + '</span>';
+                template += '<div class="custom-options">';
+                $(this).find("option").each(function () {
+                    template += '<span class="custom-option ' + $(this).attr("class") + '" data-value="' + $(this).attr("value") + '">' + $(this).html() + '</span>';
+                });
+                template += '</div></div>';
+
+                $(this).wrap('<div class="custom-select-wrapper"></div>');
+                $(this).hide();
+                $(this).after(template);
+            });
+            $(".custom-option:first-of-type").hover(function () {
+                $(this).parents(".custom-options").addClass("option-hover");
+            }, function () {
+                $(this).parents(".custom-options").removeClass("option-hover");
+            });
+            $(".custom-select-trigger").on("click", function () {
+                $('html').one('click', function () {
+                    $(".custom-select").removeClass("opened");
+                });
+                $(this).parents(".custom-select").toggleClass("opened");
+                event.stopPropagation();
+            });
+            $(".custom-option").on("click", function () {
+                $(this).parents(".custom-select-wrapper").find("select").val($(this).data("value"));
+                $(this).parents(".custom-options").find(".custom-option").removeClass("selection");
+                $(this).addClass("selection");
+                $(this).parents(".custom-select").removeClass("opened");
+                $(this).parents(".custom-select").find(".custom-select-trigger").text($(this).text());
+            });
+
+            $('.delete-parent').click(function () {
+                $(this).closest('.parent-delete').remove();
+            });
+
+
+        </script>
+    </environment>
+
     @RenderSection("Scripts", required: false)
+    @await Html.PartialAsync("_LoginPartialModal")
+
 </body>
-@await Html.PartialAsync("_LoginPartialModal")
 </html>
+

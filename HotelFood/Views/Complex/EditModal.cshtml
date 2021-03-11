@@ -1,0 +1,262 @@
+﻿@model HotelFood.Models.Complex
+@inject HotelFood.Core.SharedViewLocalizer Localizer
+
+@{
+    ViewData["Title"] = "Edit";
+}
+@if (true)
+{
+    <div class="modal-content overflow-hidden position-relative col-lg-12 col-12 p-0" id="complex" data-id="@Model.Id">
+        <div class="modal-header align-items-center col-12" style="padding-top:20px">
+            <h5 class="modal-title px-lg-3 px-md-3 px-0" id="exampleModalLabel1"
+                style="font-size: 34px; line-height: 40px; font-weight: bold">
+                @Localizer["Complex"]
+            </h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <img src="../img/close-modal.svg" aria-hidden="true" alt="">
+            </button>
+        </div>
+        <div class="modal-body complex-body col-auto mt-2 px-0 brd-bot-line-reverse">
+            @if (!Html.ViewData.ModelState.IsValid)
+            {
+                <div id="error" class="col alert-danger">@Html.ValidationSummary()</div>
+
+            }
+            <div class="col-12 px-3 mt-1 d-flex flex-md-row flex-lg-row flex-column brd-bot-line-reverse pb-3">
+                <div class="col-lg-9 col-md-9 col-12 px-lg-3 px-md-3 px-0">
+                    <div class="row p-0 flex-lg-row flex-md-row flex-column">
+                        <div class="form-group d-flex flex-lg-row flex-md-row flex-column  col-12 input-row-black  align-content-center">
+                            <input type="hidden" asp-for="Id" />
+                            <label asp-for="Name"
+                                   class="profile-form-title col-12 col-lg-4 col-md-4 p-0 d-flex align-items-center mb-0"></label>
+                            <input class="form-control col-12 col-lg-8 col-md-8 pl-9"
+                                   asp-for="Name"
+                                   placeholder="@Localizer["Complex Name"]" style="height: 34px">
+                            <span asp-validation-for="Name" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="row p-0 flex-lg-row flex-md-row flex-column">
+                        <div class="form-group d-flex flex-lg-row flex-md-row flex-column  col-12 input-row-black  align-content-center">
+                            <label asp-for="Price"
+                                   class="profile-form-title col-12 col-lg-4 col-md-4 p-0 d-flex align-items-center mb-0"></label>
+                            <input class="form-control col-12 col-lg-8 col-md-8 pl-9"
+                                   asp-for="Price"
+                                   style="height: 34px; font-family: Open-Sans, sans-serif">
+                            <span asp-validation-for="Price" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="row p-0 flex-lg-row flex-md-row flex-column">
+                        <div class="form-group d-flex flex-lg-row flex-md-row flex-column  col-12 input-row-black  align-content-center">
+                            <label asp-for="DishKindId"
+                                   class="profile-form-title col-12 col-lg-4 col-md-4 p-0 d-flex align-items-center mb-0"></label>
+                            <select class="form-control col-10 col-lg-8 col-md-8 complex-dishkind"
+                                    asp-for="DishKindId" asp-items="ViewBag.DishKindId"
+                                    style="height: 34px; border: 1px solid #ced4da; border-radius: 4px">
+                            </select>
+                            <span asp-validation-for="DishKindId" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="row p-0 flex-lg-row flex-md-row flex-column">
+                        <div class="form-group d-flex flex-lg-row flex-md-row flex-column  col-12 input-row-black  align-content-center">
+                            <label asp-for="CategoriesId"
+                                   class="profile-form-title col-12 col-lg-4 col-md-4 p-0 d-flex align-items-center mb-0"></label>
+                            <div class="col-12 col-lg-8 col-md-8 d-flex justify-content-between px-0">
+                                <input asp-for="DishesQuantity" type="hidden" id="quantity" name="DishesQuantity" min="1" max="10" class="form-control" onchange="changeQuantity()" />
+                                <select class="form-control col-10 col-lg-8 col-md-8 complex-category"
+                                        asp-for="CategoriesId" asp-items="ViewBag.CategoriesId"
+                                        style="height: 34px; border: 1px solid #ced4da; border-radius: 4px">
+                                </select>
+                                <div class="col-lg-4 col-md-4 col-2  pr-0">
+                                    <button type="button" data-toggle="modal" data-target="#change-article" id="create-dishline"
+                                            class="col-12 btn btn-xl btn-outline-danger  justify-content-center  font-weight-bold btn-block d-lg-block d-md-block d-none create"
+                                            onmousemove="this.style.background='#36C233'; this.style.color='#ffffff'"
+                                            onmouseout="this.style.background='#ffffff'; this.style.color='#36C233'"
+                                            style="background: rgb(255, 255, 255); border-color: rgb(54, 194, 51); outline: none; height: 34px; color: rgb(54, 194, 51); display: flex; align-items: center; justify-content: space-evenly; font-size: 14px;">
+                                        @Localizer["Add"]
+                                    </button>
+                                    <button class="btn col-12 button-add-complex d-block d-md-none d-lg-none"
+                                            data-toggle="modal" data-target="#change-article" type="button"
+                                            style="width: 34px; height: 34px; margin-right: 0">
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <div class=" col-12 pt-3">
+                @*<div class="complex-content container">
+                    @for (int i = 0; i < Model.DishesQuantity; i++)
+                    {
+                        await Html.RenderPartialAsync("ComplexLineDishes", Model.DishComplex.Where(d => d.DishCourse == i));
+                    }
+                    <div class="row" id="dish-footer">
+                        <div id="create-dishline" class="col create">
+                            <span class="fa fa-plus fa-2x" aria-hidden="true"></span>
+                            <span>@Localizer["Add"]</span>
+                        </div>
+                        <div id="response" class="col"></div>
+                    </div>
+                </div>*@
+                <div class="col-lg-9 col-md-9 col-12 d-flex justify-content-end px-0 px-lg-3 px-md-3">
+                    <div class="col-lg-9 col-md-8 col-12 border-reverse p-0 p-lg-3 p-md-3 complex-content" style="overflow-y: scroll;">
+                        @for (int i = 0; i < Model.DishesQuantity; i++)
+                        {
+                            await Html.RenderPartialAsync("ComplexLineDishes", Model.DishComplex.Where(d => d.DishCourse == i));
+                        }
+
+                        
+                        <div class="row" id="dish-footer">
+
+                            <div id="response" class="col"></div>
+                        </div>
+
+
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+        <div class="modal-footer justify-content-center border-0 px-3"
+             style="font-size: 14px; font-weight: bold; line-height: 16px; padding: 40px 0 58px">
+            <button type="button" class="btn btn-primary m-2 col-sm-4 col-xl-4 col-12" id="sendBut"
+                    style="background: #36C233; border: 1px solid #36C233; height: 48px">
+                @Localizer["Save"]
+            </button>
+            <button type="button" class="btn btn-secondary m-2 col-sm-4 col-xl-4 col-12 "
+                    style="background: #ffffff; border: 1px solid #F15E25; height: 48px; color: #f15e25"
+                    data-dismiss="modal">
+                @Localizer["Cancel"]
+            </button>
+        </div>
+
+    </div>
+}
+else
+{
+
+
+    <style>
+        form dt {
+            float: left;
+            display: block;
+            width: 30%;
+        }
+
+        dd select {
+            width: 50%;
+        }
+
+        dd textarea {
+            width: 100%;
+        }
+    </style>
+    <div class="modal-content" id="complex" data-id="@Model.Id">
+        <div class="modal-header">
+
+            <h5 class="modal-title">@Localizer["Complex"]</h5>
+
+            <button class="close" data-dismiss="modal" area-hidden="true">
+                <span aria-hidden="true">&times;</span>
+            </button>
+
+        </div>
+        <div class="modal-body modal-edit-body">
+            @if (@Html.ValidationSummary() != null)
+            {
+                <div id="error" class="col alert-danger">@Html.ValidationSummary()</div>
+
+            }
+            @*     @Html.ValidationSummary()*@
+            <form asp-action="EditModal">
+                <dl class="">
+                    <dd><input type="hidden" asp-for="Id" /></dd>
+
+
+
+
+                    <dt>  <label asp-for="Name" class="control-label"></label></dt>
+                    <dd>
+                        <input asp-for="Name" class="form-control" />
+                        <span asp-validation-for="Name" class="text-danger"></span>
+                    </dd>
+                    <dt> <label asp-for="Price" class="control-label"></label> </dt>
+                    <dd>
+                        <input asp-for="Price" class="form-control" />
+                        <span asp-validation-for="Price" class="text-danger"></span>
+                    </dd>
+                    <dt>
+                        <label asp-for="CategoriesId" class="control-label"></label>
+                    </dt>
+                    <dd>
+
+                        <select asp-for="CategoriesId" class="form-control complex-category" asp-items="ViewBag.CategoriesId"></select>
+                        <span asp-validation-for="CategoriesId" class="text-danger"></span>
+                        @* <span asp-validation-for="CategoriesId" class="text-danger"></span>*@
+
+                    </dd>
+                    @*<dt> <label asp-for="DishesQuantity" class="control-label"></label> </dt>*@
+                    <dd> <input asp-for="DishesQuantity" type="hidden" id="quantity" name="DishesQuantity" min="1" max="10" class="form-control" onchange="changeQuantity()" /></dd>
+                    <!--
+                    <dt><label asp-for="DishComplex" class="control-label"></label> </dt>
+                    <dd id="dishContainer" class="dishes-container">
+                        <div class="dishes-content" id="dish">
+
+                        </div>
+                        <div id="dish-footer">
+                            <div id="create-dishline" class="col  create">
+                                <span class="fa fa-plus fa-2x" aria-hidden="true"></span>
+                                <span>@Localizer["Add"]</span>
+                            </div>
+                        </div>
+                    </dd>
+                        -->
+                </dl>
+
+                <div class="complex-content container">
+                    @for (int i = 0; i < Model.DishesQuantity; i++)
+                    {
+                        await Html.RenderPartialAsync("ComplexLineDishes", Model.DishComplex.Where(d => d.DishCourse == i));
+                    }
+                    <div class="row" id="dish-footer">
+                        <div id="create-dishline" class="col create">
+                            <span class="fa fa-plus fa-2x" aria-hidden="true"></span>
+                            <span>@Localizer["Add"]</span>
+                        </div>
+                        <div id="response" class="col"></div>
+                    </div>
+                </div>
+            </form>
+            <div class="row mt-3">
+                <div class="col-sm-3">
+
+                </div>
+                <div class="col-sm-2">
+                    @*<button type="button" button class="btn btn-primary" data-save="modal">@Localizer["Save"]</button>*@
+                    <button id="sendBut" button class="btn btn-primary">@Localizer["Save"]</button>
+                </div>
+                <div class="col-sm-1">
+                </div>
+                <div class="col-sm-2">
+                    <button type="button" button class="btn btn-primary" data-dismiss="modal">@Localizer["Cancel"]</button>
+                </div>
+
+                @*<div class="col-sm-1">
+                        <button onclick="send()" button class="btn btn-primary" data-save="modal">Send</button>
+                    </div>*@
+
+            </div>
+        </div>
+
+    </div>
+
+}
+
+
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
+

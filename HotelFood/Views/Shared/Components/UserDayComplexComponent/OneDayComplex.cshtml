@@ -1,0 +1,333 @@
+﻿@model IEnumerable<HotelFood.Models.UserDayComplexViewModel>
+
+@using HotelFood.Core
+@inject Microsoft.Extensions.Options.IOptions<UIOption> pageOptions
+@inject HotelFood.Core.SharedViewLocalizer Localizer
+@{
+    ViewData["Title"] = "EditDay";
+    bool allowEdit = (bool)ViewData["AllowEdit"];
+    bool allowAdmin = (bool)ViewData["AllowAdmin"];
+    //to do check balance
+   // bool posBalance = (bool)ViewData["PositiveBalance"];
+}
+@{
+    DateTime daydate = DateTime.Now;
+    int com = 0;
+    int course = 0;
+
+}
+@* bootstrap0 grid system *@
+@if (true)
+{
+    @if (!allowAdmin)
+    {
+        <br />
+        <h2 class="text-center">@Localizer["AskAdmin"]</h2>
+    }
+    @*@if (!posBalance)
+    {
+        <br />
+        <h2 class="text-center">@Localizer["LowBalance"]</h2>
+    }*@
+    @if (Model.Count() > 0)
+    {
+        <div class="col-12 p-0 justify-content-center mt-4 d-flex">
+            <span style="font-weight: 600; font-size: 28px; color: #232323">@Localizer["Complex Dishes"]</span>
+        </div>
+        <form action="/UserDayDishes/SaveDayComplex" method="post" id="orderForm-@Model.First().Date.Day">
+            @foreach (var item in Model)
+            {
+                <div class="col-12 box-shadow-container position-relative brd-bot-line mb-3">
+                    <div class="col-12 p-0 d-flex flex-column br daycomplex-item" date="@Model.First().Date">
+                        <span class="h3 pt-lg-0 pt-md-0 pt-3 brd-bot-line-reverse pb-4 pb-md-0 pb-lg-0"
+                              style="font-weight: 600; font-size: 18px; color: #232323">@Html.DisplayFor(modelItem => item.ComplexName)</span>
+                            <div>
+                                <span style="font-size: 16px; line-height: 16px; color: #232323;">Ціна за комплекс: </span>
+                                <span style="font-size: 16px; line-height: 16px; color: #797979;"> @string.Format("{0:0.00}{1}", item.Price, pageOptions.Value.CurrencySymbol)</span>
+                            </div>
+                            @*<span class="h4 font-italic d-flex align-items-center pb-2 pb-lg-0 pb-md-0 mt-2"
+                                style="font-size: 14px; line-height: 16px; color: #797979;">Перше</span>*@
+                        </div>
+                        @{course = -1;}
+                        @foreach (var dish in item.ComplexDishes)
+                        {
+                            @if (dish.DishCourse != course)
+                            {
+                                <div class="col-12 p-0 d-flex flex-column">
+                                    <span class="h4 font-italic d-flex align-items-center pb-2 pb-lg-0 pb-md-0 mt-2"
+                                          style="font-size: 14px; line-height: 16px; color: #797979;">@Localizer["Course" + (dish.DishCourse + 1)]</span>
+                                    </div>
+                                    course++;
+                                }
+
+                            <div class="complex-dish-item-container col-12 p-0 d-flex flex-lg-row flex-md-row align-items-md-center align-items-lg-center align-items-start pb-lg-2 pb-md-2 pb-3">
+                                <div class="col-lg-1 col-md-2 col-2 px-0">
+                                    <img class="complex-dish-item-image" src="@Url.Action("GetPicture", "Pictures", new { id = dish.PictureId, width = 61, height = 61 })"
+                                         data-src="@Url.Action("GetPicture", "Pictures", new { id = dish.PictureId, width = 150, height = 150 })"
+                                         alt="Image week dish"
+                                         style="width: inherit; max-width: 61px;">
+                                </div>
+                                <div class="col-lg-11 p-0 pl-2 col-md-10 col-10 d-flex flex-lg-row flex-md-row flex-column align-items-lg-center align-items-md-center align-items-start justify-content-start">
+                                    <div class="col-lg-2 col-md-2 col-12 px-md-0 px-lg-0 bolder-change complex-dish-item-name"
+                                         style="font-size: 16px;">@Html.DisplayFor(modelItem => dish.DishName)</div>
+                                        <div class="col-5 d-lg-block d-md-block d-none pr-3" style="font-size: 16px;">
+                                            <div class="pl-4 complex-dish-item-description" >
+                                                @Html.DisplayFor(modelItem => dish.DishDescription) <p /> @*@Html.DisplayFor(modelItem => dish.DishIngredients)*@
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-2 col-md-2 col-12 d-flex justify-content-lg-start justify-content-md-start lighter-change"
+                                             style="font-family: Open-Sans, sans-serif; font-size: 16px;">
+                                            <span class="complex-dish-item-readyweight">@String.Format("{0:f0}", dish.DishReadyWeight) @Localizer["DishReadyWeightMeasureUnit"]</span>
+                                            <span class="d-inline d-md-none d-lg-none"></span>
+                                            <span class="d-inline d-md-none d-lg-none"></span>
+                                        </div>
+                                        <div class="col-lg-2 col-md-2 col-12 justify-content-center d-lg-flex d-none d-md-flex"
+                                             style="font-family: Open-Sans, sans-serif; font-size: 16px;">
+                                        </div>
+                                        <button class="col-5 d-flex d-md-none d-lg-none brn justify-content-start" type="button"
+                                                data-toggle="modal" data-target="#dish-stock"
+                                                style="outline: none; border: none; color: #36C233; font-size: 14px; background: transparent;">
+                                            @Localizer["Stock>"]
+                                        </button>
+                                        <div class="col-lg-1 col-md-1 col-12 d-flex justify-content-lg-start justify-content-md-start justify-content-end pr-4 pr-lg-0 pr-md-0">
+                                            <label class="container-for-radio">
+                                                @if (allowEdit)
+                                                {
+                                                    <input class="custom-control-input dish-check"
+                                                           @*dish-check"*@ type="radio" name="Complex[@item.ComplexId].Course[@dish.DishCourse].DishId"
+                                                           complexdish="@item.ComplexId" @if (dish.IsDefault!=null&&(bool)dish.IsDefault) {
+                                                               @:default="true" 
+                                                           }
+                                                               @*else {@:false"
+                                                           }*@
+                                                               day="@Model.First().Date.Day" course="@dish.DishCourse" value="@dish.DishId">
+    
+                                                        <span class="checkmark-for-radio"></span>
+                                                }
+                                            </label>
+                                        </div>
+                                    </div>
+                            </div>
+
+                        }
+                        <div class="custom-control font-weight-bold d-flex justify-content-end p-0 pb-3 pb-lg-0 pb-md-0 pos-for-btn"
+                             style="width: 156px;  ">
+                            @if (allowEdit)
+                            {
+                                <label class="custom-control custom-checkbox m-0 p-0 d-flex justify-content-between align-items-center flex-grow-1 px-2"
+                                       style="height: 36px; font-size: 14px; color: #36C233; width: 100%; border-radius: 4px; border: 1px solid #36C233;">
+
+                                    <input type="checkbox" class="custom-control-input complex-check"
+                                           name="Complex[@com].Id"
+                                           day="@Model.First().Date.Day" price="@item.Price"
+                                           complex="@item.ComplexId" @*id="complex$@com"*@
+                                           value="@item.ComplexId" category="@item.ComplexCategoryId">
+                                    <span class="custom-control-indicator align-self-start"></span>
+                                    <span class="custom-control-description mr-1">ЗАМОВИТИ</span>
+
+
+                                </label>
+                            }
+                        </div>
+
+                    
+
+                    </div>
+                                com++;
+                            }
+
+        </form>
+        @if (allowEdit)
+        {
+            <div class="col-12  d-flex justify-content-center align-items-center">
+                <button type="button" class="send btn btn-primary m-2 col-sm-4 col-xl-4 col-12" data-date="@Model.First().Date.Day" date-fullDate="@Model.First().Date"
+                        style="background: #36C233; border: 1px solid #36C233; height: 48px; text-transform: uppercase">
+                    @Localizer["MyOrdersSave"]
+                </button>
+
+            </div>
+            //<button data-date="@Model.First().Date.Day" date-fullDate="@Model.First().Date" class="btn btn-primary send">@Localizer["MyOrdersSave"]</button>
+            // <button type="button" button class="btn btn-primary" data-action="saveuserdaycomplex">@Localizer["MyOrdersSave"]</button>
+        }
+    }
+}
+else
+{
+    <div class="userdaycomplex">
+        @if (!allowAdmin)
+        {
+            <br />
+            <h2 class="text-center">@Localizer["AskAdmin"]</h2>
+        }
+        @*@if (!posBalance)
+        {
+            <br />
+            <h2 class="text-center">@Localizer["LowBalance"]</h2>
+        }*@
+        @if (Model.Count() > 0)
+        {
+
+
+
+            <div class="container daydish-complex-content" data-form="userdaycomplex">
+                <div class="row">
+                    <div class="col col-lg-12 col-md-12 complex-menu-header">
+                        <span>@Localizer["Complex Dishes"]</span>
+                    </div>
+                </div>
+                <form action="/UserDayDishes/SaveDayComplex" method="post" id="orderForm-@Model.First().Date.Day">
+                    @foreach (var item in Model)
+                    {
+
+                        <div class="row">
+                            <div class="container daycomplex-item" date="@Model.First().Date">
+                                <div class="row row-daycomplex" data-form="userdaycomplexitem">
+                                    <div class="col col-4">
+
+                                        @*@Html.HiddenFor(modelItem => item.ComplexId, new { datafield = "ComplexID" })
+                                            @Html.HiddenFor(modelItem => item.Price, new { datafield = "Price" })
+                                            @Html.HiddenFor(modelItem => item.Date, new { datafield = "Date" })*@
+
+                                        @Html.DisplayFor(modelItem => item.ComplexName)
+                                    </div>
+                                    <div class="col col-3">
+                                        @Html.DisplayFor(modelItem => item.ComplexCategoryName)
+                                    </div>
+                                    <div class="col col-2">
+                                        @string.Format("{0:0.00}{1}", item.Price, pageOptions.Value.CurrencySymbol)
+
+                                    </div>
+                                    <div class="col col-2">
+                                        @*@if (allowEdit)
+                                            {
+                                            @Html.EditorFor(modelItem => item.Quantity, new { htmlAttributes = new { datafield = "Quantity", @class = "numberspinner" } })
+                                            }
+                                            else
+                                            {
+                                            @Html.DisplayFor(modelItem => item.Quantity, new { htmlAttributes = new { datafield = "Quantity" } })
+                                            }*@
+                                        @if (allowEdit)
+                                        {
+                                            <input class="form-check-input complex-check" type="checkbox" name="Complex[@com].Id" day="@Model.First().Date.Day" price="@item.Price" complex="@item.ComplexId" id="complex$@com" value="@item.ComplexId" category="@item.ComplexCategoryId" />
+                                        }
+                                    </div>
+                                </div>
+                                @{course = -1;}
+                                @foreach (var dish in item.ComplexDishes)
+                                {
+                                    @if (dish.DishCourse != course)
+                                    {
+                                        <div class="col">
+                                            @Localizer["Course" + (dish.DishCourse + 1)]
+                                            @*@(dish.DishCourse+1)*@
+                                        </div>
+                                        <br />
+                                        course++;
+                                    }
+
+                                    <div class="row row-daycomplex-item">
+                                        @*<div class="col">
+                                                @(dish.DishCourse+1)
+                                            </div>*@
+                                        <div class="col col-md-2">
+                                            @* @(dish.DishCourse+1)*@
+                                            <img src="@Url.Action(" GetPicture", "Pictures" , new { id=dish.PictureId, width=50, height=50 })" style="width:50px;height:50px;" />
+
+
+                                        </div>
+                                        <div class="col col-lg-2 col-md-2 col-2">
+
+                                            @Html.DisplayFor(modelItem => dish.DishName)
+
+                                        </div>
+
+                                        <div class="col col-lg-2 col-md-2 col-2 small">
+                                            @String.Format("{0:f0}", dish.DishReadyWeight) @Localizer["DishReadyWeightMeasureUnit"]
+
+                                        </div>
+                                        <div class="col-3 col-lg-4 col-md-4 small">
+                                            @Html.DisplayFor(modelItem => dish.DishDescription)
+                                            <p />
+                                            @Html.DisplayFor(modelItem => dish.DishIngredients)
+                                        </div>
+                                        @*<div class="col col-lg-4 col-md-4 col-4 small">
+
+
+                                            </div>*@
+
+                                        <div class="col col-lg-2 col-md-2 col-2 small">
+                                            @if (allowEdit)
+                                            {
+                                                @*@Html.EditorFor(modelItem => dish.DishQuantity, new { htmlAttributes = new { datafield = "Quantity", @class = "numberspinner" } })*@
+                                                // <input class="numberspinner text-box single-line" data-val="true" data-val-required="The DishQuantity field is required." name="UserDayDish[@com].Quantity" type="number" value="0" style="display: none;">
+                                                <input class="form-check-input dish-check" type="radio" name="Complex[@item.ComplexId].Course[@dish.DishCourse].DishId" complexdish="@item.ComplexId" day="@Model.First().Date.Day" course="@dish.DishCourse" value="@dish.DishId" />
+                                            }
+                                            @*else
+                                                {
+                                                @Html.DisplayFor(modelItem => dish.DishQuantity, new { htmlAttributes = new { datafield = "Quantity" } })
+                                                }*@
+
+                                        </div>
+
+
+                                    </div>
+                                    <div class="divider"></div>
+
+                                }
+                            </div>
+
+                        </div>
+                        com++;
+                    }
+                    @* <button type="submit" button class="btn btn-primary">@Localizer["MyOrdersSave"]</button>*@
+                </form>
+            </div>
+
+
+            <div class="container  border rounded daycomplex-footer">
+                @*<div class="row total-order-row">
+                        <div class="col col-lg-1 col-md-1 col-1">
+                        </div>
+
+                        <div class="col col-lg-6 col-md-6 col-6">
+                            <span class="total">@Localizer["Order Total"]</span>
+                        </div>
+                        <div class="col col-lg-2 col-md-2 col-2">
+                            <span class="totalcomplex-quantity"> @Model.Sum(it => it.Quantity) </span>
+                        </div>
+
+                        <div class="col col-lg-3 col-md-3 col-3">
+                            <span class="totalcomplex-amount">@Model.Sum(it => it.Quantity * it.Price) </span>
+                            <span>@pageOptions.Value.CurrencySymbol</span>
+
+
+                        </div>
+
+                    </div>*@
+                <div class="row daycomplex-footer-cmd">
+                    <div class="col col-lg-1 col-md-1 col-1 col-sm-1">
+                    </div>
+                    <div class="col col-lg-4 col-md-4 col-4 col-sm-4">
+                        @if (allowEdit)
+                        {
+                            <button data-date="@Model.First().Date.Day" date-fullDate="@Model.First().Date" class="btn btn-primary send">@Localizer["MyOrdersSave"]</button>
+                            // <button type="button" button class="btn btn-primary" data-action="saveuserdaycomplex">@Localizer["MyOrdersSave"]</button>
+                        }
+                    </div>
+                    <div class="col col-lg-1 col-md-1 col-1 col-sm-1">
+                    </div>
+                    <div class="col col-lg-4 col-md-4 col-4 col-sm-4">
+                        @*<button type="button" button class="btn btn-primary" data-action="payuserdaycomplex">@Localizer["MyOrdersPayment"]</button>*@
+                    </div>
+                </div>
+            </div>
+            @*<button data-date="@Model.First().Date.Day" date-fullDate="@Model.First().Date" class="send"> Check</button>*@
+
+        }
+        else if (allowEdit)
+        {
+            @*<h2 class="text-center">@Localizer["NoDishesAtThisDay"]</h2>*@
+        }
+    </div>
+
+}

@@ -1,0 +1,53 @@
+﻿@model HotelFood.Models.UserDayComplex
+@inject HotelFood.Core.SharedViewLocalizer Localizer
+@{
+    ViewData["Title"] = "Delete";
+}
+
+<div class="modal-content delete-content">
+    <div class="modal-header">
+        <h5 class="modal-title">@Localizer["Edit"]</h5>
+        <button class="close" data-dismiss="modal" area-hidden="true">
+            <span aria-hidden="true">&times;</span>
+        </button>
+
+    </div>
+    <div class="modal-body">
+        <h4>@Localizer["UserDayDish"]</h4>
+        <hr />
+
+        <dl class="dl-horizontal">
+            <input type="hidden" asp-for="ComplexId" />
+            <dt>
+                @Html.DisplayNameFor(model => model.Complex.Name)
+            </dt>
+            <dd>
+                @Html.DisplayFor(model => model.Complex.Name)
+            </dd>
+
+        </dl>
+
+        <form id="editOrd" asp-action="DeleteDayComplex">
+            <input type="hidden" asp-for="ComplexId" />
+            <input type="hidden" asp-for="Date" />
+            <input type="hidden" asp-for="Price" />
+            <input type="hidden" asp-for="Quantity" />
+            <input name="newQuantity" min="0" step="1" asp-for="Quantity" />
+            @*<input type="hidden" asp-for="UserId" />*@
+
+            @*<a class="btn-primary" asp-action="Index">Back to List</a>*@
+        </form>
+
+        @*<button class=" btn btn-danger">@Localizer["Delete"]</button>
+        <button type="button" button class="btn btn-primary" data-dismiss="modal">@Localizer["Cancel"]</button>*@
+    </div>
+    <div class="modal-footer justify-content-center border-0" style="font-size: 14px; font-weight: bold; line-height: 16px; padding: 20px 0 30px">
+        <button type="button" id="btnyes" class="edit-Ordcomplex btn btn-primary m-2 col-sm-4 col-xl-3 col-12" style="background: #36C233; border: 1px solid #36C233; height: 48px; text-transform: uppercase">
+            @Localizer["Save"]
+        </button>
+        <button type="button" id="btnno" data-dismiss="modal" class="btn btn-primary m-2 col-sm-4 col-xl-3 col-12" style="background: #ffffff; border: 1px solid #f15e25; height: 48px; text-transform: uppercase; color: #f15e25">
+    @Localizer["Cancel"]
+</button>
+    </div>
+</div>
+

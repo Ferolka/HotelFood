@@ -1,0 +1,231 @@
+﻿@model IEnumerable<HotelFood.Models.UserOrderedDay>
+
+@using HotelFood.Core
+@inject Microsoft.Extensions.Options.IOptions<UIOption> pageOptions
+@inject HotelFood.Core.SharedViewLocalizer Localizer
+@{
+    ViewData["Title"] = "EditDay";
+    bool allowEdit = (bool)ViewData["AllowEdit"];
+    bool allowEditDish = (bool)ViewData["AllowEditDish"];
+    bool allowDelete = (bool)ViewData["AllowDelete"];
+    }   
+
+@{
+        DateTime daydate = DateTime.Now;
+        string categoryName = "";
+    }
+
+    <div class="col-12 p-0 my-3 box-shadow-container dayComplexBag" id="current-day-cart"
+         style="border: 1px solid #eaeaea; border-radius: 4px">
+        @if (Model.Count() > 0)
+        {
+            <div class="col-12 p-0 justify-content-lg-around justify-content-md-around justify-content-start mt-3 d-flex flex-column brd-bot-line align-items-lg-center align-items-md-center align-items-start">
+                <div class="col-3 align-self-end d-flex justify-content-end hide-cart" data-date="@Model.FirstOrDefault().Date.Day" id="hide-cart" style="cursor: pointer">
+                    <img src="../img/arrow-down.svg" alt="" id="image-hide-cart" class="image-hide-cart-@Model.FirstOrDefault().Date.Day" style="width: 25px;height:25px;">
+                </div>
+                <div class="col-12 d-flex align-items-center justify-content-start justify-content-lg-center justify-content-md-center brd-bot-line">
+                    <span style="font-weight: 600; font-size: 30px; color: #232323">Кошик</span>
+                    <img src="~/img/cart-icon.svg" alt="Cart" style="padding-left: 10px">
+                </div>
+                <div class="d-flex align-items-center px-lg-5 px-md-5 px-3 align-self-lg-end align-self-md-end my-2">
+                    <span style="font-weight: 600; font-size: 24px; color: #232323">Підтверджено</span>
+                    <label class="container-for-radio ml-3">
+                        <input type="checkbox" checked="checked" class="custom-control-input" disabled>
+                        <span class="checkmark-for-radio"></span>
+                    </label>
+                </div>
+            </div>
+            <div class="col-12 p-0 d-none flex-column cart-for-hide-@Model.FirstOrDefault().Date.Day" id="cart-for-hide" style="transition: 0.2s ease-in-out;">
+                @foreach (var item in Model)
+                {
+
+
+                    <div class="col-12 mt-3 brd-bot-line" style="font-size: 24px">
+                        @item.CategoryName
+                        <div class="col-lg-1 col-md-1 col-12 d-flex justify-content-lg-start justify-content-md-start justify-content-end pr-4 pr-lg-0 pr-md-0">
+
+                        </div>
+                    </div>
+                    @foreach (var complex in item.UserDayComplex)
+                    {
+                        <div class="col-12 p-0" id="dinner-container">
+                            <div class="col-12  position-relative brd-bot-line mb-3 mt-3">
+                                <div class="col-12 p-0 d-flex flex-column ">
+                                    <div class="col-12 p-0 d-flex justify-content-between align-items-center brd-bot-line-reverse ">
+                                        <span class="h3 py-lg-0 py-md-0 py-3 m-0 mr-auto "
+                                              style="font-weight: 600; font-size: 18px; color: #232323">@complex.ComplexName</span>
+                                            @if (allowEdit)
+                                            {
+                                                <div class="btn mr-2 edit-complex" complexId="@complex.ComplexId" quantity="@complex.Quantity" date="@item.Date">
+                                                    <a class="dialog-edit-icon">
+
+                                                        <img src="~/img/pen-icon.svg" alt="Change item">
+                                                    </a>
+                                                </div>
+                                            }
+                                            @if (allowDelete)
+                                            {
+                                                <button class="btn delete-parent delete-complex" complexId="@complex.ComplexId" quantity="@complex.Quantity" date="@complex.Date" style="background: none; border: none">
+                                                    <img src="~/img/delete-icon.svg" alt="Delete item">
+                                                </button>
+
+                                            }
+                                        </div>
+                                        <span class="h4 font-italic d-flex align-items-center pb-2 pb-lg-0 pb-md-0 mt-2"
+                                              style="font-size: 14px; line-height: 16px; color: #797979;">Кількість: @complex.Quantity Ціна за комплекс: @string.Format("{0:0.00}{1}", complex.Price, pageOptions.Value.CurrencySymbol)</span>
+                                        </div>
+
+                                        @foreach (var dish in complex.ComplexDishes)
+                                        {
+                                            <div class="col-12 p-0 d-flex flex-lg-row flex-md-row align-items-md-center align-items-lg-center align-items-start pb-lg-2 pb-md-2 pb-3 parent-delete">
+                                                <div class="col-lg-1 col-md-2 col-2 px-0">
+                                                    <img src="@Url.Action("GetPicture", "Pictures", new { id = dish.PictureId, width = 61, height = 61 })"
+                                                         alt="Image week dish"
+                                                         style="width: inherit; max-width: 61px;">
+                                                </div>
+                                                <div class="col-lg-11 p-0 pl-2 col-md-10 col-10 d-flex flex-lg-row flex-md-row flex-column align-items-lg-center align-items-md-center align-items-start justify-content-start">
+                                                    <div class="col-lg-2 col-md-2 col-12 px-md-0 px-lg-0 bolder-change"
+                                                         style="font-size: 16px;">
+                                                        @dish.DishName
+                                                    </div>
+                                                    <div class="col-5 d-lg-block d-md-block d-none pr-3" style="font-size: 16px;">
+                                                        <div class="pl-4">
+                                                            @dish.DishDescription
+                                                            <p />
+                                                            @Html.DisplayFor(modelItem => dish.DishIngredients)
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-lg-2 col-md-2 col-12 d-flex justify-content-lg-start justify-content-md-start lighter-change"
+                                                         style="font-family: Open-Sans, sans-serif; font-size: 16px;">
+                                                        <span>@String.Format("{0:f0}", dish.DishReadyWeight) @Localizer["DishReadyWeightMeasureUnit"]</span>
+                                                        <span class="d-inline d-md-none d-lg-none"></span>
+                                                        <span class="d-inline d-md-none d-lg-none"></span>
+                                                    </div>
+                                                    <div class="col-lg-2 col-md-2 col-12 justify-content-center d-lg-flex d-none d-md-flex"
+                                                         style="font-family: Open-Sans, sans-serif; font-size: 16px;">
+                                                    </div>
+
+
+                                                </div>
+                                            </div>
+                                        }
+
+
+                                    </div>
+                                </div>
+                            }
+
+                    @if (item.UserDayDish.Count()>0)
+                    {
+                        <div class="col-12 p-0" id="dinner-container">
+                            <div class="col-12  position-relative brd-bot-line mb-3 mt-3">
+                                <div class="col-12 p-0 d-flex flex-column ">
+                                    <div class="col-12 p-0 d-flex justify-content-between align-items-center brd-bot-line-reverse ">
+                                        <span class="h3 py-lg-0 py-md-0 py-3 m-0 mr-auto "
+                                              style="font-weight: 600; font-size: 18px; color: #232323">@Localizer["Dish"]</span>
+                                            @*@if (allowEdit)
+                                            {
+                                                <div class="btn mr-2 edit-dish" complexId="@dish." quantity="@complex.Quantity" date="@item.Date">
+                                                    <a class="dialog-edit-icon">
+
+                                                        <img src="~/img/pen-icon.svg" alt="Change item">
+                                                    </a>
+                                                </div>
+                                            }
+                                            @if (allowDelete)
+                                            {
+                                                <button class="btn delete-parent delete-complex" complexId="@complex.ComplexId" quantity="@complex.Quantity" date="@complex.Date" style="background: none; border: none">
+                                                    <img src="~/img/delete-icon.svg" alt="Delete item">
+                                                </button>
+
+                                            }*@
+                                        </div>
+                                        @*<span class="h4 font-italic d-flex align-items-center pb-2 pb-lg-0 pb-md-0 mt-2"
+                                              style="font-size: 14px; line-height: 16px; color: #797979;">Кількість: @complex.Quantity Ціна за комплекс: @string.Format("{0:0.00}{1}", complex.Price, pageOptions.Value.CurrencySymbol)</span>*@
+                                        
+                                </div>
+
+                                        @foreach (var dish in item.UserDayDish)
+                                        {
+                                            <div class="col-12 p-0 d-flex flex-lg-row flex-md-row align-items-md-center align-items-lg-center align-items-start pb-lg-2 pb-md-2 pb-3 parent-delete">
+                                                <div class="col-lg-1 col-md-2 col-2 px-0">
+                                                    <img src="@Url.Action("GetPicture", "Pictures", new { id = dish.PictureId, width = 61, height = 61 })"
+                                                         alt="Image week dish"
+                                                         style="width: inherit; max-width: 61px;">
+                                                </div>
+                                                <div class="col-lg-11 p-0 pl-2 col-md-10 col-10 d-flex flex-lg-row flex-md-row flex-column align-items-lg-center align-items-md-center align-items-start justify-content-start">
+                                                    <div class="col-lg-2 col-md-2 col-12 px-md-0 px-lg-0 bolder-change"
+                                                         style="font-size: 16px;">
+                                                        @dish.DishName
+                                                    </div>
+                                                    <div class="col-5 d-lg-block d-md-block d-none pr-3" style="font-size: 16px;">
+                                                        <div class="pl-4">
+                                                            @dish.DishDescription
+                                                            <p />
+                                                            @Html.DisplayFor(modelItem => dish.DishIngredientds)
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-lg-2 col-md-2 col-12 d-flex justify-content-lg-start justify-content-md-start lighter-change mr-auto"
+                                                         style="font-family: Open-Sans, sans-serif; font-size: 16px;">
+                                                        
+                                                    <span>@String.Format("{0:f0}", dish.Quantity) @Localizer["pieces"]  <br />1  @Localizer["pieces"] / @dish.Price @pageOptions.Value.CurrencySymbol</span>
+                                                        
+                                                        <span class="d-inline d-md-none d-lg-none"></span>
+                                                        <span class="d-inline d-md-none d-lg-none"></span>
+                                                    </div>
+                                                    <div class="col-lg-2 col-md-2 col-12 justify-content-center d-lg-flex d-md-flex"
+                                                         style="font-family: Open-Sans, sans-serif; font-size: 16px;">
+                                                        @if (allowEditDish)
+                                                        {
+                                                            <div class="btn mr-2 edit-dish" dishId="@dish.DishId" categoryId="@dish.CategoryId"  quantity="@dish.Quantity" date="@dish.Date">
+                                                                <a class="dialog-edit-icon">
+
+                                                                    <img src="~/img/pen-icon.svg" alt="Change item">
+                                                                </a>
+                                                            </div>
+                                                        }
+                                                        @if (allowDelete)
+                                                        {
+                                                            <button class="btn delete-parent delete-dish" dishId="@dish.DishId" categoryId="@dish.CategoryId"  quantity="@dish.Quantity" date="@dish.Date" style="background: none; border: none">
+                                                                <img src="~/img/delete-icon.svg" alt="Delete item">
+                                                            </button>
+
+                                                        }
+                                                    </div>
+                                                    
+
+                                                </div>
+                                            </div>
+                                        }
+
+
+                                    </div>
+                                </div>
+                            }
+                }
+
+                <div class="col-12 p-0 d-flex py-3 justify-content-md-end justify-content-lg-end justify-content-start"
+                     style="border-top: 1px solid #EAEAEA">
+                    <div class="col-12 col-md-11 col-lg-11 d-flex flex-row px-lg-3 px-md-3 px-0">
+                        <div class="col-6 d-lg-block d-md-block d-none"></div>
+                        <div class="col-lg-3 col-md-3 col-6">
+                            <span class="font-weight-bold"
+                                  style="font-size: 20px; color: #232323">Загальна сума</span>
+                        </div>
+                        <div class="col-lg-2 col-md-2 col-6 p-0 d-flex justify-content-center">
+                            <span id="total-amount"
+                                  style="font-family: Open-Sans,sans-serif; color: #797979; font-size: 24px">
+                                @*@Model.Sum(it => it.Quantity * it.Price)*@ @Model.FirstOrDefault().Total @pageOptions.Value.CurrencySymbol
+                                @if (@Model.FirstOrDefault().TotalWithoutDiscount != null)
+                                {
+                                    <br />
+                                    <span>Знижка</span>
+                                    @Model.FirstOrDefault().DiscountSum @pageOptions.Value.CurrencySymbol
+                                }
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>

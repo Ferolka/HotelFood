@@ -97,7 +97,7 @@ namespace HotelFood.Controllers
             UserDayEditModel model = new UserDayEditModel()
             {
                 DayDate = daydate,
-                DayMenu =new DayMenu() { Date = daydate, DishKind = dishKind },
+                DayMenu =new DayMenu() { Date = daydate },
                 ShowComplex = (_userdaydishesrepo.GetCompanyOrderType(this.User.GetHotelID()) & (OrderTypeEnum.OneComplexType | OrderTypeEnum.Complex) ) >0,
                 //ShowComplex = user.MenuType.HasValue && (user.MenuType.Value & 1) > 0,
                 ShowDishes = (_userdaydishesrepo.GetCompanyOrderType(this.User.GetHotelID()) & OrderTypeEnum.Dishes ) > 0

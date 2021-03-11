@@ -1,0 +1,240 @@
+@model IEnumerable<HotelFood.Models.DayComplexViewModel>
+@inject HotelFood.Core.SharedViewLocalizer Localizer
+@{
+    ViewData["Title"] = "EditDay";
+}
+@{
+    DateTime daydate = DateTime.Now;
+}
+
+
+
+@{
+    int idx = 0;
+}
+
+
+@if (true)
+{
+    @foreach (var item in Model)
+    {
+
+        string id_checkbox = daydate.Millisecond.ToString() + "_" + idx;
+
+        @*<div class="col-12 p-lg-0 p-md-0 box-shadow-container position-relative brd-bot-line mb-3">
+                <div class="col-12 p-0 d-flex flex-column">
+                    <span class="h3 pt-lg-0 pt-md-0 pt-3"
+                          style="font-weight: 600; font-size: 18px; color: #232323">������� ��� �������</span>
+                    <span class="h4 font-italic d-flex align-items-center pb-2 pb-lg-0 pb-md-0 "
+                          style="font-size: 14px; line-height: 16px; color: #797979;">
+                        <img src="../img/arrow-right.svg"
+                             class="d-md-block d-lg-block d-none mr-1"
+                             alt="Arrow right">���� � ����������,��������,������� ������ � �����
+                    </span>
+                </div>
+                <div class="col-12 p-0 d-flex flex-lg-row flex-md-row align-items-md-center align-items-lg-center align-items-start pb-lg-2 pb-md-2 pb-3">
+                    <div class="col-lg-1 col-md-2 col-3 px-0">
+                        <img src="../img/img-week.png" alt="Image week dish">
+                    </div>
+                    <div class="col-lg-11 p-0 col-md-10 col-10 d-flex flex-lg-row flex-md-row flex-column align-items-lg-center align-items-md-center align-items-start justify-content-start">
+                        <div class="col-lg-5 col-md-4 col-12 px-0 bolder-change" style="font-size: 16px;">���� � ����������</div>
+                        <div class="col-4 d-lg-block d-md-block d-none" style="font-size: 16px;">
+                            ������� ����������
+                            ���� � ���������� �� �������� ��������.
+                        </div>
+                        <div class="col-lg-3 col-md-3 col-12 px-0 d-flex justify-content-md-end justify-content-lg-end justify-content-start lighter-change"
+                             style="font-family: Open-Sans, sans-serif; font-size: 16px;">
+                            150 ��.
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 p-0 d-flex flex-lg-row flex-md-row align-items-md-center align-items-lg-center align-items-start pb-lg-2 pb-md-2 pb-3">
+                    <div class="col-lg-1 col-md-2 col-3 px-0">
+                        <img src="../img/img-week.png" alt="Image week dish">
+                    </div>
+                    <div class="col-lg-11 p-0 col-md-10 col-10 d-flex flex-lg-row flex-md-row flex-column align-items-lg-center align-items-md-center align-items-start justify-content-start">
+                        <div class="col-lg-5 col-md-4 col-12 px-0 bolder-change" style="font-size: 16px;">���� � ����������</div>
+                        <div class="col-4 d-lg-block d-md-block d-none" style="font-size: 16px;">
+                            ������� ����������
+                            ���� � ���������� �� �������� ��������.
+                        </div>
+                        <div class="col-lg-3 col-md-3 col-12 px-0 d-flex justify-content-md-end justify-content-lg-end justify-content-start lighter-change"
+                             style="font-family: Open-Sans, sans-serif; font-size: 16px;">
+                            150 ��.
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 p-0 d-flex flex-lg-row flex-md-row align-items-md-center align-items-lg-center align-items-start pb-lg-2 pb-md-2 pb-3">
+                    <div class="col-lg-1 col-md-2 col-3 px-0">
+                        <img src="../img/img-week.png" alt="Image week dish">
+                    </div>
+                    <div class="col-lg-11 p-0 col-md-10 col-10 d-flex flex-lg-row flex-md-row flex-column align-items-lg-center align-items-md-center align-items-start justify-content-start">
+                        <div class="col-lg-5 col-md-4 col-12 px-0 bolder-change" style="font-size: 16px;">���� � ����������</div>
+                        <div class="col-4 d-lg-block d-md-block d-none" style="font-size: 16px;">
+                            ������� ����������
+                            ���� � ���������� �� �������� ��������.
+                        </div>
+                        <div class="col-lg-3 col-md-3 col-12 px-0 d-flex justify-content-md-end justify-content-lg-end justify-content-start lighter-change"
+                             style="font-family: Open-Sans, sans-serif; font-size: 16px;">
+                            150 ��.
+                        </div>
+                    </div>
+                </div>
+                <div class="custom-control font-weight-bold d-flex justify-content-end p-0 pb-3 pb-lg-0 pb-md-0 pos-for-btn" style="width: 156px;  ">
+                    <label class="custom-control custom-checkbox m-0 p-0 d-flex justify-content-between align-items-center flex-grow-1 px-2" style="height: 36px; font-size: 14px; color: #36C233; width: 100%; border-radius: 4px; border: 1px solid #36C233;">
+                        <input type="checkbox" class="custom-control-input">
+                        <span class="custom-control-indicator align-self-start"></span>
+                        <span class="custom-control-description mr-1">��������</span>
+                    </label>
+                </div>
+
+            </div>*@
+        <div class="col-12 p-lg-0 p-md-0 box-shadow-container position-relative brd-bot-line mb-3">
+            <div class="col-12 p-0 d-flex flex-column">
+                <span class="h3 pt-lg-0 pt-md-0 pt-3"
+                      style="font-weight: 600; font-size: 18px; color: #232323">@Html.DisplayFor(modelItem => item.ComplexName) | @Html.DisplayFor(modelItem => item.CategoryName)</span>
+                    <span class="h4 font-italic d-flex align-items-center pb-2 pb-lg-0 pb-md-0"
+                          style="font-size: 14px; line-height: 16px; color: #797979;">
+                        <img src="../img/arrow-right.svg"
+                             class="d-md-block d-lg-block d-none mr-1"
+                             alt="Arrow right"> @Html.DisplayFor(modelItem => item.DishesString)
+                        </span>
+                    </div> @foreach (var dish in item.ComplexDishes)
+                    {
+                        <div class="col-12 p-0 d-flex flex-lg-row flex-md-row align-items-md-center align-items-lg-center align-items-start pb-lg-2 pb-md-2 pb-3">
+
+                            <div class="col-lg-1 col-md-2 col-3 px-0">
+                                <img src="@Url.Action("GetPicture", "Pictures", new { id = dish.PictureId, width = 60, height = 60 })" alt="Image week dish">
+                            </div>
+                            <div class="col-lg-11 p-0 col-md-10 col-10 d-flex flex-lg-row flex-md-row flex-column align-items-lg-center align-items-md-center align-items-start justify-content-start">
+                                <div class="col-lg-5 col-md-4 col-12 px-0 bolder-change" style="font-size: 16px;">
+                                    @Html.HiddenFor(modelItem => dish.DishId, new { datafield = "DishID" })
+
+                                    @Html.DisplayFor(modelItem => dish.DishName)
+                                </div>
+                                <div class="col-4 d-lg-block d-md-block d-none" style="font-size: 16px;">
+                                    @Html.DisplayFor(modelItem => dish.DishDescription)
+                                </div>
+                                <div class="col-lg-3 col-md-3 col-12 px-0 d-flex justify-content-md-end justify-content-lg-end justify-content-start lighter-change"
+                                     style="font-family: Open-Sans, sans-serif; font-size: 16px;">
+                                    @String.Format("{0:f0}", dish.DishReadyWeight) @Localizer["DishReadyWeightMeasureUnit"]
+                                </div>
+                            </div>
+
+                        </div>
+                    }
+
+        <div class="custom-control font-weight-bold d-flex justify-content-end p-0 pb-3 pb-lg-0 pb-md-0 pos-for-btn" style="width: 156px;  ">
+            <label class="custom-control custom-checkbox m-0 p-0 d-flex justify-content-between align-items-center flex-grow-1 px-2" style="height: 36px; font-size: 14px; color: #36C233; width: 100%; border-radius: 4px; border: 1px solid #36C233;">
+                @if (item.Enabled)
+                {
+                    <input type="checkbox" class="custom-control-input" cp-name="dayselect-complex" checked="checked">
+                }
+                else
+                {
+                    <input type="checkbox" cp-name="dayselect-complex" class="custom-control-input">
+                }
+                <span class="custom-control-indicator align-self-start"></span>
+                <span class="custom-control-description mr-1">@Localizer["AddToMenu"]</span>
+                @Html.HiddenFor(modelItem => item.ComplexId)
+                @Html.HiddenFor(modelItem => item.Date)
+            </label>
+           
+        </div>
+
+                 
+
+                </div>
+                idx++;
+
+                <div class="row dayfoot">
+                </div>
+            }
+}
+else
+{
+    <div class="container daydish-complex-content border rounded">
+        <div class="row">
+            <div class="col col-lg-12 col-md-12 complex-menu-header">
+                @Localizer["Complex Dishes"]
+            </div>
+        </div>
+        @foreach (var item in Model)
+        {
+
+            string id_checkbox = daydate.Millisecond.ToString() + "_" + idx;
+
+            <div class="row row-daycomplex">
+
+                <div class="col col-md-2 col-2">
+                    <div class="checkbox checkbox-info">
+
+                        @if (item.Enabled)
+                        {
+                            <input type="checkbox" class="checkbox styled" checked="checked" cp-name="dayselect-complex" id="@id_checkbox" />
+                        }
+                        else
+                        {
+                            <input type="checkbox" class="checkbox styled" cp-name="dayselect-complex" id="@id_checkbox" />
+                        }
+                        <label for="@id_checkbox">
+
+                        </label>
+                        @Html.HiddenFor(modelItem => item.ComplexId)
+                        @Html.HiddenFor(modelItem => item.Date)
+                    </div>
+                </div>
+                <div class="col-3">
+                    @Html.DisplayFor(modelItem => item.ComplexName)
+                </div>
+                <div class="col-2">
+                    @Html.DisplayFor(modelItem => item.CategoryName)
+                </div>
+                <div class="col col-lg-4 col-md-4 col-4 small">
+                    @Html.DisplayFor(modelItem => item.DishesString)
+                </div>
+            </div>
+            @foreach (var dish in item.ComplexDishes)
+            {
+                <div class="row row-daycomplex-item">
+                    <div class="col col-lg-2 col-md-2 col-2 small">
+
+
+                    </div>
+                    <div class="col col-md-2">
+                        <img src="@Url.Action("GetPicture", "Pictures", new { id = dish.PictureId, width = 50, height = 50 })" style="width:50px;height:50px;" />
+
+
+                    </div>
+                    <div class="col col-lg-2 col-md-2 col-2">
+
+                        @Html.HiddenFor(modelItem => dish.DishId, new { datafield = "DishID" })
+
+                        @Html.DisplayFor(modelItem => dish.DishName)
+                    </div>
+
+                    <div class="col col-lg-2 col-md-2 col-2 small">
+                        @String.Format("{0:f0}", dish.DishReadyWeight) @Localizer["DishReadyWeightMeasureUnit"]
+
+                    </div>
+                    <div class="col col-lg-4 col-md-4 col-4 small">
+                        @Html.DisplayFor(modelItem => dish.DishDescription)
+
+
+                    </div>
+
+
+
+
+                </div>
+            }
+
+            idx++;
+
+            <div class="row dayfoot">
+            </div>
+        }
+    </div>
+
+}
+

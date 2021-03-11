@@ -1,0 +1,29 @@
+﻿@model HotelFood.Models.ComplexDishViewModel
+
+@{
+    ViewData["Title"] = "Edit";
+}
+@*<div class="form-group container select-complex-dishes">
+    <div class="row">
+        <div class="col-md-12 col-12 col-lg-12">
+            @Html.ListBoxFor(i => Model.DishesIds, Model.Dishes,
+                new { @class = "form-control select-dishes" })
+            @Html.ValidationMessageFor(i => Model.Dishes,
+                "", new { @class = "text-warning" })
+        </div>
+    </div>
+</div>*@
+    <div class="form-group container select-complex-dishes">
+        <div class="row ">
+            <div class="col-md-12 col-12 col-lg-12">
+                @Html.ListBoxFor(i => Model.DishesIds, Model.Dishes,
+                    new { @class = "selectpicker form-control", @multiple="multiple"})
+                @Html.ValidationMessageFor(i => Model.Dishes,
+                    "", new { @class = "text-warning" })
+            </div>
+        </div>
+    </div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

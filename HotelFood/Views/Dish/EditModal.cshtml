@@ -1,0 +1,453 @@
+﻿@model HotelFood.Models.Dish
+@inject HotelFood.Core.SharedViewLocalizer Localizer
+@using Westwind.AspNetCore.Markdown
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+@if (false)
+{
+    @*old design*@
+    <style>
+        form dt {
+            float: left;
+            display: block;
+            width: 30%;
+        }
+
+        dd select {
+            width: 50%;
+        }
+
+        dd textarea {
+            width: 100%;
+        }
+    </style>
+    <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title">@Localizer["Dish"]</h5>
+            <button class="close" data-dismiss="modal" area-hidden="true">
+                <span aria-hidden="true">&times;</span>
+            </button>
+
+        </div>
+        <div class="modal-body">
+            <form asp-action="EditModal" enctype="multipart/form-data">
+
+                <nav>
+                    <div class="nav nav-tabs" id="nav-tabs" role="tablist">
+                        <a class="nav-item nav-link nav-main active" id="nav-tab-0" data-toggle="tab" href="#nav-content-0" role="tab" aria-controls="nav-content-1" aria-selected="false">@Localizer["DishMainTab"]</a>
+                        <a class="nav-item nav-link nav-picture" id="nav-tab-1" data-toggle="tab" href="#nav-content-1" role="tab" aria-controls="nav-content-1" aria-selected="false">@Localizer["DishPictureTab"]</a>
+                        <a class="nav-item nav-link nav-ingredients " id="nav-tab-2" data-toggle="tab" href="#nav-content-2" role="tab" aria-controls="nav-content-2" aria-selected="false">@Localizer["CookingTechnologie"]</a>
+                        <a class="nav-item nav-link nav-ingredients " id="nav-tab-3" data-toggle="tab" href="#nav-content-3" role="tab" aria-controls="nav-content-2" aria-selected="false">@(Localizer["DishIngredientsTab"] + "-" + Localizer["DishIngredientsProportionTab"])</a>
+                    </div>
+
+                    <div class="tab-content day-content" id="nav-tabContent">
+                        <div class="tab-pane fade show active" id="nav-content-0" role="tabpanel" aria-labelledby="nav-tab-0">
+                            <dl>
+                                <dd><input type="hidden" asp-for="Id" /></dd>
+
+                                <dt>  <label asp-for="Code" class="control-label col-md-2"></label></dt>
+                                <dd>
+                                    <input asp-for="Code" class="form-control" />
+                                    <span asp-validation-for="Code" class="text-danger"></span>
+                                </dd>
+
+
+                                <dt>  <label asp-for="Name" class="control-label col-md-2"></label></dt>
+                                <dd>
+                                    <input asp-for="Name" class="form-control" />
+                                    <span asp-validation-for="Name" class="text-danger"></span>
+                                </dd>
+                                <dt>
+                                    <label asp-for="CategoriesId" class="control-label col-md-2"></label>
+                                </dt>
+                                <dd>
+
+                                    <select asp-for="CategoriesId" class="form-control" asp-items="ViewBag.CategoriesId"></select>
+                                    <span asp-validation-for="CategoriesId" class="text-danger"></span>
+
+                                </dd>
+                                <dt><label asp-for="Price" class="control-label col-md-2"></label></dt>
+                                <dd>
+                                    <input asp-for="Price" class="form-control" />
+                                    <span asp-validation-for="Price" class="text-danger"></span>
+                                </dd>
+
+                                <dt><label asp-for="ReadyWeight" class="control-label col-md-2"></label></dt>
+                                <dd>
+                                    <input asp-for="ReadyWeight" class="form-control" />
+                                    <span asp-validation-for="ReadyWeight" class="text-danger"></span>
+                                </dd>
+                                <dt><label asp-for="KKal" class="control-label col-md-2"></label></dt>
+                                <dd>
+                                    <input asp-for="KKal" class="form-control" />
+                                    <span asp-validation-for="KKal" class="text-danger"></span>
+                                </dd>
+                                <dt>
+                                    <label asp-for="Description" class="control-label col-md-2"></label>
+                                </dt>
+                                <dd>
+                                    @Html.EditorFor(model => model.Description, new { @class = "form-control" })
+                                </dd>
+                            </dl>
+                        </div>
+                        <div class="tab-pane fade" id="nav-content-1" role="tabpanel" aria-labelledby="nav-tab-1">
+                            <input type="hidden" asp-for="PictureId" />
+                            <input type="file" class="form-control" placeholder=" @Localizer["FileNotChosen"]..." id="filepicture" name="filepicture" />
+                            <img width="450" id="imgfilepicture" height="300" class="form-control" style="width:450px;height:300px;" src="@Url.Action("GetPicture", "Pictures", new { id = Model.PictureId, width = 450, height = 300 })" />
+                        </div>
+
+                        <div class="tab-pane fade cooking-technologie" id="nav-content-2" role="tabpanel" aria-labelledby="nav-tab-2">
+                            <div id="showEditTech" class="pointer-event showEditTech"><span role="button" data-show="false" class="fa fa-pencil-square-o"></span></div>
+                            <div id="Tech" class="Tech">@Markdown.ParseHtmlString(Model.CookingTechnologie)</div>
+                            <div id="editableTech" class="form-group editableTech" style="display:none;">
+                                @*<label for="exampleFormControlTextarea1">Description</label>*@
+                                <textarea asp-for="CookingTechnologie" class="form-control " style="min-width: 100%" rows="10">@Model.CookingTechnologie</textarea>
+                            </div>
+                        </div>
+
+                        <div class="tab-pane fade ingredients-content-proportion" id="nav-content-3" role="tabpanel" aria-labelledby="nav-tab-3">
+
+                        </div>
+                    </div>
+
+
+                </nav>
+
+
+
+            </form>
+            <div class="row">
+                <div class="col-sm-1">
+                </div>
+                <div class="col-sm-2">
+                    <button type="button" button class="btn btn-primary" data-save="modal">@Localizer["Save"]</button>
+                </div>
+                <div class="col-sm-1">
+                </div>
+                <div class="col-sm-2">
+                    <button type="button" button class="btn btn-primary" data-dismiss="modal">@Localizer["Cancel"]</button>
+                </div>
+
+                <div class="col-sm-1">
+                </div>
+
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    @*//start new design*@
+    @*<div class="modal fade" id="change-item-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog" style="max-width: 850px">*@
+    <div class="modal-content col-lg-12 col-12">
+        <div class="modal-header align-items-center pl-lg-4 pl-2" style="padding-top:20px">
+            <h5 class="modal-title p-0" id="exampleModalLabel"
+                style="font-size: 34px; line-height: 40px; font-weight: bold">
+                Страва
+            </h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <img src="./img/close-modal.svg" aria-hidden="true" alt="">
+            </button>
+        </div>
+        <div class="modal-body col-auto">
+            <form asp-action="EditModal" enctype="multipart/form-data">
+                <div class="row justify-content-around flex-column flex-lg-row flex-md-row flex-sm-column align-content-sm-center align-content-center align-items-sm-center align-items-center"
+                     style=" min-height: 350px">
+                    <div class="col-12 col-xl-6 col-sm-12 col-md-12 p-0 "
+                         style="max-width: 350px;  ">
+                        <input type="hidden" asp-for="PictureId" />
+                        @* <input type="file" class="form-control" id="filepicture" name="filepicture" />*@
+                        @*<img  id="imgfilepicture"  src="@Url.Action("GetPicture", "Pictures", new { id = Model.PictureId, width = 450, height = 300 })" />*@
+
+                        <img class="col-12" id="imgfilepicture" src="@Url.Action("GetPicture", "Pictures", new { id = Model.PictureId, width = 450, height = 300 })" alt="" style="padding: 0">
+                        <div class="custom-file mt-3">
+                            <input type="file" class="custom-file-input" id="filepicture" name="filepicture"
+                                   placeholder="Файл не обрано..."
+                                   style="height: 48px; display: flex; align-items: center" multiple accept="image/jpeg,image/png">
+                            <label class="custom-file-label" id="self-button" for="load-image"
+                                   style="height: 48px; display: flex; align-items: center">Файл не обрано</label>
+                        </div>
+
+                    </div>
+                    <div class="col-12 col-xl-5 col-sm-6 col-md-5 justify-content-md-center justify-content-center mt-3 mt-md-0 mt-lg-0">
+                        <div class="row col-12 p-0 mt-2 mt-lg-0">
+                            <span class="h4 col-12 p-0"
+                                  style="font-weight: 500; font-size: 18px; line-height: 21px; color: #232323; margin-bottom: 16px;">Основні дані</span>
+                        </div>
+                        <div class="row">
+                            <div class="col-12 p-0 ">
+                                <input type="hidden" asp-for="Id" />
+                                <div class="row col-12 justify-content-between p-0 m-0 align-items-center mb-2"
+                                     style="margin-bottom: 6px">
+                                    <label class="col-4" asp-for="Code"
+                                           style="margin-bottom: 0; text-align: center; display: flex; justify-content: left; padding-left: 0">@*Код*@</label>
+                                        <div class="col-8 flex-grow-1 justify-content-end p-0">
+                                            <input asp-for="Code" class="form-control"
+                                                   placeholder="Код"
+                                                   style="max-width: 245px; height: 34px" />
+                                            <span asp-validation-for="Code" class="text-danger"></span>
+                                            @*<input id="Code"
+                    class="form-control"
+                    type="text"
+                    placeholder="Код"
+                    style="max-width: 245px; height: 34px">*@
+                                        </div>
+                                    </div>
+                                    <div class="row col-12 justify-content-between p-0 m-0 align-items-center mb-2"
+                                         style="margin-bottom: 6px">
+                                        <label class="col-4" asp-for="Name"
+                                               style="margin-bottom: 0; text-align: center; display: flex; justify-content: left; padding-left: 0">@*Страва*@</label>
+                                            <div class="col-8 flex-grow-1 justify-content-end p-0">
+                                                <input asp-for="Name" class="form-control"
+                                                       placeholder="Страва"
+                                                       style="max-width: 245px; height: 34px" />
+                                                <span asp-validation-for="Name" class="text-danger"></span>
+                                                @*<input id="dish"
+                        class="form-control"
+                        type="text"
+                        placeholder="Страва"
+                        style="max-width: 245px; height: 34px">*@
+                                            </div>
+                                        </div>
+                                        <div class="row col-12 justify-content-between p-0 m-0 align-items-center mb-2"
+                                             style="margin-bottom: 6px">
+                                            <label class="col-4"
+                                                   for="category-choose"
+                                                   style="margin-bottom: 0; text-align: center; display: flex; justify-content: left; padding-left: 0">Категорія</label>
+
+                                            <div class="col-8 flex-grow-1 justify-content-end p-0">
+
+                                                <select asp-for="CategoriesId" class="form-control" asp-items="ViewBag.CategoriesId"></select>
+                                                <span asp-validation-for="CategoriesId" class="text-danger"></span>
+                                                @*<div class="form-group mb-0">
+                            <h4 data-toggle="dropdown" class="form-control dropdown-toggle m-0"
+                                style="max-width: 245px; height: 34px">
+                                Вартість <i class="fa fa-chevron-down"></i>
+                            </h4>
+                            <ul class="dropdown-menu w-100 mt-0" id="category-choose"
+                                style="border-radius: 0 4px 4px;">
+                                <a class="dropdown-item px-2 category-drp" href="#" value="price">
+                                    Вартість
+                                </a>
+                                <a class="dropdown-item px-2 category-drp" href="#" value="weight">
+                                    Вихід (гр.)
+                                </a>
+                                <a class="dropdown-item px-2 category-drp" href="#" value="ccal">
+                                    Ккал
+                                </a>
+                                <a class="dropdown-item px-2 category-drp" href="#" value="about">
+                                    Опис
+                                </a>
+                            </ul>
+
+                        </div>*@
+                                            </div>
+                                        </div>
+                                        <div class="row col-12 justify-content-between p-0 m-0 align-items-center mb-2"
+                                             style="margin-bottom: 6px">
+                                            <label class="col-4" asp-for="Price"
+                                                   style="margin-bottom: 0; text-align: center; display: flex; justify-content: left; padding-left: 0">@*Вартість*@</label>
+                                                <div class="col-8 flex-grow-1 justify-content-end p-0">
+                                                    @*<input id="Price"
+                            class="form-control"
+                            type="text"
+                            placeholder="Вартість"
+                            style="max-width: 245px; height: 34px">*@
+                                                    <input asp-for="Price" class="form-control"
+                                                           type="text"
+                                                           placeholder="Вартість"
+                                                           style="max-width: 245px; height: 34px" />
+                                                    <span asp-validation-for="Price" class="text-danger"></span>
+                                                </div>
+                                            </div>
+                                            <div class="row col-12 justify-content-between p-0 m-0 align-items-center mb-2"
+                                                 style="margin-bottom: 6px">
+                                                <label class="col-4" asp-for="ReadyWeight"
+                                                       style="margin-bottom: 0; text-align: center; display: flex; justify-content: left; padding-left: 0">
+                                                </label>
+                                                <div class="col-8 flex-grow-1 justify-content-end p-0">
+                                                    <input asp-for="ReadyWeight" class="form-control"
+                                                           placeholder="Вихід (гр.)"
+                                                           style="max-width: 245px; height: 34px" />
+                                                    <span asp-validation-for="ReadyWeight" class="text-danger"></span>
+                                                </div>
+                                            </div>
+                                            <div class="row col-12 justify-content-between p-0 m-0 align-items-center mb-2"
+                                                 style="margin-bottom: 6px">
+                                                <label class="col-4" asp-for="KKal"
+                                                       style="margin-bottom: 0; text-align: center; display: flex; justify-content: left; padding-left: 0">@*Ккал*@</label>
+                                                    <div class="col-8 flex-grow-1 justify-content-end p-0">
+                                                        @*<input id="ccal"
+                                class="form-control"
+                                type="text"
+                                placeholder="Ккал"
+                                style="max-width: 245px; height: 34px">*@
+                                                        <input asp-for="KKal" class="form-control"
+                                                               placeholder="Ккал"
+                                                               style="max-width: 245px; height: 34px" />
+                                                        <span asp-validation-for="KKal" class="text-danger"></span>
+                                                    </div>
+                                                </div>
+                                               
+                                                <div class="row col-12 justify-content-between p-0 m-0 align-items-center mb-2"
+                                                     style="margin-bottom: 6px">
+                                                    <label class="col-4" asp-for="MeasureUnit"
+                                                           style="margin-bottom: 0; text-align: center; display: flex; justify-content: left; padding-left: 0">
+                                                    </label>
+                                                    <div class="col-8 flex-grow-1 justify-content-end p-0">
+                                                        <input asp-for="MeasureUnit" class="form-control"
+                                                               style="max-width: 245px; height: 34px" />
+                                                        <span asp-validation-for="MeasureUnit" class="text-danger"></span>
+                                                    </div>
+                                                </div>
+                                                <div class="row col-12 justify-content-between p-0 m-0 align-items-center mb-2"
+                                                     style="margin-bottom: 6px;">
+                                                    <label class="col-4" asp-for="Description"
+                                                           style="margin-bottom: 0; text-align: center; display: flex; justify-content: left; padding-left: 0">Опис</label>
+                                                    <div class="col-8 flex-grow-1 justify-content-end p-0">
+                                                        <textarea class="form-control" @*id="about"*@ rows="3" style="max-width: 245px" data-val="true"
+                                                                  data-val-length="The field Опис must be a string with a maximum length of 255."
+                                                                  data-val-length-max="255" id="Description" maxlength="255" name="Description">@Model.Description</textarea>
+                                                        @*<textarea class="form-control" id="about" rows="3" style="max-width: 245px">Еко-котлета по-Київські з індички</textarea>*@
+                                                        @*@Html.EditorFor(model => model.Description, new { @class = "form-control", @rows="3", @style = "max-width: 245px" })*@
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                                <div class="row justify-content-center justify-content-xl-end justify-content-lg-end justify-content-md-end mb-4 mt-2">
+                                    <div class="col-12 col-xl-6 col-sm-7 col-md-6 p-0 justify-content-xl-center"
+                                         style="display: flex; margin-left: 2px">
+                                        <div class="row col-12 justify-content-around align-items-center m-0 pl-xl-3 pr-xl-3 p-0 pl-lg-4 pr-lg-4 pl-md-4 pr-md-4">
+                                            <div class="col-xl-8 col-sm-9 pl-xl-1 pl-sm-1 pl-0 col-10"
+                                                 style="font-size: 18px; line-height: 21px; color: #232323; font-weight: 500;">
+                                                Інгредієнти-Пропорцiї
+                                            </div>
+
+                                            <div class="col-2 pr-0 mr-0 mr-lg-1">
+                                                @*<a class="add-ingredients-dishes-line" style="cursor:pointer;">@Localizer["Add"]</a>*@
+                                                <a class="btn btn-outline-danger float-right font-weight-bold add-ingredients-dishes-line"
+                                                   onmousemove="this.style.background='#36C233'; this.style.color='#ffffff'" @*id="add-ingredients-dishes-line"*@
+                                                   onmouseout="this.style.background='#ffffff'; this.style.color='#36C233'"
+                                                   style="margin: 0; border-color: #36C233; max-width: 130px; height:30px; color: #36C233; display: flex; align-items: center; justify-content: space-evenly;  font-size: 14px;">
+                                                    &#65291;<span class="d-none d-md-block">@Localizer["Create"]</span>
+
+                                                </a>
+                                                @*<button type="button" class="btn btn-outline-danger float-right font-weight-bold "
+                                                onmousemove="this.style.background='#36C233'; this.style.color='#ffffff'"
+                                                onmouseout="this.style.background='#ffffff'; this.style.color='#36C233'"
+                                                style="margin: 0; border-color: #36C233; max-width: 130px; height:30px; color: #36C233; display: flex; align-items: center; justify-content: space-evenly;  font-size: 14px;">
+                                            &#65291;<span class="d-none d-md-block">@Localizer["Create"]</span>
+
+                                        </button>*@
+
+                                            </div>
+                                            <div id="responseS"></div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row justify-content-lg-end justify-content-xl-end justify-content-center">
+                                    <div class="col-12 col-sm-12 col-xl-12 col-md-12  mr-0 justify-content-center p-0 "
+                                         style="display: flex; justify-content: center;">
+                                        <div class="col-12 col-sm-12 col-xl-12 col-md-12  mr-xl-3 mr-0"
+                                             style="border: 1px solid #B1B1B1; border-radius: 4px; height: 235px; overflow-y: scroll; box-sizing: border-box; width:340px">
+
+                                            <div class="row mt-3" style="max-width: 750px;">
+                                                <div class="col-12">
+                                                    @*<div id="responseS" class="row"></div>*@
+                                                    <div class="row" style="margin-bottom: 9px">
+                                                        <div class="col-3">@Localizer["Ingredient Name"]</div>
+                                                        <div class="col-3">@Localizer["Ingredients ProprotionNetto"]</div>
+                                                        <div class="col-3">@Localizer["Ingredients Proprotion"]</div>
+                                                    </div>
+                                                    <div class="ingredients-content-proportion" id="nav-content-3" role="tabpanel" aria-labelledby="nav-tab-3">
+
+
+                                                    </div>
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row justify-content-lg-end justify-content-xl-end justify-content-center mb-4 mt-2">
+
+                                    <a class="btn btn-primary m-2 col-sm-4 col-xl-4 col-12" asp-action="Print" asp-route-id="@Model.Id" asp-route-xslx="false"
+                                       style="background: #36C233; border: 1px solid #36C233; height: 48px">
+                                        Pdf
+                                    </a>
+                                    <a class="btn btn-primary m-2 col-sm-4 col-xl-4 col-12" asp-action="Print" asp-route-id="@Model.Id" asp-route-xslx="true"
+                                       style="background: #36C233; border: 1px solid #36C233; height: 48px">
+                                        Xslx
+                                    </a>
+                                </div>
+                                <div class="row justify-content-lg-end justify-content-xl-end justify-content-center mb-4 mt-2">
+
+                                    <div class="col-xl-8 col-sm-9 pl-xl-1 pl-sm-1 pl-0 col-10"
+                                         style="font-size: 18px; line-height: 21px; color: #232323; font-weight: 500;">
+                                        @Localizer["CookingTechnologie"]
+                                    </div>
+                                </div>
+                                <div class="row justify-content-lg-end justify-content-xl-end justify-content-center">
+                                    <div class="col-12" style="min-height:300px">
+                                        <div style="height:100%"> <textarea id="cooktechnology" asp-for="CookingTechnologie" class="form-control" style="height:300px">@Model.CookingTechnologie</textarea></div>
+                                    </div>
+                                </div>
+
+                            </form>
+                        </div>
+                        <div class="modal-footer justify-content-center"
+                             style="font-size: 14px; font-weight: bold; line-height: 16px; padding: 40px 0 58px">
+                            <button type="button" button class="btn btn-primary m-2 col-sm-4 col-xl-4 col-12"
+                                    style="background: #36C233; border: 1px solid #36C233; height: 48px" data-save="modal">
+                                ЗБЕРЕГТИ
+                            </button>
+
+                            <button type="button" class="btn btn-secondary m-2 col-sm-4 col-xl-4 col-12 "
+                                    style="background: #ffffff; border: 1px solid #F15E25; height: 48px; color: #f15e25"
+                                    data-dismiss="modal">
+                                ВІДМІНИТИ
+                            </button>
+                        </div>
+                    </div>
+
+                    @*</div>
+                        </div>*@
+                }
+@*//end new design*@
+<script>
+    $(document).on("click", ".showEditTech",
+        function (e) {
+            //console.log("Edit" + $(this).attr("data-show"));
+            //var shown = $(this).attr("data-show");
+            //if (!shown) {
+            $(".editableTech").show();
+            $(".Tech").hide();
+            $(".showEditTech").hide();
+            //$(this).attr("data-show", "true") ;
+            //} else {
+            //    $(".editableTech").hide();
+            //    $(".Tech").show();
+            //    $(this).attr("data-show", "false") ;
+            //}
+
+        });
+    $('.editableTech').bind('input propertychange', function () {
+        $(".showEditTech").hide();
+
+    });
+</script>
+
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

@@ -1,0 +1,648 @@
+﻿@model DateTime
+@using System.Globalization
+@using HotelFood.Core
+@using HotelFood.Helpers
+
+@inject HotelFood.Core.SharedViewLocalizer Localizer
+@{
+    ViewData["Title"] = "EditDay";
+}
+@{
+    DateTime daydate = Model;
+    long ms_since1970 = (long)daydate.Subtract(DateTime.MinValue.AddYears(1969)).TotalMilliseconds;
+    CultureInfo ci = new CultureInfo("en-US");
+    // Get the DateTimeFormatInfo for the en-US culture.
+    DateTimeFormatInfo dtfi = ci.DateTimeFormat;
+}
+
+@if (Layout == "_LayoutCabachok")
+{
+    @section Styles{
+        <link rel="stylesheet" href="~/css/jquery-ui.css" />
+    }
+    <div class="container-xl container container-md container-sm container-lg">
+        <div class="row align-items-center pb-3  ml-xl-0 ml-md-0 ml-sm-0 p-0 ml-0 mt-lg-5 mt-md-5 mt-2">
+            <div class="col-9 col-xl-9 col-md-9 col-sm-9 align-content-center mr-md-auto pl-0">
+                <p class="h2 h2-mob"
+                   style="font-weight: 600;">
+                    @Localizer["DishesWeekMenu"]
+                </p>
+                
+                <div class="row">
+                    <div class="col-2">
+                         <label for="menuType">@Localizer["MenuType"]</label>
+                    </div>
+                    <div class="col-10">
+                        <select class="form-control col-10 col-lg-8 col-md-8"
+                                @*asp-items="ViewBag.MenuType"*@ id="menuType"
+                                style="height: 34px; border: 1px solid #ced4da; border-radius: 4px">
+                            @foreach (var value in @EnumHelper<OrderTypeEnum>.GetValues(ViewBag.MenuType))
+                            {
+                                if (ViewBag.MenuType.HasFlag(value))
+                                {
+                                    <option value="@value">@Localizer[value.ToString()]</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                </div>
+                </div>
+                <div class="col-3 col-xl-3 col-md-3 col-sm-3 align-content-center mr-md-auto pl-0">
+                    <button type="button" class="btn btn-info day-menu-copy" >
+                             @Localizer["DayMenyCopy"] 
+                    </button>
+                </div>
+            </div>
+        <div id="days-of-week-carousel" class="carousel slide container px-0" data-ride="carousel">
+            <div class="carousel-inner" style="position: relative">
+                <input type="hidden" asp-for="@ms_since1970" id="currentdate" />
+                @*<div id="weekselector" class="weekselector">
+
+                    </div>*@
+                <div style="position: absolute; z-index: 5; right: -5px; width: 60px; height: 70px;background: linear-gradient(270deg, #FFFFFF 15.1%, rgba(255, 255, 255, 0) 100%);"></div>
+                <div class="carousel-item active">
+                    <ul class="nav nav-tabs justify-content-lg-around justify-content-md-around justify-content-between weeks-tab "
+                        id="weeks-tab" role="tablist">
+                        @{
+                            DateTime current_head = daydate.StartOfWeek(DayOfWeek.Monday);
+                        }
+
+
+
+                        @for (int i = 0; i < 7; i++)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link day-of-week p-lg-0 p-md-0 @(i == 0 ? " active" : "")" id="nav-tab-@i" style="width: 100%;" data-toggle="tab"
+                                   href="#nav-content-@i" data-i="@i"
+                                   role="tab"
+                                   aria-controls="home"
+                                   aria-selected="true">
+                                    <div class="col-12 p-0 d-flex flex-lg-column flex-md-column flex-column-reverse date-container">
+                                        <div class="col-12 d-lg-none d-md-none d-flex p-0 justify-content-center align-items-center arrow-down-mob"
+                                             style=" min-width: 55px; height: 15px">
+                                            <img src="../img/mob-arrow-active.svg" alt="">
+                                        </div>
+                                        <div class="col-12 d-flex justify-content-center day-of" data-i="@i">
+                                            @*@if (i == 6)
+                                                {
+                                                    @System.Globalization.CultureInfo.CurrentUICulture.DateTimeFormat.GetDayName((DayOfWeek)0)<br />
+                                                }
+                                                else
+                                                {
+                                                    @System.Globalization.CultureInfo.CurrentUICulture.DateTimeFormat.GetDayName((DayOfWeek)i + 1)<br />
+                                                }*@
+                                        </div>
+                                        <div class="col-12 number-of d-md-block d-lg-block d-none shorttabdate"
+                                             style="font-size: 14px; font-family: Open-Sans, sans-serif;">@current_head.ToShortDateString()</div>
+                                            <div class="col-12 month-rus month-rus__active d-lg-none d-md-none d-flex p-0 justify-content-center align-items-center date-day"
+                                                 style=" font-size: 14px; font-family: Open-Sans, sans-serif; min-width: 55px; line-height: 29px;">@current_head.Day</div>
+                                            </div>
+                                        </a>
+                                    </li>
+                                    current_head = current_head.AddDays(1);
+                                }
+
+                    </ul>
+                </div>
+
+            </div>
+            <a class="carousel-control-prev  d-lg-flex d-md-flex align-items-center dayselectback"
+               style="width: auto; z-index: 6" href="#days-of-week-carousel" role="button" data-slide="prev">
+                <span class="carousel-control-prev-icon d-flex justify-content-start align-items-center"
+                      aria-hidden="true"
+                      style="width: 20px; height: 20px; border: 2px solid #F05E25; border-radius: 50%">
+                    <div style="border: 4px solid transparent;border-right: 5px solid #F05E25;display: block;width: 0;height: 0;"></div>
+                </span>
+                <span class="sr-only">Previous</span>
+            </a>
+            <a class="carousel-control-next d-flex align-items-center dayselectforward" style="width: auto; z-index: 6"
+               href="#days-of-week-carousel" role="button" data-slide="next">
+                <span class="carousel-control-next-icon d-flex justify-content-end align-items-center"
+                      aria-hidden="true"
+                      style="width: 20px; height: 20px; border: 2px solid #F05E25; border-radius: 50%">
+                    <div style="border: 4px solid transparent;border-left: 5px solid #F05E25;display: block;width: 0;height: 0;"></div>
+                </span>
+                <span class="sr-only">Next</span>
+            </a>
+
+        </div>
+        <div id="response"></div>
+        <div class="tab-content mt-lg-5 pt-lg-3 mt-md-5 pt-md-3 mt-3 pt-0" id="week-day-content">
+            @{
+                DateTime current_content = daydate.StartOfWeek(DayOfWeek.Monday);
+            }
+            @for (int i = 0; i < 7; i++)
+            {
+                <div class="tab-pane fade@(i == 0 ? "  show active" : "")" id="nav-content-@i" role="tabpanel" aria-labelledby="nav-tab-@i">
+                    @*<div class="row">
+                            @await Component.InvokeAsync("DayComplexComponent", new DayMenu() { Date = current_content, DishKind = 0 });
+                        </div>*@
+                    @*<div class="row">
+                            @await Component.InvokeAsync("DayDishComponent", current_content)
+                        </div>*@
+                </div>
+
+                current_content = current_content.AddDays(1);
+            }
+        </div>
+    </div>
+    <div id="modDialogcomplexline" class="modal modal-search fade complex-line">
+        <div id="dialogContentcomplexline" class="modal-dialog modal-search-dialog  d-flex justify-content-end"
+             style="max-width: 966px">
+            <div class="modal-content modal-content-search position-relative  col-lg-7 col-md-7 col-12 p-0 "
+                 style="min-height: 867px">
+                <div id="responseS" class="row"></div>
+                <div class="modal-header">
+                    <div class="modal-title  px-0 d-flex align-items-center"
+                         style="font-size: 28px; line-height: 40px; font-weight: 600; color: #232323; text-decoration: none; width: 250px; outline: none; border: none; background: #ffffff">
+                        <img src="../img/back-report.svg" class="mr-3 d-block d-md-none d-lg-none" alt="">Додати страву
+                    </div>
+                    <button type="button" class="close d-none d-lg-block d-md-block" data-target="#modDialogcomplexline" data-toggle="modal"
+                            aria-label="Close">
+                        <img src="../img/close-article.svg" aria-hidden="true" alt="">
+                    </button>
+                    @*<button type="button" class="close" data-toggle="modal" data-target="#modDialogcomplexline">X</button>*@
+                </div>
+                <div class="col-12">
+
+                    <input class="form-control  w-100" id="search-dishes" type="search" placeholder="Search..." aria-label="Search"
+                           style="font-size: 16px; color:#797979; height: 48px; background: url('../img/search-icon.svg') no-repeat 95%; font-family: Open-Sans, sans-serif">
+                </div>
+                <div class="modal-body col-auto mt-2 px-0">
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+    <div id="modMenuCopy" class="modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">@Localizer["DayMenyCopy"]</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-4">
+                            <label for="copydatefrom"
+                                   class="mb-0"
+                                   style="font-size: 16px; color: #232323">@Localizer["DateFrom"]</label>
+                            </div>
+                            <div class="col-4">
+                                <input id="copydatefrom" class="ml-3 mr-lg-3 mr-md-3 mr-0">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-4">
+                                <label for="copydateto"
+                                       class="mb-0"
+                                       style="font-size: 16px; color: #232323">@Localizer["DateTo"]</label>
+                                </div>
+                                <div class="col-4">
+                                    <input id="copydateto" class="ml-3 mr-lg-3 mr-md-3 mr-0">
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-4">
+                                    <label for="copydays"
+                                           class="mb-0"
+                                           style="font-size: 16px; color: #232323">@Localizer["CopyDaysNumber"]</label>
+                                    </div>
+                                    <div class="col-4">
+                                        <input id="copydays" class="ml-3 mr-lg-3 mr-md-3 mr-0" type="number" value="5">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row align-content-center ">
+                                <div class="col-12  text-center ">
+                                    <button type="button" id="btn-copydaymenu" class="btn btn-primary " data-dismiss="modal">@Localizer["Copy"]</button>
+                                </div>
+                            </div>
+                        <div class="modal-footer">
+
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">@Localizer["Close"]</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+        else
+        {
+            <h2>@Localizer["DishesWeekMenu"]</h2>
+            <div class="container">
+                <div id="response"></div>
+                <div class="row  justify-content-center">
+                    <div class="col input-group justify-content-centers">
+                        <div class="input-group-prepend dayselector dayselectback">
+                            <span><i class="fa fa-angle-double-left input-group-text"></i></span>
+
+                        </div>
+
+                        <input type="hidden" asp-for="@ms_since1970" id="currentdate" />
+                        <div id="weekselector" class="weekselector">
+
+                        </div>
+
+
+                        <div class="input-group-append dayselector  dayselectforward">
+                            <span><i class="fa fa-angle-double-right input-group-text"></i></span>
+
+                        </div>
+                    </div>
+                </div>
+                <div class="row" style="height:10px">
+
+                </div>
+
+            </div>
+            <nav>
+                <div class="nav nav-tabs" id="nav-tab" role="tablist">
+
+                    @{
+                        DateTime current_head = daydate.StartOfWeek(DayOfWeek.Monday);
+                    }
+                    @for (int i = 0; i < 7; i++)
+                    {
+                        <a class="nav-item nav-link nav-day @(i == 0 ? " active" : "")" id="nav-tab-@i" data-toggle="tab" href="#nav-content-@i" role="tab" aria-controls="nav-content-@i" aria-selected="false">
+                            @if (i == 6)
+                            {
+                                @System.Globalization.CultureInfo.CurrentUICulture.DateTimeFormat.GetDayName((DayOfWeek)0)<br />
+                            }
+                            else
+                            {
+                                @System.Globalization.CultureInfo.CurrentUICulture.DateTimeFormat.GetDayName((DayOfWeek)i + 1)<br />
+                            }
+                            @*@System.Globalization.CultureInfo.CurrentUICulture.DateTimeFormat.GetDayName((DayOfWeek)i)<br />*@
+                            <span class="shorttabdate">@current_head.Day</span>
+
+                        </a>
+
+                        current_head = current_head.AddDays(1);
+                    }
+                </div>
+            </nav>
+            <div class="tab-content day-content" id="nav-tabContent">
+                @{
+                    DateTime current_content = daydate.StartOfWeek(DayOfWeek.Monday);
+                }
+                @for (int i = 0; i < 7; i++)
+                {
+                    <div class="tab-pane fade@(i == 0 ? "  show active" : "")" id="nav-content-@i" role="tabpanel" aria-labelledby="nav-tab-@i">
+                        @*<div class="row">
+                                @await Component.InvokeAsync("DayComplexComponent", current_content)
+                            </div>
+                            <div class="row">
+                                @await Component.InvokeAsync("DayDishComponent", current_content)
+                            </div>*@
+                    </div>
+
+                    current_content = current_content.AddDays(1);
+                }
+            </div>
+        }
+@*
+    <div id="accordion">
+        @{
+            DateTime current = daydate.StartOfWeek(DayOfWeek.Sunday);
+
+        }
+        @for (int i = 0; i < 0; i++)
+        {
+
+            <div class="container">
+                <div class="row justify-content-md-center">
+                    <div class="col-lg-10 col-md-10 ">
+                        <button class="btn btn-link collapsed daydish" data-toggle="collapse" data-target=@("#collapse" + i) aria-expanded="false" aria-controls=@("collapse" + i)>
+                            <div class="expand">
+
+
+                            </div>
+                            <div class="dayname">@dtfi.GetDayName((DayOfWeek)i) </div>
+                        </button>
+
+                    </div>
+
+                </div>
+                <div class="row justify-content-md-center">
+                    <div id=@("collapse" + i) class="col col-lg-8 col-md-8 collapse  aria-labelledby=@("heading" + i)" data-parent="#accordion" data-daydate="@current">
+
+                        @await Component.InvokeAsync("DayDishComponent", current)
+
+                    </div>
+                </div>
+
+
+            </div>
+            current = current.AddDays(1);
+        }
+    </div>
+*@
+<script type="text/javascript" src="~/js/dishdayedit.js" defer></script>
+@section Scripts {
+
+
+    <script>
+        $(function () {
+
+
+            var html_loading = '<div class="spinner-container"> <div>Loading</div><div class="spinner-border" role="status"> <span class="sr-only">Loading...</span> </div></div>';
+
+            var dtcopydatefrom=$('#copydatefrom').datepicker();
+            var dtcopydateto = $('#copydateto').datepicker();
+
+
+            var reloadDay = function (dayindex, callback) {
+                var ms = parseInt($('#currentdate').val());
+                var dt = new Date(ms);
+                dt.setDate(dt.getDate() - dt.getDay() + dayindex + 1);
+
+                $('#nav-content-' + dayindex).html(html_loading);
+                var dishKind = $("#dishKind").val();
+                var dishKindparam = '';
+                if (dishKind == parseInt(dishKind, 10)) {
+                    dishKindparam = encodeURI(dishKind.toString());
+                }
+                var menuType = encodeURI($("#menuType").val());
+                $('#nav-content-' + dayindex).load('/DayDishes/EditDayContent?daydate=' + encodeURI(dt.toDateString()) + "&dishKind=" + dishKindparam + "&menuType=" + menuType,
+                    function (response, status, xhr) {
+                        var daytabtext = dateToshortString(dt);
+                        //old design
+                        //daytabtext = "" + dt.getDate();
+
+                        $('#nav-tab-' + dayindex).find('.shorttabdate').text(daytabtext);
+                        daytabtext = "" + dt.getDate();
+                        $('#nav-tab-' + dayindex).find('.date-day').text(daytabtext);
+                        if (callback)
+                            callback();
+                    }
+                );
+                // $('#nav-content-' + dayindex).load('/DayDishes/EditDayContent?daydate=' + encodeURI(dt.toDateString()));
+
+                var daytabtext = dateToshortString(dt);
+                //old design
+                //daytabtext = "" + dt.getDate();
+
+                $('#nav-tab-' + dayindex).find('.shorttabdate').text(daytabtext);
+                daytabtext = "" + dt.getDate();
+                $('#nav-tab-' + dayindex).find('.date-day').text(daytabtext);
+            }
+            var dateToshortString = (dt) => {
+                var dd = dt.getDate();
+                var mm = dt.getMonth() + 1;
+                if (dd < 10) { dd = '0' + dd }
+                if (mm < 10) { mm = '0' + mm }
+                var yyyy = dt.getFullYear();
+                return dd + '.' + mm + '.' + yyyy;
+            }
+            var weektext = function () {
+                var ms = parseInt($('#currentdate').val());
+                var dt = new Date(ms);
+                firstweekday = new Date(dt.getTime());
+                lasttweekday = new Date(dt.getTime());
+                firstweekday.setDate(dt.getDate() - dt.getDay());
+                lasttweekday.setDate(dt.getDate() + (8 - dt.getDay()));
+                return firstweekday.toLocaleDateString() + " - " + lasttweekday.toLocaleDateString();
+            }
+
+            $('#weekselector').text(weektext());
+            var incrementday = function (d) {
+                var ms = parseInt($('#currentdate').val());
+                var dt = new Date(ms);
+                dt.setDate(dt.getDate() + d);
+                $('#currentdate').val(dt.getTime());
+                $('#weekselector').text(weektext());
+                //for (var i = 0; i < 7; i++)
+                //    reloadDay(i);
+                var index = parseInt($(".day-of-week.active").attr("data-i"));
+                var start = 0
+                var cb = function () {
+                    if (start < 7) {
+                        //start++;
+                        //reloadDay(start, cb);
+                        if (index == start) {
+                            if (start == 6) {
+                                return;
+                            }
+                            start++;
+                        }
+                        reloadDay(start, cb);
+                        start++;
+                    }
+                }
+
+                reloadDay(index, cb);
+            }
+            $('.dayselectback').click((e) => {
+                e.preventDefault();
+                incrementday(-7);
+            });
+            $('.dayselectforward').click((e) => {
+                e.preventDefault();
+                incrementday(7);
+            });
+            incrementday(0);
+            $(document).on("change", "#dishKind", function (e) {
+                incrementday(0);
+            });
+            $(document).on("change", "#menuType", function (e) {
+                incrementday(0);
+            });
+            function setDays() {
+
+                $(".day-of").each(function () {
+                    var day = getWeekDay(parseInt($(this).attr("data-i")));
+                    $(this).html(day);
+                });
+            }
+            setDays();
+            //add dishes
+            function delay(callback, ms) {
+                var timer = 0;
+                return function () {
+                    var context = this, args = arguments;
+                    clearTimeout(timer);
+                    timer = setTimeout(function () {
+                        callback.apply(context, args);
+                    }, ms || 0);
+                };
+            };
+             $(document).on("keyup", '#search-dishes', delay(function (e) {
+            //$('#search-dishes').keyup(delay(function (e) {
+               //console.log('Time elapsed!', this.value);
+                var url = '@Url.Content("~/Dishes/SearchViewWeight")' + `?SearchCriteria=${this.value}`;
+                $('#modDialogcomplexline').find(".modal-body").html(html_loading);
+                $.get(url, function (data) {
+                    $('#modDialogcomplexline').find(".modal-body").html(data);
+                    //$('#modDialog').modal('hide');
+                    //$('#modDialogcomplexline').modal('show');
+                    $('#modDialogcomplexline').modal('handleUpdate');
+                    setupDishSearch($('#modDialogcomplexline'), category, function () {
+                        //  $('#modDialog').modal('show');
+
+                    });
+                });
+             }, 500));
+
+            $(document).on('click', '.day-menu-copy', function (event) {
+                event.preventDefault();
+                
+                var ms = parseInt($('#currentdate').val());
+                var dt = new Date(ms);
+                dt.setDate(dt.getDate() - dt.getDay()  + 1);
+                dtcopydatefrom.datepicker('setDate', new Date(dt));
+                var numWeeks = 4;
+                dt.setDate(dt.getDate() + numWeeks*7);
+                dtcopydateto.datepicker('setDate', new Date(dt));
+                $('#modMenuCopy').modal('show');
+            })
+            $('#btn-copydaymenu').click(function (e) {
+                event.preventDefault();
+                var dtfrom = dtcopydatefrom.datepicker("getDate");
+                var dtto = dtcopydateto.datepicker("getDate");
+                $.ajax({
+                    type: "POST",
+                    data: { DateFrom: dtfrom.toUTCString(), DateTo: dtto.toUTCString(), NumDays: $('#copydays').val() },
+                    async: false,
+                    url: "/DayDishes/CopyDayDish",
+                    success: function (data) {
+                        if (!data) {
+                            dialog_error("ERROR ! please contact support" );
+                        }
+                    }
+                }).fail(function (xhr, status, error) {
+                    dialog_error("ERROR !" + error);
+                    //alert("ERROR !" + error);
+                });
+            });
+            $(document).on('click', '.add-complex-line', function (event) {
+                event.preventDefault();
+                category = $(this).attr("categoryDate");
+
+                var url = '@Url.Content("~/Dishes/SearchViewWeight")'/* + `?category=${category}`*/;
+                $('#modDialogcomplexline').find(".modal-body").html(html_loading);
+                //$('#modDialog').modal('hide');
+                $('#modDialogcomplexline').modal('show');
+                $.get(url, function (data) {
+                    $('#modDialogcomplexline').find(".modal-body").html(data);
+                    //$('#modDialog').modal('hide');
+                    //$('#modDialogcomplexline').modal('show');
+                   // $('#modDialogcomplexline').modal('handleUpdate');
+                    setupDishSearch($('#modDialogcomplexline'), category, function () {
+                      //  $('#modDialog').modal('show');
+                        //$('#modDialog').modal('handleUpdate');
+                        });
+                });
+
+            });
+            function setupDishSearch(dlg, categoryDate,closecb) {
+                $(dlg).find('.add-item').click(function (e) {
+                //$(dlg).find('.table.search-items tr').click(function (e) {
+
+                    console.log(categoryDate);
+                    var category = categoryDate.toString().split("_")[0];
+                    var date = categoryDate.toString().split("_")[1];
+                        e.preventDefault();
+                         //var dlg = $("#complex");
+
+                         var id = $(this).attr("data-id");
+
+                       // var id = $(this).find('.add-item').attr("data-id");
+                         console.log(id );
+                         var url = '@Url.Content("~/Dishes/InfoDayDish/")' + `${id}`;
+                        //console.log(url);
+                    var flag = true;
+                        $.get(url, function (data) {
+
+
+                            //dlg.find("#complex-line "+i).find("#course-footer "+i).before(data);
+                            var complexLines = $(".category-content[categoryDate='" + categoryDate+"']").find(".dish-line");
+                            $(complexLines).each(function (i) {
+                                var dishLine = $(this).find(".dish-line");
+                                // sendObj.DishComplexes.push() = [];
+                                $(dishLine).each(function (ind) {
+                                    //console.log("Sear" + $(data).attr("dish-id"));
+                                    if ($(this).attr("dish-id") == $(data).attr("dish-id")) {
+                                        //$("#modDialogcomplexline").modal('hide');
+                                        //$("#IncorrectModal").modal('show');
+                                        showeditdayalert({ class: 'alert-danger', text: "@Localizer["SameDish"]" });
+                                       // alert("You can't add the same dish");
+                                        flag = false;
+                                    }
+                                    // sendObj["DishesIdes" + i].push($(this).attr("dish-id"));
+                                });
+
+                            });
+                            if (flag) {
+
+                                $(data).insertBefore(".category-footer[categoryDate='" + categoryDate+"']");
+                                saveDayDish(id, category, date, true);
+                            }
+                            //$(".modal-dialog").scroll();
+                            $('#modDialog').modal('handleUpdate');
+                            //var el_complexid = $(`<input type='hidden' name='DishComplexes[0].DishId' value='${id}'/>`);  // Create with jQuery
+                            //var el_course = $(`<input type='hidden' name='DishComplexes[0].DishCourse' value='${course}'/>`);
+                            //var elid = $("input[name='dishid']");
+                            //$(elid).after(el_complexid);
+                            //$(elid).after(el_course);
+                        });
+                    //$('#modDialog').modal('handleUpdate');
+                });
+                $(dlg).on('hide.bs.modal', function (e) {
+                    console.log('close search');
+
+                    $('#modDialogcomplexline').find(".modal-body").empty();
+                    if (closecb)
+                        closecb();
+                    //$('#modDialog').modal('show');
+                })
+            }
+            $(document).on('click', '.delete-item', function (event) {
+                event.preventDefault();
+                var id = $(this).attr("dish-id");
+                var categoryDate = $(this).parent().parent().parent()/*.find(".category-content")*/.attr("categoryDate");
+                console.log(categoryDate);
+                var category = categoryDate.toString().split("_")[0];
+                var date = categoryDate.toString().split("_")[1];
+                var deleted = saveDayDish(id, category, date, false);
+                if (deleted) {
+                    var dayDish = $(this).parent().parent();
+                    dayDish.remove();
+                }
+            });
+            function saveDayDish(dishId, categoryId, date, checked) {
+                var flag = false;
+                var dishKind = $("#dishKind").val();
+                var dishKindparam = '';
+                if (dishKind == parseInt(dishKind, 10)) {
+                    dishKindparam = encodeURI(dishKind.toString());
+                }
+                $.ajax({
+                    type: "POST",
+                    data: { DishId: dishId, CategoryId: categoryId, DishKindId: dishKindparam, daydate: date, enabled: checked },
+                    async: false,
+                    url: "/DayDishes/SaveDayDish",
+                    success: function (data) {
+                        showeditdayalert({ class: 'alert-success', text: checked ? $.text_resource.added : $.text_resource.removed });
+                        if (!checked&&data!=-1) {
+                            flag= true;
+                        }
+                    }
+                })
+                    .fail(function (xhr, status, error) {
+                        showeditdayalert({ class: 'alert-danger', text: error });
+                        if (!checked) {
+                            flag= false;
+                        }
+                    });
+                return flag;
+            }
+        });
+
+    </script>
+}
+
+

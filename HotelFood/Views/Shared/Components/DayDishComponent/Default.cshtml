@@ -1,0 +1,64 @@
+ @model IEnumerable<HotelFood.Models.DayDishViewModelPerGategory>
+
+@{
+    ViewData["Title"] = "EditDay";
+}
+@{
+    DateTime daydate = DateTime.Now;
+}
+
+
+
+@{
+    int idx = 0;
+}
+
+@foreach (var itemcategory in Model)
+{
+   
+    <div class="container daydish-category-content border rounded">
+        <div class="row">
+            <div class="col col-lg-12 col-md-12 row-daydish-header">
+                @Html.DisplayFor(modelItem => itemcategory.CategoryName)
+            </div>
+        </div>
+
+            @foreach (var item in itemcategory.DayDishes)
+            {
+                string id_checkbox = item.DishId.ToString()+"_"+daydate.Millisecond.ToString() + "_" + idx;
+                <div class="row row-daydish">
+                    <div class="col col-md-2">
+
+                    </div>
+                    <div class="col col-md-1">
+                        <div class="checkbox checkbox-info">
+
+                            @if (item.Enabled)
+                            {
+                                <input type="checkbox" class="checkbox styled" checked="checked" cp-name="dayselect" id="@id_checkbox" />
+                            }
+                            else
+                            {
+                                <input type="checkbox" class="checkbox styled" cp-name="dayselect" id="@id_checkbox" />
+                            }
+                            <label for="@id_checkbox">
+
+                            </label>
+                            @Html.HiddenFor(modelItem => item.DishId)
+                            @Html.HiddenFor(modelItem => item.Date)
+                        </div>
+                    </div>
+                    <div class="col col-lg-4 col-md-4">
+                        @Html.DisplayFor(modelItem => item.DishName)
+                      
+                    </div>
+                </div>
+                idx++;
+            }
+
+            <div class="row dayfoot">
+            </div>
+        </div>
+
+   
+}

@@ -1,0 +1,110 @@
+﻿@model IEnumerable<HotelFood.Models.Categories>
+
+@using HotelFood.Core
+
+
+@{
+    QueryModel querymodel = ViewData["QueryModel"] as QueryModel;
+    if (querymodel == null)
+    {
+        querymodel = new QueryModel();
+    }
+
+}
+@if (true)
+{
+    @foreach (var item in Model)
+    {
+        <div class="col-12 p-lg-0 p-md-0 p-0 mt-3 shadow-cust">
+
+            <div class="card  flex-md-row flex-lg-row flex-column mb-0 mb-lg-3 mb-md-3"
+                 style=" border: none">
+                <div class="col-lg-5 p-lg-0 p-md-0 d-flex flex-row col-12 col-md-5 mt-3 mt-lg-0 mt-md-0">
+
+                    <div class="col-md-10 col-lg-10 col-sm-7 col-7 p-0 flex-md-row flex-lg-row flex-column d-flex align-items-center">
+                        <div class="col-md-6 col-lg-6  align-items-center d-flex" style="height: 22px">
+                            <span class="col-sm-10 col-6 col-md-12 col-lg-12 span-gray-bg p-sm-0 pl-sm-1 pr-sm-1 pl-0 pr-0 pr-lg-3 pl-lg-3 pr-md-3 pl-md-3  text-center text-md-left text-lg-left"
+                                  style="font-size: 16px; height: 22px; ">@item.Name</span>
+
+                            </div>
+                            <div class="col-md-6 col-lg-6 col-12   pl-sm-0 pl-0 pl-md-2 pl-lg-2 align-items-lg-center align-items-md-center align-items-sm-start d-flex pr-0"
+                                 style="height: 38px">
+                                <span class="col-12 align-content-center d-flex bold-w mt-2 mt-md-0 mt-lg-0 pr-0"
+                                      style=" height: 38px">@item.Code</span>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="col-lg-7 p-0 align-items-center d-flex flex-lg-row flex-md-row flex-column mb-3 mb-lg-0 mb-md-0">
+                            <div class="col-md-7 col-lg-7 col-12 p-0 mt-2 mt-lg-0 mt-md-0">
+                                <span class="col-12 align-content-center d-flex change-w">
+                                    @item.Description
+                                </span>
+                            </div>
+                            <div class="col-md-5 col-lg-5 col-12 p-0 align-items-center d-flex">
+
+                                <div class="col-md-6 col-lg-6 col-4 p-0 justify-content-between d-flex">
+                                    <div class="btn " data-toggle="modal" data-target="#change-item-modal">
+                                        <a class="cmd-edit dialog-edit-icon" href="@Url.Action("EditModal", "Categories",
+new { id = item.Id }, null)">
+
+                                            <img src="~/img/pen-icon.svg" alt="Change item">
+                                        </a>
+                                    </div>
+                                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn cmd-delete dialog-edit-icon"><img src="~/img/delete-icon.svg" alt="Delete item"></a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                </div>
+
+    }
+    @Html.DisplayFor(model => querymodel, "PageNavigation", null)
+}
+else
+{
+<table class="table">
+    <thead>
+        <tr class="bg-white text-success">
+            <th>
+
+                @await this.InvokeComponentAsync(Component, "TableColumn", model => model.Name, querymodel)
+            </th>
+            <th>
+                @await this.InvokeComponentAsync(Component, "TableColumn", model => model.Description, querymodel)
+
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr class="bg-white text-secondary">
+                <td>
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Description)
+                </td>
+                <td>
+
+
+                    <a asp-action="Delete" asp-route-id="@item.Id" class="cmd-delete dialog-edit-icon"> <span class="fa fa-trash" aria-hidden="true"></span></a>
+                    @Html.ActionLink("", "EditModal",
+                          new { id = item.Id }, new { @class = "cmd-edit dialog-edit-icon fa fa-pencil-square-o" })
+                </td>
+            </tr>
+        }
+    </tbody>
+    <tfoot>
+        <tr class="bg-white text-success rounded border">
+            <td colspan="3">
+                @await this.InvokeComponentAsync(Component, "TablePager", model => model.Description, querymodel)
+            </td>
+        </tr>
+    </tfoot>
+</table>
+}

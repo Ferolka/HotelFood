@@ -1,0 +1,49 @@
+﻿@model HotelFood.Models.ItemsLine
+@inject HotelFood.Core.SharedViewLocalizer Localizer
+@{
+    ViewData["Title"] = "Edit";
+    Layout = null;
+    int i = 0;
+    
+         i = (int)(ViewData["courseindex"]);
+  
+}
+<div class="row dish-line" data-courseid="@i">
+    <div class="form-group container select-complex-dishes">
+        <div class="row">
+            <div class="col col-lg-1 col-md-1 form-control dish-line-number" name="DishLines[@i].Number" asp-for="@Model.DishCourse" >@(i+1)</></div>
+            <div class="col-md-10 col-10 col-lg-10">
+
+
+
+
+                <select class="selectpicker form-control" multiple="multiple" name="DishLine[@i].DishesIds">
+                    @foreach (var item in Model.Dishes)
+                    {
+                        @if (Model.DishesIds.Contains(int.Parse(item.Value)))
+                        {
+                                <option  selected value="@item.Value">@item.Text</option>
+                        }
+                        else
+                        {
+                                <option value="@item.Value">@item.Text</option>
+                            }
+
+                            // <option value="@item.Value">@item.Text</option>
+
+                        }
+                </select>
+                @*@Html.ListBoxFor(i => Model.DishesIds, Model.Dishes,
+        new { @class = "selectpicker form-control", @multiple = "multiple", id = "H", Name = "DishCourse[" + i + "].DishCourse" })*@
+                @*@Html.ValidationMessageFor(i => Model.Dishes,
+        "", new { @class = "text-warning" })*@
+            </div>
+                <div class="col-1 delete-line">
+                    <span class="fa fa-trash fa-2x" aria-hidden="true"></span>
+
+                </div>
+            
+           
+        </div>
+    </div>
+</div>

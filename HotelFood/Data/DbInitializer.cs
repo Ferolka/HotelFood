@@ -90,6 +90,8 @@ namespace HotelFood.Data
                 UserName = "admin",
                 Email = "admin@default.com",
                 HotelId=1,
+                EmailConfirmed=true,
+                ConfirmedByAdmin=true,
                 Id = Guid.NewGuid().ToString(),
             };
 
@@ -104,14 +106,14 @@ namespace HotelFood.Data
 
         private static void SeedDatabase(AppDbContext _context, RoleManager<HotelRole> _roleManager, UserManager<HotelUser> _userManager)
         {
-            var cat1 = new Categories { Code = "", Name = "Standard", Description = "The Bakery's Standard pizzas all year around.", HotelId = 1 };
-            var cat2 = new Categories { Code = "", Name = "Spcialities", Description = "The Bakery's Speciality pizzas only for a limited time.", HotelId = 1 };
-            var cat3 = new Categories { Code = "", Name = "News", Description = "The Bakery's New pizzas on the menu.", HotelId = 1 };
-            var cat4 = new Categories { Code = "1", Name = "Завтраки", Description = "The Bakery's New pizzas on the menu.", HotelId = 1 };
-            var cat5 = new Categories { Code = "2", Name = "Обед", Description = "The Bakery's New pizzas on the menu.", HotelId = 1 };
+            var cat1 = new Categories { Id = 1, Code = "", Name = "Standard", Description = "The Bakery's Standard pizzas all year around.", HotelId = 1 };
+            var cat2 = new Categories { Id = 2, Code = "", Name = "Spcialities", Description = "The Bakery's Speciality pizzas only for a limited time.", HotelId = 1 };
+            var cat3 = new Categories { Id = 3, Code = "", Name = "News", Description = "The Bakery's New pizzas on the menu.", HotelId = 1 };
+            var cat4 = new Categories { Id = 4, Code = "1", Name = "Завтраки", Description = "The Bakery's New pizzas on the menu.", HotelId = 1 };
+            var cat5 = new Categories { Id = 5, Code = "2", Name = "Обед", Description = "The Bakery's New pizzas on the menu.", HotelId = 1 };
 
-            var usrGr1 = new UserGroups { Name = "Group1", HotelId = 1 };
-            var usrGr2 = new UserGroups { Name = "Group2", HotelId = 1 };
+            var usrGr1 = new UserGroups { Id = 1, Name = "Group1", HotelId = 1 };
+            var usrGr2 = new UserGroups { Id = 2, Name = "Group2", HotelId = 1 };
             var usrGr3 = new UserGroups { Name = "Group3", HotelId = 1 };
             var usrGr4 = new UserGroups { Name = "Завтраки", HotelId = 1 };
             var usrGr5 = new UserGroups { Name = "Обед", HotelId = 1 };
@@ -131,10 +133,10 @@ namespace HotelFood.Data
             };
 
 
-            var d1=new Dish { Code = "1", Name = "Борщ", Price = 2,  Description = "...", CategoriesId=4, HotelId = 1 };
-            var d2 = new Dish { Code = "2", Name = "Котлета", Price = 2, Description = "A normal pizza with a taste from the forest.", CategoriesId = 4, HotelId = 1 };
-            var d3 = new Dish { Code = "3", Name = "Запеканка", Price = 2, Description = "A normal pizza with a taste from the forest.", CategoriesId = 3, HotelId = 1 };
-            var d4 = new Dish { Code = "4", Name = "Омлет", Price = 2, Description = "A normal pizza with a taste from the forest.", CategoriesId = 3, HotelId = 1 };
+            var d1=new Dish { Id = 1, Code = "1", Name = "Борщ", Price = 2,  Description = "...", CategoriesId=4, HotelId = 1 };
+            var d2 = new Dish { Id = 2, Code = "2", Name = "Котлета", Price = 2, Description = "A normal pizza with a taste from the forest.", CategoriesId = 4, HotelId = 1 };
+            var d3 = new Dish { Id = 3, Code = "3", Name = "Запеканка", Price = 2, Description = "A normal pizza with a taste from the forest.", CategoriesId = 3, HotelId = 1 };
+            var d4 = new Dish { Id = 4, Code = "4", Name = "Омлет", Price = 2, Description = "A normal pizza with a taste from the forest.", CategoriesId = 3, HotelId = 1 };
 
 
             var dishes = new List<Dish>()
@@ -151,11 +153,36 @@ namespace HotelFood.Data
             //};
 
 
-            var user1 = new HotelUser { UserName = "user1@gmail.com", Email = "user1@gmail.com" };
-            var user2 = new HotelUser { UserName = "user2@gmail.com", Email = "user2@gmail.com" };
-            var user3 = new HotelUser { UserName = "user3@gmail.com", Email = "user3@gmail.com" };
-            var user4 = new HotelUser { UserName = "user4@gmail.com", Email = "user4@gmail.com" };
-            var user5 = new HotelUser { UserName = "user5@gmail.com", Email = "user5@gmail.com" };
+            var user1 = new HotelUser
+            {
+                EmailConfirmed = true,
+                ConfirmedByAdmin = true,
+                Id = Guid.NewGuid().ToString(),
+                UserName = "user1@gmail.com", Email = "user1@gmail.com" };
+            var user2 = new HotelUser
+            {
+                EmailConfirmed = true,
+                ConfirmedByAdmin = true,
+                Id = Guid.NewGuid().ToString(),
+                UserName = "user2@gmail.com", Email = "user2@gmail.com" };
+            var user3 = new HotelUser
+            {
+                EmailConfirmed = true,
+                ConfirmedByAdmin = true,
+                Id = Guid.NewGuid().ToString(),
+                UserName = "user3@gmail.com", Email = "user3@gmail.com" };
+            var user4 = new HotelUser
+            {
+                EmailConfirmed = true,
+                ConfirmedByAdmin = true,
+                Id = Guid.NewGuid().ToString(),
+                UserName = "user4@gmail.com", Email = "user4@gmail.com" };
+            var user5 = new HotelUser
+            {
+                EmailConfirmed = true,
+                ConfirmedByAdmin = true,
+                Id = Guid.NewGuid().ToString(),
+                UserName = "user5@gmail.com", Email = "user5@gmail.com" };
 
             string userPassword = "Password123";
 

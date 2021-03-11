@@ -1,0 +1,32 @@
+﻿@model UserDayEditModel
+@using System.Globalization
+@using HotelFood.Core
+@inject HotelFood.Core.SharedViewLocalizer Localizer
+@inject HotelFood.Repositories.IUserDayDishesRepository udrepo;
+@inject Microsoft.Extensions.Options.IOptions<UIOption> pageOptions
+
+@{
+    Layout = null;
+    DateTime daydate = Model.DayDate;
+    long ms_since1970 = (long)daydate.Subtract(DateTime.MinValue.AddYears(1969)).TotalMilliseconds;
+    CultureInfo ci = new CultureInfo("en-US");
+    // Get the DateTimeFormatInfo for the en-US culture.
+    DateTimeFormatInfo dtfi = ci.DateTimeFormat;
+}
+
+@if (!udrepo.IsAllowDayEdit(daydate, User.GetHotelID()))
+{
+    <div class="container day-closed-msg">
+        <h3> @Localizer["DayClosedForOrder"] </h3>
+    </div>
+}
+@await Component.InvokeAsync("UserDayOrderedComponent", daydate)
+@if (Model.ShowComplex)
+{
+    @await Component.InvokeAsync("UserDayComplexComponent", Model.DayMenu)
+}
+@if (Model.ShowDishes)
+{
+    @await Component.InvokeAsync("UserDayDishComponent", Model.DayMenu)
+}
+

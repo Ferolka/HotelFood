@@ -1,0 +1,817 @@
+﻿
+@{
+    Layout = null;
+    decimal discount = 0;
+}
+
+@model HotelFood.Models.WeekReportModel
+@using HotelFood.Core
+@inject Microsoft.Extensions.Options.IOptions<UIOption> pageOptions
+@inject HotelFood.Core.SharedViewLocalizer Localizer
+@*@inject HotelFood.Helpers.URLHelperContextLess Url*@
+@*@if (true)
+{
+   
+return;
+}*@
+@if (true)
+{
+    <html>
+    <head>
+
+
+        <style>
+            #modal-body {
+                max-width: 966px;
+            }
+
+                #modal-body * {
+                    box-sizing: border-box;
+                }
+
+                #modal-body .btn {
+                    display: inline-block;
+                    font-weight: 400;
+                    color: #212529;
+                    text-align: center;
+                    vertical-align: middle;
+                    -webkit-user-select: none;
+                    -moz-user-select: none;
+                    -ms-user-select: none;
+                    user-select: none;
+                    background-color: transparent;
+                    border: 1px solid transparent;
+                    padding: .375rem .75rem;
+                    font-size: 1rem;
+                    line-height: 1.5;
+                    border-radius: .25rem;
+                    transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+                }
+
+                #modal-body .btn-outline-danger {
+                    color: #dc3545;
+                    border-color: #dc3545;
+                }
+
+                #modal-body .btn:not(:disabled):not(.disabled) {
+                    cursor: pointer;
+                }
+
+                #modal-body .row {
+                    display: -ms-flexbox;
+                    display: flex;
+                    -ms-flex-wrap: wrap;
+                    flex-wrap: wrap;
+                    margin-right: -15px;
+                    margin-left: -15px;
+                }
+
+                #modal-body .col, #modal-body .col-1, #modal-body .col-10, #modal-body .col-11, #modal-body .col-12, #modal-body .col-2, #modal-body .col-3, #modal-body .col-4, #modal-body .col-5, #modal-body .col-6, #modal-body .col-7, #modal-body .col-8, #modal-body .col-9, #modal-body .col-auto, #modal-body .col-lg, #modal-body .col-lg-1, #modal-body .col-lg-10, #modal-body .col-lg-11, #modal-body .col-lg-12, #modal-body .col-lg-2, #modal-body .col-lg-3, #modal-body .col-lg-4, #modal-body .col-lg-5, #modal-body .col-lg-6, #modal-body .col-lg-7, #modal-body .col-lg-8, #modal-body .col-lg-9, #modal-body .col-lg-auto, #modal-body .col-md, #modal-body .col-md-1, #modal-body .col-md-10, #modal-body .col-md-11, #modal-body .col-md-12, #modal-body .col-md-2, #modal-body .col-md-3, #modal-body .col-md-4, #modal-body .col-md-5, #modal-body .col-md-6, #modal-body .col-md-7, #modal-body .col-md-8, #modal-body .col-md-9, #modal-body .col-md-auto, #modal-body .col-sm, #modal-body .col-sm-1, #modal-body .col-sm-10, #modal-body .col-sm-11, #modal-body .col-sm-12, #modal-body .col-sm-2, #modal-body .col-sm-3, #modal-body .col-sm-4, #modal-body .col-sm-5, .col-sm-6, #modal-body .col-sm-7, #modal-body .col-sm-8, #modal-body .col-sm-9, #modal-body .col-sm-auto, #modal-body .col-xl, #modal-body .col-xl-1, #modal-body .col-xl-10, #modal-body .col-xl-11, #modal-body .col-xl-12, #modal-body .col-xl-2, #modal-body .col-xl-3, #modal-body .col-xl-4, #modal-body .col-xl-5, #modal-body .col-xl-6, #modal-body .col-xl-7, #modal-body .col-xl-8, #modal-body .col-xl-9, #modal-body .col-xl-auto {
+                    position: relative;
+                    width: 100%;
+                    padding-right: 15px;
+                    padding-left: 15px;
+                }
+
+                #modal-body .col-2 {
+                    -ms-flex: 0 0 16.666667%;
+                    flex: 0 0 16.666667%;
+                    max-width: 16.666667%;
+                }
+
+                #modal-body .col-4 {
+                    -ms-flex: 0 0 33.333333%;
+                    flex: 0 0 33.333333%;
+                    max-width: 33.333333%;
+                }
+
+                #modal-body .col-6 {
+                    -ms-flex: 0 0 50%;
+                    flex: 0 0 50%;
+                    max-width: 50%;
+                }
+
+                #modal-body .col-7 {
+                    -ms-flex: 0 0 58.333333%;
+                    flex: 0 0 58.333333%;
+                    max-width: 58.333333%;
+                }
+
+                #modal-body .col-12 {
+                    -ms-flex: 0 0 100%;
+                    flex: 0 0 100%;
+                    max-width: 100%;
+                }
+
+                #modal-body .d-flex {
+                    display: -ms-flexbox !important;
+                    display: flex !important;
+                }
+
+                #modal-body .flex-column {
+                    -ms-flex-direction: column !important;
+                    flex-direction: column !important;
+                }
+
+                #modal-body .flex-row {
+                    -ms-flex-direction: row !important;
+                    flex-direction: row !important;
+                }
+
+                #modal-body .align-content-center {
+                    -ms-flex-line-pack: center !important;
+                    align-content: center !important;
+                }
+
+                #modal-body .align-self-center {
+                    -ms-flex-item-align: center !important;
+                    align-self: center !important;
+                }
+
+                #modal-body .align-items-center {
+                    -ms-flex-align: center !important;
+                    align-items: center !important;
+                }
+
+                #modal-body .justify-content-start {
+                    -ms-flex-pack: start !important;
+                    justify-content: flex-start !important;
+                }
+
+                #modal-body .justify-content-between {
+                    -ms-flex-pack: justify !important;
+                    justify-content: space-between !important;
+                }
+
+                #modal-body .justify-content-around {
+                    -ms-flex-pack: distribute !important;
+                    justify-content: space-around !important;
+                }
+
+                #modal-body .justify-content-end {
+                    -ms-flex-pack: end !important;
+                    justify-content: flex-end !important;
+                }
+
+                #modal-body .order-active {
+                    background: #F1FFF1;
+                    border-left: 4px solid #36C233;
+                    font-weight: bold;
+                }
+
+                #modal-body .order-active__no-order {
+                    background: #FFF2F2;
+                    border-left: 4px solid #FF6666;
+                    font-weight: normal;
+                }
+
+                #modal-body .brd-bot-line-reverse {
+                    border-bottom: none;
+                }
+
+                #modal-body .change-color-grey {
+                    color: #797979;
+                }
+
+                #modal-body .change-weight {
+                    font-weight: normal;
+                }
+
+                #modal-body .p-0 {
+                    padding: 0 !important;
+                }
+
+                #modal-body .pl-0, #modal-body .px-0 {
+                    padding-left: 0 !important;
+                }
+
+                #modal-body .pr-0, #modal-body .px-0 {
+                    padding-right: 0 !important;
+                }
+
+                #modal-body .pb-2, #modal-body .py-2 {
+                    padding-bottom: .5rem !important;
+                }
+
+                #modal-body .pl-3, #modal-body .px-3 {
+                    padding-left: 1rem !important;
+                }
+
+                #modal-body .pr-3, #modal-body .px-3 {
+                    padding-right: 1rem !important;
+                }
+
+                #modal-body .ml-0, #modal-body .mx-0 {
+                    margin-left: 0 !important;
+                }
+
+                #modal-body .ml-4, #modal-body .mx-4 {
+                    margin-left: 1.5rem !important;
+                }
+
+                #modal-body .mr-0, #modal-body .mx-0 {
+                    margin-right: 0 !important;
+                }
+
+                #modal-body .mb-1, #modal-body .my-1 {
+                    margin-bottom: .25rem !important;
+                }
+
+                #modal-body .mt-1, #modal-body .my-1 {
+                    margin-top: .25rem !important;
+                }
+
+                #modal-body .mb-2, #modal-body .my-2 {
+                    margin-bottom: .5rem !important;
+                }
+
+                #modal-body .mb-3, #modal-body .my-3 {
+                    margin-bottom: 1rem !important;
+                }
+
+                #modal-body .mt-2, #modal-body .my-2 {
+                    margin-top: .5rem !important;
+                }
+
+                #modal-body .mt-3, #modal-body .my-3 {
+                    margin-top: 1rem !important;
+                }
+
+                #modal-body .mt-5, #modal-body .my-5 {
+                    margin-top: 3rem !important;
+                }
+
+                #modal-body .font-weight-bold {
+                    font-weight: 700 !important;
+                }
+
+                #modal-body .w-100 {
+                    width: 100% !important;
+                }
+
+                #modal-body .d-none {
+                    display: none !important;
+                }
+
+                #modal-body .d-inline {
+                    display: inline !important;
+                }
+
+                #modal-body .brd-bot-line-reverse {
+                    border-bottom: none;
+                }
+
+
+            @@media (min-width: 576px) {
+                #modal-body .d-sm-none {
+                    display: none !important;
+                }
+
+                #modal-body .col-sm-6 {
+                    -ms-flex: 0 0 50%;
+                    flex: 0 0 50%;
+                    max-width: 50%;
+                }
+            }
+
+            @@media (min-width: 768px) {
+
+                #modal-body .flex-md-row {
+                    -ms-flex-direction: row !important;
+                    flex-direction: row !important;
+                }
+
+                #modal-body .justify-content-md-start {
+                    -ms-flex-pack: start !important;
+                    justify-content: flex-start !important;
+                }
+
+                #modal-body .justify-content-md-between {
+                    -ms-flex-pack: justify !important;
+                    justify-content: space-between !important;
+                }
+
+                #modal-body .justify-content-md-end {
+                    -ms-flex-pack: end !important;
+                    justify-content: flex-end !important;
+                }
+
+                #modal-body .col-md-2 {
+                    -ms-flex: 0 0 16.666667%;
+                    flex: 0 0 16.666667%;
+                    max-width: 16.666667%;
+                }
+
+                #modal-body .col-md-4 {
+                    -ms-flex: 0 0 33.333333%;
+                    flex: 0 0 33.333333%;
+                    max-width: 33.333333%;
+                }
+
+                #modal-body .col-md-5 {
+                    -ms-flex: 0 0 41.666667%;
+                    flex: 0 0 41.666667%;
+                    max-width: 41.666667%;
+                }
+
+                #modal-body .col-md-6 {
+                    -ms-flex: 0 0 50%;
+                    flex: 0 0 50%;
+                    max-width: 50%;
+                }
+
+                #modal-body .col-md-10 {
+                    -ms-flex: 0 0 83.333333%;
+                    flex: 0 0 83.333333%;
+                    max-width: 83.333333%;
+                }
+
+                #modal-body .pl-md-3, #modal-body .px-md-3 {
+                    padding-left: 1rem !important;
+                }
+
+                #modal-body .pr-md-3, #modal-body .px-md-3 {
+                    padding-right: 1rem !important;
+                }
+
+                #modal-body .mb-md-0, #modal-body .my-md-0 {
+                    margin-bottom: 0 !important;
+                }
+
+                #modal-body .mt-md-0, #modal-body .my-md-0 {
+                    margin-top: 0 !important;
+                }
+
+                #modal-body .ml-md-5, #modal-body .mx-md-5 {
+                    margin-left: 3rem !important;
+                }
+
+                #modal-body .d-md-none {
+                    display: none !important;
+                }
+
+                #modal-body .d-md-flex {
+                    display: -ms-flexbox !important;
+                    display: flex !important;
+                }
+
+                #modal-body .d-md-inline {
+                    display: inline !important;
+                }
+
+                #modal-body .brd-bot-line-reverse {
+                    border-bottom: 1px solid #EAEAEA !important;
+                }
+
+                #modal-body .brd-bot-line {
+                    border-bottom: none;
+                }
+
+                #modal-body .change-color-grey {
+                    color: #232323 !important;
+                }
+
+                #modal-body .change-weight {
+                    font-weight: 600;
+                }
+            }
+
+            @@media (min-width: 992px) {
+                #modal-body .flex-lg-row {
+                    -ms-flex-direction: row !important;
+                    flex-direction: row !important;
+                }
+
+                #modal-body .justify-content-lg-start {
+                    -ms-flex-pack: start !important;
+                    justify-content: flex-start !important;
+                }
+
+                #modal-body .justify-content-lg-between {
+                    -ms-flex-pack: justify !important;
+                    justify-content: space-between !important;
+                }
+
+                #modal-body .justify-content-lg-end {
+                    -ms-flex-pack: end !important;
+                    justify-content: flex-end !important;
+                }
+
+                #modal-body .col-lg-2 {
+                    -ms-flex: 0 0 16.666667%;
+                    flex: 0 0 16.666667%;
+                    max-width: 16.666667%;
+                }
+
+                #modal-body .col-lg-4 {
+                    -ms-flex: 0 0 33.333333%;
+                    flex: 0 0 33.333333%;
+                    max-width: 33.333333%;
+                }
+
+                #modal-body .col-lg-5 {
+                    -ms-flex: 0 0 41.666667%;
+                    flex: 0 0 41.666667%;
+                    max-width: 41.666667%;
+                }
+
+                #modal-body .col-lg-6 {
+                    -ms-flex: 0 0 50%;
+                    flex: 0 0 50%;
+                    max-width: 50%;
+                }
+
+                #modal-body .col-lg-10 {
+                    -ms-flex: 0 0 83.333333%;
+                    flex: 0 0 83.333333%;
+                    max-width: 83.333333%;
+                }
+
+                #modal-body .pl-lg-3, #modal-body .px-lg-3 {
+                    padding-left: 1rem !important;
+                }
+
+                #modal-body .pr-lg-3, #modal-body .px-lg-3 {
+                    padding-right: 1rem !important;
+                }
+
+                #modal-body .mb-lg-0, #modal-body .my-lg-0 {
+                    margin-bottom: 0 !important;
+                }
+
+                #modal-body .mt-lg-0, #modal-body .my-lg-0 {
+                    margin-top: 0 !important;
+                }
+
+                #modal-body .ml-lg-5, #modal-body .mx-lg-5 {
+                    margin-left: 3rem !important;
+                }
+
+                #modal-body .d-lg-none {
+                    display: none !important;
+                }
+
+                #modal-body .d-lg-flex {
+                    display: -ms-flexbox !important;
+                    display: flex !important;
+                }
+
+                #modal-body .d-lg-inline {
+                    display: inline !important;
+                }
+            }
+
+            #modal-body .order-active {
+                background: #F1FFF1;
+                border-left: 4px solid #36C233;
+                font-weight: bold;
+            }
+
+            #modal-body .order-active__no-order {
+                background: #FFF2F2;
+                border-left: 4px solid #FF6666;
+                font-weight: normal;
+            }
+
+            #modal-body .change-color-grey {
+                color: #797979;
+            }
+
+            #modal-body .change-weight {
+                font-weight: normal;
+            }
+
+            #modal-body .brd-bot-line {
+                border-bottom: 1px solid #EAEAEA !important;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="modal-body" class=" modal-body week-details  col-auto p-0 mt-2 ">
+            <div class="col-12 d-flex flex-column px-0" id="modal-body">
+                <div class="col-12 d-flex flex-lg-row flex-md-row flex-column">
+                    <div class="col-lg-2 col-md-2 col-12 px-0 px-lg-3 px-md-3 d-flex">
+                       
+                        @*<div class="col-7 d-flex flex-column d-md-none d-lg-none mt-3" style="color: #232323">*@
+                            <div class="col-7 d-md-none d-lg-none mt-3" style="color: #232323">
+                                <div class="col-12 d-flex flex-column justify-content-start"
+                                     style="max-height: 60px">
+                                    <span class="font-weight-bold" style="font-size: 14px;">Рахунок:</span>
+                                    <span style="font-family: Open-Sans, sans-serif; font-size: 16px;"> @Model.Number</span>
+                                </div>
+                                <div class="col-12 d-flex flex-column justify-content-end" style="max-height: 60px">
+                                    <span class="font-weight-bold" style="font-size: 14px;">Дата:</span>
+                                    <span style="font-family: Open-Sans, sans-serif;font-size: 16px; ">@DateTime.Now.ToShortDateString()</span>
+                                </div>
+                                <div class="col-12 d-flex flex-column justify-content-end" style="max-height: 60px">
+                                    <span class="font-weight-bold" style="font-size: 14px;">Дитина:</span>
+                                    <span style="font-family: Open-Sans, sans-serif;font-size: 16px; ">@Model.Buyer.ChildName</span>
+                                </div>
+                            </div>
+                        </div>
+                    <div class="col-12 col-md-10 col-lg-10 px-0 px-lg-3 px-md-3 d-flex flex-column mt-3 mt-lg-0 mt-md-0">
+                        <div class="col-12 p-0 brd-bot-line d-flex flex-row justify-content-lg-between justify-content-md-between justify-content-center "
+                             style="max-height: 100px">
+                            <div class="col-4 col-md-5 col-lg-4 d-none flex-column d-md-flex d-lg-flex  pb-2"
+                                 style="color: #232323">
+                               
+                                    <div class="col-12 d-flex flex-row justify-content-between mb-3 mt-2"
+                                         style="line-height: 22px; max-height: 22px">
+                                        <span class="col-6 p-0"
+                                              style="font-size: 14px; color: #797979;">Рахунок:</span>
+                                        <span class="col-6 p-0"
+                                              style="font-family: Open-Sans, sans-serif; font-size: 16px;"> @Model.Number</span>
+                                        </div>
+                                        <div class="col-12 d-flex flex-row justify-content-between"
+                                             style="line-height: 22px; max-height: 22px">
+                                            <span class="col-6 p-0"
+                                                  style="font-size: 14px; color: #797979;">Дата:</span>
+                                            <span class="col-6 p-0"
+                                                  style="font-family: Open-Sans, sans-serif;font-size: 16px; ">@DateTime.Now.ToShortDateString()</span>
+                                            </div>
+                                            <div class="col-12 d-flex flex-row justify-content-between"
+                                                 style="line-height: 22px; max-height: 22px">
+                                                <span class="col-6 p-0"
+                                                      style="font-size: 14px; color: #797979;">Дитина:</span>
+                                                <span class="col-6 p-0"
+                                                      style="font-family: Open-Sans, sans-serif;font-size: 16px; ">@Model.Buyer.ChildName</span>
+                                                </div>
+                                            </div>
+                                            <button type="button"
+                                                    class="sendWeek btn btn-xl btn-outline-danger  font-weight-bold  col-12 col-sm-6 col-md-4 col-lg-4  d-flex justify-content-lg-start justify-content-md-start justify-content-around align-self-center mb-3 mb-lg-0 mb-md-0"
+                                                    style=" color: rgb(255, 255, 255); border-color: rgb(54, 194, 51); outline: none; height: 48px; background: rgb(54, 194, 51); display: flex; align-items: center; justify-content: space-evenly; font-size: 14px; text-transform: uppercase">
+                                                <img src="../img/mail-icon-report.svg" alt=""><span class="d-flex justify-content-center ml-4"
+                                                                                                    style="">@Localizer["SendEmail"]</span>
+                                                                                                </button>
+                                                                                            </div>
+                                                                                            <div class="brd-bot-line-reverse col-12 p-0 d-flex flex-column flex-md-row flex-lg-row ">
+                                                                                                <div class="col-12 col-md-5 col-lg-5 d-flex flex-column pb-2 px-0 px-lg-3 px-md-3 "
+                                                                                                     style="color: #232323">
+                                                                                                    <div class="col-12 d-flex flex-row justify-content-between mb-3 mt-2 px-0 px-lg-3 px-md-3"
+                                                                                                         style="line-height: 22px; max-height: 22px">
+                                                                                                        <span class="col-6 p-0 change-color-grey change-weight"
+                                                                                                              style="font-size: 14px; color: #797979;">@Model.Seller.Name</span>
+                                                                                                            <span class="col-6 p-0"
+                                                                                                                  style="font-family: Open-Sans, sans-serif; font-size: 16px;">@Model.Buyer.Name</span>
+                                                                                                            </div>
+                                                                                                            <div class="col-12 d-flex flex-row justify-content-between px-0 px-lg-3 px-md-3"
+                                                                                                                 style="line-height: 22px; max-height: 22px">
+                                                                                                                <span class="col-6 p-0 change-color-grey change-weight"
+                                                                                                                      style="font-size: 14px; color: #797979;">@Model.Seller.City</span>
+                                                                                                                    <span class="col-6 p-0"
+                                                                                                                          style="font-family: Open-Sans, sans-serif;font-size: 16px; ">@Model.Buyer.City</span>
+                                                                                                                    </div>
+                                                                                                                </div>
+                                                                                                                <div class="col-12 col-md-6 col-lg-6 d-flex flex-column pb-2 ml-md-5 ml-lg-5 px-0 px-lg-3 px-md-3"
+                                                                                                                     style="color: #232323">
+                                                                                                                    <div class="col-12 d-flex flex-row justify-content-between mb-3 mt-2 px-0 px-lg-3 px-md-3"
+                                                                                                                         style="line-height: 22px; max-height: 22px">
+                                                                                                                        <span class="col-6 p-0 change-color-grey change-weight"
+                                                                                                                              style="font-size: 14px;">@Model.Seller.Country</span>
+                                                                                                                            <span class="col-6 p-0"
+                                                                                                                                  style="font-family: Open-Sans, sans-serif; font-size: 16px;">@Model.Buyer.Country</span>
+                                                                                                                            </div>
+                                                                                                                            <div class="col-12 d-flex flex-row justify-content-between px-0 px-lg-3 px-md-3"
+                                                                                                                                 style="line-height: 22px; max-height: 22px">
+                                                                                                                                <span class="col-6 p-0 change-color-grey change-weight"
+                                                                                                                                      style="font-size: 14px;">@Model.Seller.Address1</span>
+                                                                                                                                    <span class="col-6 p-0"
+                                                                                                                                          style="font-family: Open-Sans, sans-serif;font-size: 16px; ">@Model.Buyer.Address1</span>
+                                                                                                                                    </div>
+                                                                                                                                </div>
+                                                                                                                            </div>
+                                                                                                                        </div>
+
+                                                                                                            </div>
+                                                                                                            <div class="row ml-0 mr-0 justify-content-start w-100 align-content-center d-lg-flex d-none d-md-flex d-sm-none mt-5"
+                                                                                                                 style="height: 40px; font-weight: 500; font-size: 18px; color: #232323; background: #F7F7F7;">
+                                                                                                                <div class="col-12 d-flex">
+                                                                                                                    <div class="col-2" style="cursor: pointer"><span>Код</span></div>
+                                                                                                                    <div class="col-4" style="cursor: pointer"><span>Назва</span></div>
+                                                                                                                    <div class="col-2" style="cursor: pointer"><span>Кількість</span></div>
+                                                                                                                    <div class="col-2" style="cursor: pointer"><span>Вартiсть (@pageOptions.Value.CurrencySymbol)</span></div>
+                                                                                                                    <div class="col-2" style="cursor: pointer"><span>Сума (@pageOptions.Value.CurrencySymbol)</span></div>
+
+                                                                                                                </div>
+                                                                                                            </div>
+                                                                                                            @{
+                                                                                                                DateTime date = default;
+                                                                                                            }
+                                                                                                            @foreach (var item in Model.Items)
+                                                                                                            {
+                                                                                                                <div class="col-12 d-flex flex-column px-0">
+                                                                                                                    <div class="col-12  d-flex flex-column px-0">
+                                                                                                                        @{
+                                                                                                                            discount += item.Discount;
+                                                                                                                        }
+                                                                                                                        <div class="col-12 my-3 px-0 px-lg-3 px-md-3">
+                                                                                                                            <span class="px-3"
+                                                                                                                                  style="font-weight: 600; font-size: 18px; line-height: 21px; color: #232323">@System.Globalization.CultureInfo.CurrentUICulture.DateTimeFormat.GetDayName(item.Date.DayOfWeek)  @item.Date.Day</span>
+                                                                                                                            </div>
+
+                                                                                                                            @if (!item.Enabled)
+                                                                                                                            {
+                                                                                                                                <div class="col-12 px-0 order-active order-active__no-order" style="max-height: 51px">
+                                                                                                                                    <div class="col-12 d-flex align-items-center px-0 px-lg-3 px-md-3"
+                                                                                                                                         style="height: 51px">
+                                                                                                                                        <span class="px-3"
+                                                                                                                                              style="font-family: Open-Sans, sans-serif; font-size: 16px; color: #232323;">Немає замовлень</span>
+                                                                                                                                    </div>
+                                                                                                                                </div>
+                                                                                                                            }
+                                                                                                                            else if (item.DishesPerCategory.Count() > 0)
+                                                                                                                            {
+                                                                                                                                foreach (var day in item.DishesPerCategory)
+                                                                                                                                {
+                                                                                                                                    foreach (var complex in day.UserDayComplex)
+                                                                                                                                    {
+                                                                                                                                        <div class="col-12 px-0 mb-2">
+                                                                                                                                            <div class="col-12 d-flex align-items-center px-0 px-lg-3 px-md-3">
+
+                                                                                                                                                <div class="col-12 d-flex px-0 flex-md-row flex-lg-row flex-column"
+                                                                                                                                                     style="font-size: 18px">
+                                                                                                                                                    <div class=" col-md-2 col-lg-2 col-12 flex-row d-flex my-1"
+                                                                                                                                                         style=" font-family: Open-Sans, sans-serif">
+                                                                                                                                                        <span class="col-6 p-0 d-md-none d-lg-none d-inline"
+                                                                                                                                                              style="font-size: 14px; font-weight: bold">Код</span>
+                                                                                                                                                        <span></span>
+                                                                                                                                                    </div>
+                                                                                                                                                    <div class=" col-md-4 col-lg-4 col-12 flex-row d-flex my-1">
+                                                                                                                                                        <span class="col-6 p-0 d-md-none d-lg-none d-inline"
+                                                                                                                                                              style="font-size: 14px; font-weight: bold">Назва</span>
+                                                                                                                                                        <span>@complex.ComplexName</span>
+                                                                                                                                                    </div>
+                                                                                                                                                    <div class=" col-md-2 col-lg-2 col-12 flex-row d-flex my-1">
+                                                                                                                                                        <span class="col-6 p-0 d-md-none d-lg-none d-inline"
+                                                                                                                                                              style="font-size: 14px; font-weight: bold">Кількість</span>
+                                                                                                                                                        <span style=" font-family: Open-Sans, sans-serif"
+                                                                                                                                                              id="order-amount">@Html.DisplayFor(model => complex.Quantity)</span>
+                                                                                                                                                        </div>
+                                                                                                                                                        <div class="col-md-2 col-lg-2 col-12 flex-row d-flex my-1">
+                                                                                                                                                            <span class="col-6 p-0 d-md-none d-lg-none d-inline"
+                                                                                                                                                                  style="font-size: 14px; font-weight: bold">Вартiсть (@pageOptions.Value.CurrencySymbol)</span>
+                                                                                                                                                                <span style=" font-family: Open-Sans, sans-serif"
+                                                                                                                                                                      id="order-price"> @complex.Price.ToString("0.00")</span>
+                                                                                                                                                                </div>
+                                                                                                                                                                <div class="col-md-2 col-lg-2 col-12 flex-row d-flex my-1 d-flex justify-content-lg-end justify-content-md-end">
+                                                                                                                                                                    <span class="col-6 p-0 d-md-none d-lg-none d-inline"
+                                                                                                                                                                          style="font-size: 14px; font-weight: bold">Сума (@pageOptions.Value.CurrencySymbol)</span>
+                                                                                                                                                                        <span style=" font-family: Open-Sans, sans-serif" class=""
+                                                                                                                                                                              id="total-order-price">@{ decimal comTot = complex.Quantity * complex.Price;} @comTot.ToString("0.00")</span>
+
+                                                                                                                                                                        </div>
+
+
+                                                                                                                                                                    </div>
+
+                                                                                                                                                                </div>
+
+                                                                                                                                                            </div>
+
+
+
+
+                                                                                                                                                            @foreach (var dish in complex.ComplexDishes)
+                                                                                                                                                            {
+                                                                                                                                                                <div class="col-12 d-flex px-0 flex-md-row flex-lg-row flex-column align-items-center"
+                                                                                                                                                                     style="font-size: 18px; border-top: 1px solid #eaeaea; border-bottom:1px solid #eaeaea; ">
+                                                                                                                                                                    <div class=" col-md-2 col-lg-2 col-4 flex-row d-flex my-1  align-self-start"
+                                                                                                                                                                         style=" font-family: Open-Sans, sans-serif">
+                                                                                                                                                                        
+                                                                                                                                                                    </div>
+                                                                                                                                                                    <div class=" col-md-4 col-lg-4 col-12 flex-row d-flex my-1">
+                                                                                                                                                                        <span class="col-6 p-0 d-md-none d-lg-none d-inline align-items-center justify-content-center"
+                                                                                                                                                                              style="font-size: 14px; font-weight: bold">Назва</span>
+                                                                                                                                                                        <span>@Html.DisplayFor(modelItem => dish.DishName)</span>
+                                                                                                                                                                    </div>
+                                                                                                                                                                    <div class=" col-md-2 col-lg-2 col-12 flex-row d-flex my-1">
+                                                                                                                                                                        <span class="col-6 p-0 d-md-none d-lg-none d-inline"
+                                                                                                                                                                              style="font-size: 14px; font-weight: bold">Кількість</span>
+                                                                                                                                                                        <span style=" font-family: Open-Sans, sans-serif">@Html.DisplayFor(modelItem => dish.DishQuantity, new { htmlAttributes = new { datafield = "Quantity" } })</span>
+                                                                                                                                                                    </div>
+                                                                                                                                                                    <div class="col-4"></div>
+
+                                                                                                                                                                </div>
+                                                                                                                                                            }
+
+                                                                                                                                                        }
+                                                                                                                                                        foreach (var dish in day.UserDayDish)
+                                                                                                                                                        {
+                                                                                                                    <div class="col-12 px-0 mb-2">
+                                                                                                                        <div class="col-12 d-flex align-items-center px-0 px-lg-3 px-md-3">
+
+                                                                                                                            <div class="col-12 d-flex px-0 flex-md-row flex-lg-row flex-column"
+                                                                                                                                 style="font-size: 18px">
+                                                                                                                                <div class=" col-md-2 col-lg-2 col-12 flex-row d-flex my-1"
+                                                                                                                                     style=" font-family: Open-Sans, sans-serif">
+                                                                                                                                    
+                                                                                                                                   
+                                                                                                                                </div>
+                                                                                                                                <div class=" col-md-4 col-lg-4 col-12 flex-row d-flex my-1">
+                                                                                                                                    <span class="col-6 p-0 d-md-none d-lg-none d-inline"
+                                                                                                                                          style="font-size: 14px; font-weight: bold">Назва</span>
+                                                                                                                                    <span>@dish.DishName</span>
+                                                                                                                                </div>
+                                                                                                                                <div class=" col-md-2 col-lg-2 col-12 flex-row d-flex my-1">
+                                                                                                                                    <span class="col-6 p-0 d-md-none d-lg-none d-inline"
+                                                                                                                                          style="font-size: 14px; font-weight: bold">Кількість</span>
+                                                                                                                                    <span style=" font-family: Open-Sans, sans-serif"
+                                                                                                                                          id="order-amount">@if (dish.IsWeight)
+                                                                                                                                          { @(dish.Quantity * dish.OrderBaseWeight) }
+                                                                                                                                          else { @(dish.Quantity) }</span>
+                                                                                                                                    </div>
+                                                                                                                                    <div class="col-md-2 col-lg-2 col-12 flex-row d-flex my-1">
+                                                                                                                                        <span class="col-6 p-0 d-md-none d-lg-none d-inline"
+                                                                                                                                              style="font-size: 14px; font-weight: bold">Вартiсть (@pageOptions.Value.CurrencySymbol)</span>
+                                                                                                                                            <span style=" font-family: Open-Sans, sans-serif"
+                                                                                                                                                  id="order-price"> @dish.Price.ToString("0.00")</span>
+                                                                                                                                            </div>
+                                                                                                                                            <div class="col-md-2 col-lg-2 col-12 flex-row d-flex my-1 d-flex justify-content-lg-end justify-content-md-end">
+                                                                                                                                                <span class="col-6 p-0 d-md-none d-lg-none d-inline"
+                                                                                                                                                      style="font-size: 14px; font-weight: bold">Сума (@pageOptions.Value.CurrencySymbol)</span>
+                                                                                                                                                    <span style=" font-family: Open-Sans, sans-serif" class=""
+                                                                                                                                                          id="total-order-price">@{ decimal comTot = dish.Quantity * dish.Price;} @comTot.ToString("0.00")</span>
+
+                                                                                                                                                    </div>
+
+
+                                                                                                                                                </div>
+
+                                                                                                                                            </div>
+
+                                                                                                                                        </div>
+                                                                                                                                                        }
+
+                                                                                                                                                    }
+                                                                                                                                                }
+                                                                                                                            @if (item == Model.Items.LastOrDefault())
+                                                                                                                            {
+                                                                                                                                <div class="col-12 px-0 order-active" style="max-height: 51px">
+                                                                                                                                    <div class="col-12 d-flex align-items-center" style="height: 51px">
+                                                                                                                                        <div class="col-12 d-flex px-0" style="font-size: 18px">
+                                                                                                                                            <div class="col-2 d-none d-lg-inline d-md-inline"></div>
+                                                                                                                                            <div class="col-4  d-none d-lg-inline d-md-inline"></div>
+                                                                                                                                            <div class=" col-md-4 col-lg-4 col-6 px-0 px-lg-3 px-md-3"
+                                                                                                                                                 style="cursor: pointer"><span>Загальна сума:</span></div>
+                                                                                                                                            <div class=" col-md-2 col-lg-2 col-6 px-0 px-lg-3 px-md-3"
+                                                                                                                                                 style="cursor: pointer; font-family: Open-Sans, sans-serif">
+                                                                                                                                                @{
+                                                                                                                                                    var total = Model.Items.Sum(i => i.TotalWithoutDiscount);
+
+                                                                                                                                                    //   var discount = Model.Items.Sum(i => i.Discount);
+                                                                                                                                                    total -= discount;
+                                                                                                                                                }
+                                                                                                                                                <span class="d-flex justify-content-lg-end justify-content-md-end">
+                                                                                                                                                    @*@Model.Items.Sum(i => i.Amount).ToString("0.00") (@pageOptions.Value.CurrencySymbol)*@
+                                                                                                                                                    @total.ToString("0.00") (@pageOptions.Value.CurrencySymbol)
+
+                                                                                                                                                </span>
+                                                                                                                                            </div>
+
+                                                                                                                                        </div>
+                                                                                                                                    </div>
+                                                                                                                                </div>
+                                                                                                                                <div class="col-12 px-0 order-active" style="max-height: 51px">
+                                                                                                                                    <div class="col-12 d-flex align-items-center" style="height: 51px">
+                                                                                                                                        <div class="col-12 d-flex px-0" style="font-size: 18px">
+                                                                                                                                            <div class="col-2 d-none d-lg-inline d-md-inline"></div>
+                                                                                                                                            <div class="col-4  d-none d-lg-inline d-md-inline"></div>
+                                                                                                                                            <div class=" col-md-4 col-lg-4 col-6 px-0 px-lg-3 px-md-3"
+                                                                                                                                                 style="cursor: pointer"><span>Знижка:</span></div>
+                                                                                                                                            <div class=" col-md-2 col-lg-2 col-6 px-0 px-lg-3 px-md-3"
+                                                                                                                                                 style="cursor: pointer; font-family: Open-Sans, sans-serif">
+
+                                                                                                                                                <span class="d-flex justify-content-lg-end justify-content-md-end">
+
+                                                                                                                                                    @discount.ToString("0.00")
+                                                                                                                                                </span>
+                                                                                                                                            </div>
+
+                                                                                                                                        </div>
+                                                                                                                                    </div>
+                                                                                                                                </div>
+                                                                                                                            }
+                                                                                                                        </div>
+                                                                                                                </div>
+                                                                                                            }
+
+
+                                                                                                        </div>
+                                                                                                        @*<div class="col-12 d-flex justify-content-lg-end justify-content-md-end">
+                                                                                                            <div class="col-12 col-md-6 col-lg-6 d-flex px-0 flex-lg-row flex-md-row flex-column">
+                                                                                                                <div class="col-6 px-0 px-lg-3 px-md-3 mb-3" style="font-weight: 500; font-size: 18px;">
+                                                                                                                    Директор
+                                                                                                                </div>
+                                                                                                                <div class="col-6 px-0 px-lg-3 px-md-3">
+                                                                                                                    <img src="@Url.BuildPictureUrl(Model.Seller.StampPictureId)" alt="" style="width: inherit">
+                                                                                                                </div>
+                                                                                                            </div>
+                                                                                                        </div>*@
+
+
+                                                                                                    </div>
+                                                                                                </body>
+
+                                                                                            </html>
+                                                                                        }
+                                                                                        
