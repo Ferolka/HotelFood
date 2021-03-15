@@ -1,0 +1,29 @@
+@model HotelFood.ViewModels.QueryModel
+
+@{
+    QueryModel querymodel = Model;
+    string fieldname = ViewData["field"].ToString();
+    if (querymodel == null)
+    {
+        querymodel = new QueryModel();
+    }
+
+}
+
+  
+    <div class="table-foot-pager">
+        <a class="apagebottom" asp-action="ListItems" asp-route-sortfield=@querymodel.SortField asp-route-sortorder=@querymodel.SortOrder asp-route-page=0>
+            <span><i class="fa fa-angle-double-left"></i></span>
+        </a>
+        <a class="apagebottom" asp-action="ListItems" asp-route-sortfield=@querymodel.SortField asp-route-sortorder=@querymodel.SortOrder asp-route-page=@(querymodel.Page-1)>
+            <span><i class="fa fa-angle-left"></i></span>
+        </a>
+        <a class="apagebottom" asp-action="ListItems" asp-route-sortfield=@querymodel.SortField asp-route-sortorder=@querymodel.SortOrder asp-route-page=@(querymodel.Page+1)>
+            <span><i class="fa fa-angle-right"></i></span>
+        </a>
+        <a class="apagebottom" asp-action="ListItems" asp-route-sortfield=@querymodel.SortField asp-route-sortorder=@querymodel.SortOrder asp-route-page=999999>
+            <span><i class="fa fa-angle-double-right"></i></span>
+        </a>
+    </div>
+      
+

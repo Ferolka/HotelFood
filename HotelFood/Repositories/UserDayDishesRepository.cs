@@ -1792,7 +1792,7 @@ namespace HotelFood.Repositories
                             TotalWithoutDiscount = uday.TotalWtithoutDiscount,
                             Discount = uday.Discount,
                             Enabled = dayd.Date == daydate,  /*dayd != null*/
-                            ComplexDishes = from d in _context.Dish.WhereCompany(companyid)
+                            ComplexDishes = (from d in _context.Dish.WhereCompany(companyid)
                                                 //join dc in _context.DishComplex.WhereCompany(companyid) on d.Id equals dc.DishId
                                             join udd in _context.UserDayDish.WhereCompany(companyid).Where(i => i.Date == daydate && i.UserId == userId && i.ComplexId == comp.Id) on d.Id equals udd.DishId
                                             join dc in _context.DishComplex.WhereCompany(companyid).Where(d => d.ComplexId == comp.Id) on d.Id equals dc.DishId into leftdk
@@ -1813,7 +1813,7 @@ namespace HotelFood.Repositories
                                                 DishIngredients = ""/* string.Join(",", from di in _context.DishIngredients.WhereCompany(companyid).Where(t => t.DishId == d.Id)
                                                                                    join ingr in _context.Ingredients on di.IngredientId equals ingr.Id
                                                                                    select ingr.Name)*/
-                                            }
+                                            }).ToList()
                         };
             var query1 = query.ToList();
             var confirmed1 = confirmed.ToList();

@@ -78,7 +78,7 @@ namespace HotelFood
            // services.AddTransient<IDayDishesRepository, DayDishesRepository>();
             services.AddTransient<IUserDayDishesRepository, UserDayDishesRepository>();
             services.AddTransient<IGenericModelRepository<Dish>, GenericModelRepository<Dish>>();
-            
+            services.AddTransient<IDayDishesRepository, DayDishesRepository>();
             services.AddTransient<IComplexRepository, ComplexRepository>();
            
             //services.AddTransient<IUserGroupsRepository, UserGroupsRepository>();

@@ -13,7 +13,7 @@
     }
 
 }
-@if (true)
+@if (false)
 {
 @*<table class="table">
     <thead>
@@ -138,9 +138,14 @@ else
 
 
 
-                <a asp-action="Delete" asp-route-id="@item.Id" class="cmd-delete dialog-edit-icon"> <span class="fa fa-trash" aria-hidden="true"></span></a>
-                @Html.ActionLink("", "EditModal",
-                          new { id = item.Id }, new { @class = "dishitem dialog-edit-icon fa fa-pencil-square-o" })
+                <div class="btn " data-toggle="modal" data-target="#change-item-modal">
+                    <a class="dishitem dialog-edit-icon" href="@Url.Action("EditModal","Dish",
+                                  new { id = item.Id }, null)">
+
+                        <img src="~/img/pen-icon.svg" alt="Change item">
+                    </a>
+                </div>
+                <a asp-action="Delete" asp-route-id="@item.Id" class="btn cmd-delete dialog-edit-icon"><img src="~/img/delete-icon.svg" alt="Delete item"></a>
             </td>
         </tr>
             }

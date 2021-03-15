@@ -1,0 +1,50 @@
+@model HotelFood.ViewModels.QueryModel
+@inject HotelFood.Core.SharedViewLocalizer Localizer
+@{
+    QueryModel querymodel = Model;
+    string fieldname = ViewData["field"].ToString();
+    string displayname = ViewData["displayname"].ToString();
+    SelectList selList = ViewData["selectlist"] as SelectList;
+    if (querymodel == null)
+    {
+        querymodel = new QueryModel();
+    }
+    Func<string, string> get_span_class = (field) =>
+    {
+
+        if (querymodel.SortField == field)
+            return querymodel.SortOrder == "asc" ? "fa fa-sort-asc" : "fa fa-sort-desc";
+        return "fa fa-unsorted";
+    };
+    Func<string, string> get_sort_dir = (field) =>
+    {
+
+        if (querymodel.SortField == field)
+            return querymodel.SortOrder == "asc" ? "desc" : "asc";
+        return "asc";
+    };
+}
+
+
+@if (selList != null)
+{
+    <a class="ahead" asp-action="ListItems" asp-route-sortfield=@fieldname asp-route-sortorder="@get_sort_dir(fieldname)">
+        <span class="@get_span_class(fieldname)"></span>
+    </a>
+    <div class="col-select-filter-wrap">
+        <select asp-for="RelationFilter" class="form-control col-select-filter" asp-items="selList"></select>
+        <a hidden="hidden" class="aheadhidden" asp-route-sortfield=@querymodel.SortField asp-route-sortorder=@querymodel.SortOrder asp-action="ListItems"></a>
+    </div>
+}
+else
+{
+    <a class="ahead" asp-action="ListItems" asp-route-sortfield=@fieldname asp-route-sortorder="@get_sort_dir(fieldname)">
+        <span class="@get_span_class(fieldname)"></span>
+
+
+
+        @Localizer[displayname]
+
+    </a>
+}
+

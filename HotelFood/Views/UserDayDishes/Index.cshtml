@@ -28,7 +28,7 @@
     DateTimeFormatInfo dtfi = ci.DateTimeFormat;
     CultureInfo cultureCurrent = CultureInfo.CurrentUICulture;
 }
-@if (Layout == "_LayoutCabachok")
+@if (true)
 {
     <div class="container-xl container container-md container-sm container-lg">
         <div class="col-12 align-items-center pb-3  ml-xl-0 ml-md-0 ml-sm-0 p-0 ml-0 mt-lg-5 mt-md-5 mt-2">
@@ -52,7 +52,7 @@
                 <button class="btn btn-for-type-menu" type="button">Безлактозне</button>
                 <button class="btn btn-for-type-menu" type="button">Безглютенове</button>
                 <button class="btn btn-for-type-menu" type="button">Овочево-рибне</button>*@
-                                @foreach (var it in ViewBag.DishKindId)
+                                @*@foreach (var it in ViewBag.DishKindId)
                                 {
                                     if (it.Value == ViewBag.DishKindId.SelectedValue.Value)
                                     {
@@ -62,7 +62,7 @@
                                         continue;
                                     }
                                     <button class="btn btn-for-type-menu" type="button" value="@it.Value">@it.Text</button>
-                                }
+                                }*@
                             </div>
                             @*<select name="sources" id="sources" class="custom-select sources type-of-food"
                     placeholder="Стандартне"
@@ -76,7 +76,7 @@
                 <option class="drpdown-btn-type" value="fish-and-vegetables">Овочево-рибне</option>
             </select>*@
 
-                            <select class="custom-select sources type-of-food col-lg-5"
+                            @*<select class="custom-select sources type-of-food col-lg-5"
                                     placeholder="@ViewBag.DishKindId.SelectedValue.Text"
                                     style="border: none;"
                                     id="dishKind">
@@ -89,7 +89,7 @@
                                     }
                                     <option class="drpdown-btn-type" value="@it.Value">@it.Text</option>
                                 }
-                            </select>
+                            </select>*@
                         </div>
                     </div>
                 <button type="button"
@@ -536,10 +536,10 @@
                                                                 </div>
                                                             }
                                                             @await Component.InvokeAsync("UserDayOrderedComponent", current_content)
-                                                            @*@if (Model.ShowComplex)
+                                                            @if (Model.ShowComplex)
                                                                 {
-                                                                    @await Component.InvokeAsync("UserDayComplexComponent", new DayMenu() { Date = current_content, DishKind = 0 })
-                                                                }*@
+                                                                    @await Component.InvokeAsync("UserDayComplexComponent", new DayMenu() { Date = current_content })
+                                                                }
                                                             @if (Model.ShowDishes)
                                                             {
                                                                 @await Component.InvokeAsync("UserDayDishComponent", current_content)

@@ -151,7 +151,7 @@ else
         </div>
         <div class="row">
             <div class="col-12 col-md-12 col-lg-12">
-                <div id="table-content" class="table-content">
+                <div id="table-content" data-sortfield="@querymodel.SortField" data-sortorder="@querymodel.SortOrder" data-filter="@querymodel.SearchCriteria" class="table-content">
 
                 </div>
             </div>
@@ -262,7 +262,7 @@ else
 
                        // var id = $(this).find('.add-item').attr("data-id");
                          console.log(id );
-                         var url = '@Url.Content("~/Dishes/Info/")' + `${id}`;
+                         var url = '@Url.Content("~/Dish/Info/")' + `${id}`;
                         //console.log(url);
                     var flag = true;
                         $.get(url, function (data) {

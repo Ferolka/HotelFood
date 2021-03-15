@@ -15,7 +15,7 @@
     DateTimeFormatInfo dtfi = ci.DateTimeFormat;
 }
 
-@if (Layout == "_LayoutCabachok")
+@if (true)
 {
     @section Styles{
         <link rel="stylesheet" href="~/css/jquery-ui.css" />
@@ -367,7 +367,7 @@
                     dishKindparam = encodeURI(dishKind.toString());
                 }
                 var menuType = encodeURI($("#menuType").val());
-                $('#nav-content-' + dayindex).load('/DayDishes/EditDayContent?daydate=' + encodeURI(dt.toDateString()) + "&dishKind=" + dishKindparam + "&menuType=" + menuType,
+                $('#nav-content-' + dayindex).load('/DayDishes/EditDayContent?daydate=' + encodeURI(dt.toDateString())+ "&menuType=" + menuType,
                     function (response, status, xhr) {
                         var daytabtext = dateToshortString(dt);
                         //old design

@@ -182,8 +182,8 @@ namespace HotelFood.Repositories
                         join cat in _context.Categories.Where(d => d.HotelId == companyid) on comp.CategoriesId equals cat.Id
                         join dd in (from subday in _context.DayComplex where subday.Date == daydate && subday.HotelId == companyid select subday) on comp.Id equals dd.ComplexId into proto
                         from dayd in proto.DefaultIfEmpty()
-                         
-                       
+
+
                         orderby dayd.Date != daydate, cat.Code
                         select new DayComplexViewModel()
                         {
@@ -192,23 +192,24 @@ namespace HotelFood.Repositories
                             Date = daydate,
                             Enabled = dayd.Date == daydate,
                             CategoryName = cat.Name,
-                            DishesString = String.Join(",", comp.DishComplex.Select(d => d.Dish.Name)),
-                            ComplexDishes = from d in _context.Dish.WhereCompany(companyid)
-                                            join dc in _context.DishComplex.WhereCompany(companyid) on d.Id equals dc.DishId
-                                            where dc.ComplexId == comp.Id
-                                            orderby dc.DishCourse ascending, dc.IsDefault descending
-                                            select new DayComplexDishesViewModel()
-                                            {
+                            // DishesString = String.Join(",", comp.DishComplex.Select(d => d.Dish.Name)),
+                            ComplexDishes = (from d in _context.Dish.WhereCompany(companyid)
+                                             join dc in _context.DishComplex.WhereCompany(companyid) on d.Id equals dc.DishId
+                                             where dc.ComplexId == comp.Id
+                                             orderby dc.DishCourse ascending
+                                             select new DayComplexDishesViewModel()
+                                             {
 
-                                                DishId = d.Id,
-                                                DishName = d.Name,
-                                                DishReadyWeight = d.ReadyWeight,
-                                                PictureId = d.PictureId,
-                                                
-                                                DishDescription = d.Description,
-                                                DishCourse = dc.DishCourse
-                                            }
+                                                 DishId = d.Id,
+                                                 DishName = d.Name,
+                                                 DishReadyWeight = d.ReadyWeight,
+                                                 PictureId = d.PictureId,
+
+                                                 DishDescription = d.Description,
+                                                 DishCourse = dc.DishCourse
+                                             }).ToList()
                         };
+            var res = query.ToList();
             return query;
         }
         public async Task<bool> CopyDayMenu(DateTime daydate_from, DateTime daydate_to,int days, int companyId)
