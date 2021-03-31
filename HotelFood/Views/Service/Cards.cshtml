@@ -1,0 +1,711 @@
+﻿@inject HotelFood.Core.SharedViewLocalizer Localizer
+@{
+    ViewData["Title"] = @Localizer["ManagingUserCards"];
+    // Layout = null;
+
+}
+
+@if (true)
+{
+    { Layout = null; }
+    <!doctype html>
+    <html lang="en">
+
+    <head>
+        <link rel="stylesheet" href="~/css/service.css">
+        <link rel="stylesheet" href="~/css/bootstrap.min.css" />
+    </head>
+    <body>
+        <header class="main-header">
+
+            <h1>@ViewData["Title"]</h1>
+
+        </header>
+
+        <div class="container card-service">
+            <div id="nfc_isoffline" class="row container-state bg-danger text-white" style="display: none;">
+                <div class="col-4 container-state">
+                    <span id="nfc_isoffline">
+                        @Localizer["NFC Reader Offline"]
+                    </span>
+                    <span id="error-offline" class="service-status error"></span>
+                </div>
+                <div class="col-4 container-state">
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text ">URL</span>
+                        </div>
+                        <input id="nfcurl" class="form-control" value="wss://localhost:44360/ws" />
+                    </div>
+
+
+                </div>
+                <div class="col-4 container-state">
+                    <button id="connectnfc" class="btn btn-info">@Localizer["Connect NFC"]</button>
+                </div>
+            </div>
+            <div id="nfc_isonline" class="row bg-success text-white" style="display: none;">
+                <div class="col-4 container-state">
+                    <img id="nfc_image" src="~/images/acr122u.png" style="width:50px;height:50px;" />
+
+                </div>
+                <div class="col-4 container-state">
+                    <span class="service-status online">
+                        <span id="nfc_readername"></span>
+                        @Localizer["NFC Reader Online"]
+                    </span>
+
+                    <span id="error-online" class="service-status error"></span>
+                </div>
+                <div class="col-4 container-state">
+                    <span>@Localizer["Scan card at any time to detect user"]</span>
+
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12">
+                    <div id="card-info" class="container">
+
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12">
+                    <div id="card-user-info" class="container">
+
+                    </div>
+                </div>
+            </div>
+            <div class="row user-card-search justify-content-end my-2">
+                <div class="col-6">
+                    <div id="custom-search-input">
+                        <div class="input-group">
+                            <input type="text" id="search-val" class="form-control input-lg" placeholder="Search" />
+                            <span class="input-group-btn">
+                                <button class="btn btn-info btn-lg search-card-btn" id="search-card-btn" type="button">
+                                    <span class="fa fa-search" aria-hidden="true"></span>
+                                </button>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <div id="users-cards-content" class="container users-cards-content">
+
+                </div>
+            </div>
+        </div>
+
+
+        <script src="../js/jquery.min.js"></script>
+        <script src="~/js/bootstrap.min.js"></script>
+        <script src="../js/resources.js"></script>
+        <script src="../js/site.js"></script>
+        <script src="../js/nfcsocket.js"></script>
+
+        <script>
+        $(function () {
+            var elnfc_online = $("#nfc_isonline");
+            var elnfc_offline = $("#nfc_isoffline");
+            elnfc_online.hide();
+            elnfc_offline.show();
+            var baseUrl = '/Service';
+            const key_url = 'nfcurl';
+            var timer_checknfcstate;
+            $('#nfcurl').val(localStorage[key_url] || 'wss://localhost:44360/ws');
+
+            var nfcsock;
+            $('#connectnfc').click(function (e) {
+                $('#connectnfc').prop('disabled', true);
+                e.preventDefault();
+                if (localStorage[key_url])
+                    localStorage.removeItem(key_url);
+                localStorage[key_url] = $('#nfcurl').val();
+                nfcsock = new nfc_socket($('#nfcurl').val(),
+                    function (data) {
+                        console.log(data);
+                    },
+                    function (cmd, event) {
+                        console.log(cmd);
+                        console.log(event);
+                        //if (cmd === 'open') {
+                        //    nfcsock.getstatus(function () { });
+                        //}
+                    }
+                );
+                nfcsock.connect();
+                nfcsock.on('status', function (msg) {
+                    showNfcInfo(msg);
+                });
+                nfcsock.on('cardreaded', fillCardScan);
+                nfcsock.on('error', function (msg) {
+                    $('#connectnfc').prop('disabled', false);
+                    dialog_error(msg);
+                });
+                nfcsock.on('state', function (msg) {
+
+                    check_statenfc(msg);
+                    showNfcInfo(msg);
+
+                });
+
+            });
+            function check_statenfc(msg) {
+                if (msg && msg.Isreaderconnected) {
+                    if (timer_checknfcstate)
+                        clearTimeout(timer_checknfcstate);
+                }
+                else {
+                    if (!timer_checknfcstate)
+                        check_nfc();
+                }
+            }
+            function check_nfc() {
+                console.log('checknfc');
+                if (nfcsock.issocketconnected()) {
+                    nfcsock.getstatus();
+                }
+                timer_checknfcstate = setTimeout(check_nfc, 10000);
+            }
+            function LoadCards() {
+
+                var url = `/Service/CardsList/?searchcriteria=${$('#search-val').val()}`;
+                $('#users-cards-content').load(url, function () { attachEvents(); });
+                // $('#table-content').load(href + 'searchcriteria=' + $('#search-val').val());
+
+            }
+            function attachEvents() {
+                $('#users-cards-content').find(".burn-card").click(function (e) {
+                    e.preventDefault();
+                    burnProcess($(this).attr('data-id'));
+                });
+            }
+
+            $.ajaxSetup({ cache: false });
+            $('#search-card-btn').click(function (e) {
+                e.preventDefault();
+                LoadCards();
+            })
+
+            $('#search-val').keypress(function (event) {
+                var keycode = (event.keyCode ? event.keyCode : event.which);
+                if (keycode == '13') {
+                    LoadCards();
+                }
+            });
+            LoadCards();
+            function burnProcess(userid) {
+
+                if (!nfcsock || !nfcsock.NFCReady) {
+                    dialog_error('NFC ще не підключено.');
+                    return;
+                }
+                promise_dialog_yes_no('Підтвердіть дію. <p/> В рузультаті цієї операції, попередня картка буде недійсна.  <p/> Картка NFC буде перезаписана.')
+                    .then(data => fetch(
+                        `${baseUrl}/GenUserCardToken?userId=${userid}`,
+                        { method: 'GET' }
+                    ))
+                    .then(response => response.json())
+                    .then(json => {
+                        if (!json.isSuccess)
+                            throw "Error generating token";
+                        return nfcsock.writecard(json.cardTag);
+                    })
+                    .then(data => {
+                        console.log(data);
+                        if (!data.IsSuccess) {
+                            throw "Error writing";
+                        }
+                        return fetch(
+                            `${baseUrl}/GenUserCardTokenConfirm?userId=${userid}&token=${data.Cardtag}`,
+                            { method: 'GET' }
+                        );
+                    })
+                    .then(data => {
+                        console.log(data);
+                        dialog_announcement("Успішно.");
+                    })
+                    .catch(error => {
+                        dialog_error(error);
+                        console.error('error:', error)
+                    });
+            }
+            function showNfcInfo(msg) {
+                $('#connectnfc').prop('disabled', false);
+                if (msg && msg.Isreaderconnected == true) {
+                    elnfc_online.show();
+                    elnfc_offline.hide();
+                    $('#nfc_readername').text(msg.Readername);
+                }
+                else {
+                    elnfc_online.hide();
+                    elnfc_offline.show();
+                }
+            }
+            function fillCardScan(carddata) {
+                //$('#card-info').empty();
+                var token = carddata.Cardtag;
+                var addclass = '';
+                var askdetails = true;
+                if (carddata.Cardtag === undefined) {
+                    token = "ERROR READING";
+                    addclass = 'bg-danger text-white';
+                    askdetails = false;
+                }
+                else if (carddata.Cardtag.length == 0) {
+                    token = "Card is empty";
+                    addclass = 'bg-warning text-dark';
+                    askdetails = false;
+                };
+                var divcard = $(`<div class="row user-welcome bg-info text-white" >
+                                                     <div class="col-4 card-info-scan">
+                                                        <span class="card-info-scan" >@Localizer["Card Details"]</span>
+                                                    </div>
+                                                    <div class="col-8 card-info-scan ${addclass}">
+                                                        <span class="card-info-scan" >${token}</span>
+                                                    </div>
+                                                </div>
+                                                <div id="user-card-details-temp" class="row user-card-details" >
+                                                    <div class="col-4 card-info-scan">
+                                                         <span class="card-info-scan" >..Fetchind user data</span>
+                                                     </div>
+                                                </div>`);
+
+                $('#card-info').prepend(divcard);
+                $(divcard).delay(7000).animate({
+                    height: '-=100px'
+                }, 300, function () { $(divcard).remove() });
+
+                if (!askdetails) {
+                    return;
+                }
+                fetch(
+                    `${baseUrl}/UserCardDetails?token=${carddata.Cardtag}`,
+                    { method: 'GET' }
+                )
+                    .then(response => response.text())
+                    .then(data => {
+                        console.log(data);
+                        $("#user-card-details-temp").remove();
+                        var userdata = $(data);
+                        $('#card-user-info').prepend(userdata);
+                        $(userdata).delay(7000).animate({
+                            height: '-=100px'
+                        }, 300, function () { $(userdata).remove() });
+                    })
+                    .catch(error => console.error('error:', error))
+            }
+        });
+        </script>
+
+
+    </body>
+</html>
+}
+else
+{
+<div class="container-xl container container-md container-sm container-lg p-md-0 p-lg-0">
+    <div class="col-12 align-items-center pb-3  ml-xl-0 ml-md-0 ml-sm-0 p-0 ml-0 mt-2">
+        <div class="col-12 align-content-center mr-md-auto px-0 d-flex justify-content-between flex-md-row flex-lg-row flex-column">
+            <p class="h2 h2-mob pr-3 d-flex flex-wrap d-lg-none" style="font-weight: 600;">
+                Керування картками користувачів
+            </p>
+
+        </div>
+        <div class="col-12 align-content-center mr-md-auto px-0 d-flex justify-content-between flex-column mt-3 mt-lg-0 mt-md-0">
+            <div id="nfc_isoffline" class="col-12 flex-column flex-md-row flex-lg-row nfc-non-active align-items-center justify-content-around justify-content-lg-between justify-content-md-between" style="display: flex">
+                <div class="col-md-4 col-lg-4 col-12" id="off-nfc" style="display: flex;">
+                    <img class="nfc-off-desktop" src="~/img/nfc-off-dsk.svg" alt="">
+                    <img class="nfc-off-mob" src="~/img/nfc-off-mob.svg" alt="">
+                    <span class="off-nfc-span ml-2" id="nfc_isoffline">@Localizer["NFC Reader Offline"]</span>
+                    <span id="error-offline" class="service-status error"></span>
+                </div>
+                <div class="col-md-4 col-lg-4 col-12 p-0" id="url-nfc" style="display: flex;">
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text py-0" style="color: #797979; font-size: 16px; font-weight: 600">URL</span>
+                        </div>
+                        <input id="nfcurl" class="form-control" value="wss://localhost:44360/ws" style="color:#232323;">
+                    </div>
+                </div>
+                <div class="col-md-4 col-lg-4 col-12 p-0 justify-content-end" id="nfc-button" style="display: flex;">
+                    <div class="col-md-8 col-lg-6 col-12 p-0" id="connectnfc" style="cursor:pointer; text-transform: uppercase; color: #ffffff; font-size:14px; font-weight: bold; background: #F05E25; border-radius: 4px; height: 48px; display: grid; place-items: center">
+                        @Localizer["Connect NFC"]
+                    </div>
+                </div>
+            </div>
+            <div id="nfc_isonline" class="col-12 flex-column flex-md-row flex-lg-row nfc-non-active align-items-center justify-content-around justify-content-lg-between justify-content-md-between nfc-is-active" style="display: none">
+
+                <div  class="col-md-4 col-lg-4 col-12 align-items-center flex-column flex-md-row flex-lg-row my-3" id="on-nfc" style="display: flex;">
+                    <img class="nfc-on-icon" src="~/img/nfc-on-icon.svg" alt="">
+                    <div class="d-flex flex-column ml-2">
+                        <span class="on-nfc-span ">@Localizer["NFC Reader Online"]</span>
+                        <span id="off-nfc-button" style="color: #36C233; font-size: 14px; font-weight: 500; cursor: pointer;">Припинити</span>
+                        <span id="error-online" class="service-status error"></span>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-6 col-12 align-items-center flex-column flex-md-row flex-lg-row my-3 justify-content-lg-end justify-content-md-end" id="pick-up-nfc" style="display: flex;">
+                    <img class="nfc-on-icon" src="~/img/pick-up-nfc.svg" alt="">
+                    <div class="d-flex flex-column ml-2">
+                        <span class="on-nfc-span" style="text-align: center">@Localizer["Scan card at any time to detect user"]</span>
+
+                    </div>
+                </div>
+
+            </div>
+            @*<div id="nfc_isonline" class="row bg-success text-white" style="display: none;">
+                <div class="col-4 container-state">
+                    <img id="nfc_image" src="~/images/acr122u.png" style="width:50px;height:50px;" />
+
+                </div>
+                <div class="col-4 container-state">
+                    <span class="service-status online">
+                        <span id="nfc_readername"></span>
+                        @Localizer["NFC Reader Online"]
+                    </span>
+
+                    <span id="error-online" class="service-status error"></span>
+                </div>
+                <div class="col-4 container-state">
+                    <span>@Localizer["Scan card at any time to detect user"]</span>
+
+                </div>
+            </div>*@
+            @*<div class="row">
+                <div class="col-12">
+                    <div id="card-info" class="container">
+
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12">
+                    <div id="card-user-info" class="container">
+
+                    </div>
+                </div>
+            </div>*@
+            <div class="col-12  p-0 justify-content-center" id="card-user-info" style="display: flex;">
+               
+            </div>
+            <div class="row mb-3 mt-5 ml-xl-0 ml-md-0 ml-sm-0 p-lg-0 p-md-0 align-items-center  justify-content-end m-0 flex-md-column flex-lg-row flex-column container p-0">
+                <div class="col-lg-6 col-12 p-0 ">
+                    <div class="col-12 p-0 justify-content-center w-100" style="display: flex">
+                        @*<form class="form-inline col-12 p-0" style=" display: flex;">*@
+                            <input class="form-control  w-100" id="search-val" type="search" placeholder="Пошук..." aria-label="Search" style="        font-size: 16px;
+        color: #797979;
+        height: 48px;
+        background: url(&#39;../img/search-icon.svg&#39;) no-repeat;
+        background-position: 95%">
+                        @*</form>*@
+                    </div>
+                </div>
+
+            </div>
+            <div class="row ml-0 mr-0 justify-content-start w-100 align-content-center d-lg-flex d-none d-md-flex d-sm-none mt-3" style="height: 40px; font-weight: 500; font-size: 18px; color: #232323; background: #F7F7F7;">
+                <div class="col-6 p-0 d-flex ">
+                    <div class="col-3" style="cursor: pointer"><span>Фотографія</span></div>
+                    <div class="col-4" style="cursor: pointer"><span>Ім’я та прізвище</span></div>
+                    <div class="col-5" style="cursor: pointer"><span>E-mail </span></div>
+                </div>
+                <div class="col-6 p-0 d-flex">
+                    <div class="col-4" style="cursor: pointer"><span>Дитина</span></div>
+                    <div class="col-4" style="cursor: pointer"><span>Токен</span></div>
+                    <div class="col-4" style="cursor: pointer"><span>Дія</span></div>
+                </div>
+
+
+            </div>
+
+
+        </div>
+        
+        <div id="users-cards-content" class="users-cards-content row mx-0 justify-content-start w-100 align-content-center">
+            
+        </div>
+    </div>
+
+
+</div>
+@*<div class="container-xl container container-md container-sm container-lg">
+
+    <div class="row" style="margin-top: 48px">
+        <div class="col-sm">
+            <nav aria-label="Page navigation">
+                <ul class="pagination justify-content-center">
+                    <li class="page-item">
+                        <a class="page-link m-lg-1 m-sm-2 m-md-3 m-2 mt-0 mb-0" href="https://jukachu.github.io/Catering-bootstrap/admin/service-cards.html#" aria-label="Previous" style="border: none; color: #232323; width: 40px; height: 40px; background: #F1F2F4; border-radius: 0; text-align: center">
+                            <span aria-hidden="true">&lt;</span>
+                            <span class="sr-only">Previous</span>
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link m-lg-1 m-sm-2 m-md-3 m-2 mt-0 mb-0" href="https://jukachu.github.io/Catering-bootstrap/admin/service-cards.html#" style="border: none; color: #232323; font-family: Open-Sans, sans-serif; font-size: 16px; line-height: 22px; width: 40px; height: 40px; background: #F1F2F4; text-align: center">1</a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link m-lg-1 m-sm-2 m-md-3 m-2 mt-0 mb-0" href="https://jukachu.github.io/Catering-bootstrap/admin/service-cards.html#" style="border: none; color: #232323; font-family: Open-Sans, sans-serif; font-size: 16px; line-height: 22px; width: 40px; height: 40px; background: #F1F2F4; text-align: center">2</a>
+                    </li>
+                    <li class="page-item"><a class="page-link m-lg-1 m-sm-2 m-md-3 m-2 mt-0 mb-0 active-custom" href="https://jukachu.github.io/Catering-bootstrap/admin/service-cards.html#" style="border: none; color: #232323; font-family: Open-Sans, sans-serif; font-size: 16px; line-height: 22px; width: 40px; height: 40px;  text-align: center">3<span class="sr-only">(current)</span></a></li>
+                    <li class="page-item">
+                        <a class="page-link m-lg-1 m-sm-2 m-md-3 m-2 mt-0 mb-0" href="https://jukachu.github.io/Catering-bootstrap/admin/service-cards.html#" aria-label="Next" style="border: none; color: #232323; width: 40px; height: 40px; background: #F1F2F4; border-radius: 0; text-align: center">
+                            <span aria-hidden="true">&gt;</span>
+                            <span class="sr-only">Next</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+
+</div>*@
+<div class="modal fade" id="error-popup" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="max-width: 560px">
+        <div class="modal-content col-lg-12 col-12">
+            <div class="modal-header align-items-center col-12 px-0 px-md-3 px-lg-3" style="padding-top:20px">
+                <h5 class="modal-title p-0 d-flex align-items-center" id="exampleModalLabel" style="font-size: 34px; line-height: 40px; font-weight: bold">
+                    <img src="~/img/popup-error.svg" alt="" style="margin-right: 15px">Помилка
+                </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <img src="~/img/close-modal.svg" aria-hidden="true" alt="">
+                </button>
+            </div>
+            <div class="modal-body col-auto p-0 mt-2 ">
+
+                <div class="col-12 p-0 d-flex flex-column align-items-center justify-content-around my-3" style="min-height: 180px">
+                    <img class="popup-icon" src="~/img/nfc-off-mob.svg" alt="">
+                    <span class="span-popup-text">NFC ще не підключено.</span>
+                </div>
+
+
+            </div>
+            <div class="modal-footer justify-content-center border-0" style="font-size: 14px; font-weight: bold; line-height: 16px; padding: 20px 0 30px">
+                <button type="button" class="btn btn-primary m-2 col-sm-4 col-xl-4 col-12" style="background: #36C233; border: 1px solid #36C233; height: 48px; text-transform: uppercase">
+                    так
+                </button>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+<script src="../js/jquery.min.js"></script>
+<script src="~/js/bootstrap.min.js"></script>
+<script src="../js/resources.js"></script>
+<script src="../js/site.js"></script>
+<script src="../js/nfcsocket.js"></script>
+
+<script>
+        $(function () {
+            var elnfc_online = $("#nfc_isonline");
+            var elnfc_offline = $("#nfc_isoffline");
+            elnfc_online.hide();
+            elnfc_offline.css('display', 'flex');
+            var baseUrl = '/Service';
+            const key_url = 'nfcurl';
+            var timer_checknfcstate;
+            $('#nfcurl').val(localStorage[key_url] || 'wss://localhost:44360/ws');
+
+            var nfcsock;
+            $('#connectnfc').click(function (e) {
+                $('#connectnfc').prop('disabled', true);
+                e.preventDefault();
+                if (localStorage[key_url])
+                    localStorage.removeItem(key_url);
+                localStorage[key_url] = $('#nfcurl').val();
+                nfcsock = new nfc_socket($('#nfcurl').val(),
+                    function (data) {
+                        console.log(data);
+                    },
+                    function (cmd, event) {
+                        console.log(cmd);
+                        console.log(event);
+                        //if (cmd === 'open') {
+                        //    nfcsock.getstatus(function () { });
+                        //}
+                    }
+                );
+                nfcsock.connect();
+                nfcsock.on('status', function (msg) {
+                    showNfcInfo(msg);
+                });
+                nfcsock.on('cardreaded', fillCardScan);
+                nfcsock.on('error', function (msg) {
+                    $('#connectnfc').prop('disabled', false);
+                    dialog_error(msg);
+                });
+                nfcsock.on('state', function (msg) {
+
+                    check_statenfc(msg);
+                    showNfcInfo(msg);
+
+                });
+
+            });
+            function check_statenfc(msg) {
+                if (msg && msg.Isreaderconnected) {
+                    if (timer_checknfcstate)
+                        clearTimeout(timer_checknfcstate);
+                }
+                else {
+                    if (!timer_checknfcstate)
+                        check_nfc();
+                }
+            }
+            function check_nfc() {
+                console.log('checknfc');
+                if (nfcsock.issocketconnected()) {
+                    nfcsock.getstatus();
+                }
+                timer_checknfcstate = setTimeout(check_nfc, 10000);
+            }
+            function LoadCards() {
+
+                var url = `/Service/CardsList/?searchcriteria=${$('#search-val').val()}`;
+                $('#users-cards-content').load(url, function () { attachEvents(); });
+                // $('#table-content').load(href + 'searchcriteria=' + $('#search-val').val());
+
+            }
+            function attachEvents() {
+                $('#users-cards-content').find(".burn-card").click(function (e) {
+                    e.preventDefault();
+                    burnProcess($(this).attr('data-id'));
+                });
+            }
+
+            $.ajaxSetup({ cache: false });
+            $('#search-card-btn').click(function (e) {
+                e.preventDefault();
+                LoadCards();
+            })
+
+            $('#search-val').keypress(function (event) {
+                var keycode = (event.keyCode ? event.keyCode : event.which);
+                if (keycode == '13') {
+                    LoadCards();
+                }
+            });
+            LoadCards();
+            function burnProcess(userid) {
+
+                if (!nfcsock || !nfcsock.NFCReady) {
+                    $("#error-popup").modal('show');;
+                    //dialog_error('NFC ще не підключено.');
+                    return;
+                }
+                //promise_dialog_rewrite()
+                promise_dialog_yes_no('<div class="col-12 p-0 d-flex flex-column align-items-center justify-content-center my-3" style="min-height: 160px">'+
+                    '<span class="span-popup-text">Підтвердіть дію.</span>'+
+                    '<div class="d-flex flex-column align-items-center my-3" style="color: #232323; font-size: 16px; line-height: 25px; text-align: center">'+
+                        '<span>В результаті цієї операції, попередня карта буде не дійсна</span>'+
+                        '<span>Карта NFC буде записана</span>'+
+                    '</div>'+
+                '</div>')
+                    .then(data => fetch(
+                        `${baseUrl}/GenUserCardToken?userId=${userid}`,
+                        { method: 'GET' }
+                    ))
+                    .then(response => response.json())
+                    .then(json => {
+                        if (!json.isSuccess)
+                            throw "Error generating token";
+                        return nfcsock.writecard(json.cardTag);
+                    })
+                    .then(data => {
+                        console.log(data);
+                        if (!data.IsSuccess) {
+                            throw "Error writing";
+                        }
+                        return fetch(
+                            `${baseUrl}/GenUserCardTokenConfirm?userId=${userid}&token=${data.Cardtag}`,
+                            { method: 'GET' }
+                        );
+                    })
+                    .then(data => {
+                        console.log(data);
+                        dialog_announcement('<div class="col - 12 p - 0 d - flex flex - column align - items - center justify - content - around my - 3" style="min - height: 180px">'+
+                           ' <img class= "popup-icon" src = "~/img/nfc-on-icon.svg" alt = "" >'+
+                            '<span class="span-popup-text">Успішно</span>'+
+               ' </div >');
+                    })
+                    .catch(error => {
+                        dialog_error(error);
+                        console.error('error:', error)
+                    });
+            }
+            function showNfcInfo(msg) {
+                $('#connectnfc').prop('disabled', false);
+                if (msg && msg.Isreaderconnected == true) {
+                    elnfc_online.css('display', 'flex');;
+                    elnfc_offline.hide();
+                    $('#nfc_readername').text(msg.Readername);
+                }
+                else {
+                    elnfc_online.hide();
+                    elnfc_offline.css('display', 'flex');;
+                }
+            }
+            function fillCardScan(carddata) {
+                //$('#card-info').empty();
+                var token = carddata.Cardtag;
+                var addclass = '';
+                var askdetails = true;
+                if (carddata.Cardtag === undefined) {
+                    token = "ERROR READING";
+                    addclass = 'bg-danger text-white';
+                    askdetails = false;
+                }
+                else if (carddata.Cardtag.length == 0) {
+                    token = "Card is empty";
+                    addclass = 'bg-warning text-dark';
+                    askdetails = false;
+                };
+                var divcard = $(`<div class="row user-welcome bg-info text-white" >
+                                                     <div class="col-4 card-info-scan">
+                                                        <span class="card-info-scan" >@Localizer["Card Details"]</span>
+                                                    </div>
+                                                    <div class="col-8 card-info-scan ${addclass}">
+                                                        <span class="card-info-scan" >${token}</span>
+                                                    </div>
+                                                </div>
+                                                <div id="user-card-details-temp" class="row user-card-details" >
+                                                    <div class="col-4 card-info-scan">
+                                                         <span class="card-info-scan" >..Fetchind user data</span>
+                                                     </div>
+                                                </div>`);
+
+                $('#card-info').prepend(divcard);
+                $(divcard).delay(7000).animate({
+                    height: '-=100px'
+                }, 300, function () { $(divcard).remove() });
+
+                if (!askdetails) {
+                    return;
+                }
+                fetch(
+                    `${baseUrl}/UserCardDetails?token=${carddata.Cardtag}`,
+                    { method: 'GET' }
+                )
+                    .then(response => response.text())
+                    .then(data => {
+                        console.log(data);
+                        $("#user-card-details-temp").remove();
+                        var userdata = $(data);
+                        $('#card-user-info').prepend(userdata);
+                        $(userdata).delay(7000).animate({
+                            height: '-=100px'
+                        }, 300, function () { $(userdata).remove() });
+                    })
+                    .catch(error => console.error('error:', error))
+            }
+
+
+           
+        });
+</script>
+}

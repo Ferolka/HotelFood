@@ -11,7 +11,7 @@
     }
 }
 
-@if (true)
+@if (false)
 {
     <div class="container-xl container container-md container-sm container-lg">
         <div class="row align-items-center pb-3  ml-xl-0 ml-md-0 ml-sm-0 p-0 ml-0" style="margin-top: 48px">
@@ -88,7 +88,7 @@ else
         </div>
         <div class="row">
             <div class="col-12 col-md-12 col-lg-12">
-                <div id="table-content" class="table-content">
+                <div id="table-content" data-sortfield="@querymodel.SortField" data-sortorder="@querymodel.SortOrder" data-filter="@querymodel.SearchCriteria" class="table-content">
 
                 </div>
             </div>

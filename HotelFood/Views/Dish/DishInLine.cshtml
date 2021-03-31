@@ -1,6 +1,6 @@
 ﻿@model HotelFood.Models.Dish
 
-@if (true)
+@if (false)
 {
 <div class="col-12  my-2 d-flex align-items-center justify-content-between parent-delete dish-line" dish-id="@Model.Id">
     <div class="">
@@ -42,7 +42,7 @@ else
             @Model.Name
         </div>
         <div class="col-sm-1">
-            <a class="dialog-edit-icon delete-item"> <span class="fa fa-trash" aria-hidden="true"></span></a>
+            <a class="dialog-edit-icon delete-item"> <span class="fa fa-trash" aria-hidden="true">Delete</span></a>
         </div>
     </div>
 }

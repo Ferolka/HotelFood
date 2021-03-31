@@ -1,0 +1,459 @@
+﻿@model IEnumerable<HotelUser>
+
+@using  HotelFood.Core
+@inject HotelFood.Core.SharedViewLocalizer Localizer
+
+
+
+
+@{
+    QueryModel querymodel = ViewData["QueryModel"] as QueryModel;
+    if (querymodel == null)
+    {
+        querymodel = new QueryModel();
+    }
+
+}
+
+
+
+<div class="container-xl container container-md container-sm container-lg">
+
+
+    <div class="row pb-3 ml-xl-0 ml-md-0 ml-sm-0 p-lg-0 p-md-0 align-items-center  justify-content-end m-0 flex-md-column flex-lg-row flex-column container p-0">
+        @*@Html.DisplaySortField(model => model.ChildNameSurname).AddSortField(model => model.Email).AddSortField(model => model.UserGroup).Display(querymodel)*@
+        @Html.DisplaySortField(model => model.Email).AddSortField(model => model.NameSurname).AddSortField(model => model.UserGroup.Name).Display(querymodel)
+        <div class="col-lg-4 col-12 p-0 ">
+            <div class="col-12 p-0 justify-content-center w-100" style="display: flex">
+                <form class="form-inline col-12 p-0" style=" display: flex;">
+                    <input id="search-val" class="form-control  w-100" type="search" placeholder="Пошук..." aria-label="Search"
+                           style="font-size: 16px; color:#797979; height: 48px; background: url('../img/search-icon.svg') no-repeat; background-position: 95%">
+                </form>
+            </div>
+        </div>
+        <div class="col-lg-4 col-12 p-0 d-none d-md-block">
+            <div class="col-12 p-0 justify-content-center" style="height: 48px">
+                <button type="button" id="create-btn"
+                        class=" btn btn-xl btn-outline-danger float-lg-right justify-content-center float-md-none font-weight-bold btn-block col-lg-6"
+                        onmousemove="this.style.background='#36C233'; this.style.color='#ffffff'"
+                        onmouseout="this.style.background='#ffffff'; this.style.color='#36C233'"
+                        style="background: #ffffff; border-color: #36C233; outline: none; height: 48px; color: #36C233; display: flex; align-items: center; justify-content: space-evenly; margin: 28px 0 23px; font-size: 14px;">
+                    &#65291; @Localizer["Create"]
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="row ml-0 mr-0 justify-content-start w-100 align-content-center d-lg-flex d-none d-md-flex d-sm-none mt-3"
+         style="height: 40px; font-weight: 500; font-size: 18px; color: #232323; background: #F7F7F7;">
+
+        @Html.DisplayListHeaderForEx(model => model.NameSurname, new { colnumbers = 4 })
+        @Html.DisplayListHeaderForEx(model => model.Email, new { colnumbers = 3 })
+        
+        @Html.DisplayListHeaderForEx(model => model.UserGroup.Name, new { colnumbers = 2 })
+        @*@Html.DisplayListHeaderForEx(model => model.RegisterDate, new { colnumbers = 3 })*@
+
+
+        <div class="col-1"></div>
+
+
+    </div>
+    <div id="table-content" data-sortfield="@querymodel.SortField" data-sortorder="@querymodel.SortOrder" data-filter="@querymodel.SearchCriteria" class="row ml-0 mr-0 mt-0 justify-content-center w-100 table-content">
+
+    </div>
+</div>
+<div class="col-lg-4 col-12 p-0 d-lg-none d-md-none d-block position-sticky sticky-class align-content-center "
+     style="display: flex; bottom: -2px; height: 70px; background: #ffffff; box-shadow: 0px -11px 22px -15px rgba(0, 0, 0, 0.25);">
+    <div class="container h-100 ">
+        <div class="col-12 p-0 justify-content-center h-100 align-items-center d-flex">
+            <button type="button"
+                    class=" btn btn-xl btn-outline-danger float-lg-right justify-content-center float-md-none font-weight-bold btn-block col-lg-6"
+                    onmousemove="this.style.background='#36C233'; this.style.color='#ffffff'"
+                    onmouseout="this.style.background='#ffffff'; this.style.color='#36C233'"
+                    style="background: #ffffff; border-color: #36C233; outline: none; height: 48px; color: #36C233; display: flex; align-items: center; justify-content: space-evenly; font-size: 14px;">
+                &#65291; @Localizer["Create"]
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modDialog" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" id="dialogContent" style="max-width: 966px">
+
+    </div>
+</div>
+<div class="modal fade" id="modDialogBlock" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" id="dialogContentBlock" style="max-width: 966px">
+
+    </div>
+</div>
+
+<div id="modDialog-addbalance" class="modal fade wide-modal" tabindex="-1" role="dialog">
+    <div id="dialogContent-addbalance" class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+
+                <h5 class="modal-title"><i class="fa fa-exclamation-circle fa-3" style="color:red" aria-hidden="true"></i>@Localizer["AddBalance"]</h5>
+                <button type="button" class="close" data-dismiss="modal" data-target="modDialog-addbalance" aria-label="Close">
+                    <span aria-hidden="true">X</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="row p-0 flex-lg-row flex-md-row flex-column">
+                        <div class="form-group d-flex flex-lg-row flex-md-row flex-column col-lg-6 col-md-6 col-12 input-row-black justify-content-end align-content-center">
+                            <label for="add-balance-amount"
+                                   class="profile-form-title col-12 col-lg-3 col-md-3 p-0 d-flex align-items-center mb-0"></label>
+                            <input id="add-balance-amount"
+                                   type="text" class="form-control col-12 col-lg-6 col-md-6 pl-3"
+                                   placeholder="@Localizer["Amount"]" Amount" style="height: 34px">
+                        </div>
+                    </div>
+                    <div class="row p-0 flex-lg-row flex-md-row flex-column">
+                        <div class="form-group d-flex flex-lg-row flex-md-row flex-column col-lg-6 col-md-6 col-12 input-row-black justify-content-end align-content-center">
+                            <label for="add-balance-comment"
+                                   class="profile-form-title col-12 col-lg-3 col-md-3 p-0 d-flex align-items-center mb-0"></label>
+                            <input id="add-balance-comment"
+                                   type="text" class="form-control col-12 col-lg-6 col-md-6 pl-3"
+                                   placeholder="@Localizer["Comment"]" style="height: 34px">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <div class="container">
+                    <div class="row p-0 flex-lg-row flex-md-row flex-column">
+
+                        <div class="col-6 my-2 text-center">
+                            <button id="add-balance-confirm" type="button" button class="btn btn-primary m-2 col-sm-4 col-xl-4 col-12"
+                                    style="background: #36C233; border: 1px solid #36C233; height: 48px" data-dismiss="modal" data-target="modDialog-addbalance">
+                                @Localizer["Add"]
+                            </button>
+                        </div>
+                        <div class="col-6 my-2 text-center">
+                            <button id="add-balance-reject" type="button" button class="btn btn-primary m-2 col-sm-4 col-xl-4 col-12"
+                                    style="background: #36C233; border: 1px solid #36C233; height: 48px" data-dismiss="modal" data-target="modDialog-addbalance">
+                                @Localizer["Reject"]
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts
+        {
+
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+
+    <script type="text/javascript">
+
+    $(function () {
+        //$(document).on('submit', '[method="post"]', function (e) {
+        //    e.preventDefault();
+        //    var form = $(this).parents('.modal-body').find('form');
+        //    if (form.length == 0)
+        //        form = $('#modDialog').find('.modal-body').find('form');
+        //    var actionUrl = form.attr('action');
+        //    var formData = new FormData(this);
+
+        //    $.ajax({
+        //        url: actionUrl,
+        //        type: 'POST',
+        //        data: formData,
+        //        success: function (data) {
+        //            alert(data)
+        //        },
+        //        cache: false,
+        //        contentType: false,
+        //        processData: false
+        //    });
+        //});
+                $(document).on('click', '[data-save-user="modal"]', function (event) {
+                    event.preventDefault();
+                    // console.log("Data Save");
+                    var form = $(this).parents('.modal-body').find('form');
+                    if (form.length == 0)
+                        form = $('#modDialog').find('.modal-body').find('form');
+                    var actionUrl = form.attr('action');
+                   // var dataToSend = form.serialize();
+                    var dataToSend = new FormData(form[0]);
+
+                    $.ajax({
+                        url: actionUrl,
+                        data: dataToSend ? dataToSend : form.serialize(),
+                        cache: false,
+                        contentType: false,
+                        processData: false,
+                        type: 'POST',
+                        success: function (data) {
+                        var isValid = false;
+
+                        if (data && data.res && data.res == "OK")
+                            isValid = true;
+                        else if (data && data.res && data.res == "FAIL") {
+                            if (data.reason) {
+                                dialog_error(data.reason);
+                                return;
+                            }
+                        }
+                        else if (data && data.res && data.res == "INFO") {
+                            if (data.reason) {
+                                dialog_announcement(data.reason);
+                                return;
+                            }
+                        }
+                        if (isValid) {
+                            $('#modDialog').attr("_changed", false);
+                            $('#modDialog').modal('hide');
+                            $('#dialogContent').empty();
+                            reload(/*$(".selection").val()*/);
+                        }
+                        else {
+                            var newBody = $('.modal-body', data);
+                            $(document).find('.modal-body').replaceWith(newBody);
+                            //setupChangesChecker($('#modDialog'));
+                            onload();
+                        }
+                        },
+                         fail: function (xhr, status, error) {
+                            dialog_error("ERROR !" + error);
+                            //alert("ERROR !" + error);
+                        }
+                    });
+
+                });
+        function isFileImage(file) {
+            const acceptedImageTypes = ['image/jpeg', 'image/png'];
+            return file && acceptedImageTypes.includes(file['type'])
+        }
+        function readURL(input) {
+            if (input.files && input.files[0]) {
+                var target_img = $($(input).attr('data-target'));
+                if (!isFileImage(input.files[0])) {
+                    $(input).val('');
+                    return;
+                }
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    $(target_img).attr('src', e.target.result);
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+        $(document).on("change", ".custom-file-input", function () {
+            readURL(this);
+        });
+                    setup_listitems({
+                        href: '@Url.Content("~/Account")',
+                        method: "UsersList",
+                        createmethod: "CreateUserModal",
+                        onloadedcb: onload
+                    });
+
+                    function isFileImage(file) {
+                        const acceptedImageTypes = ['image/jpeg', 'image/png'];
+                        return file && acceptedImageTypes.includes(file['type'])
+                    }
+                    function readURL(input) {
+                        if (input.files && input.files[0]) {
+                            var target_img = $($(input).attr('data-target'));
+                            if (!isFileImage(input.files[0])) {
+                                $(input).val('');
+                                return;
+                            }
+                            var reader = new FileReader();
+                            reader.onload = function (e) {
+                                $(target_img).attr('src', e.target.result);
+                            }
+                            reader.readAsDataURL(input.files[0]);
+                        }
+                    }
+                    $(document).on("change", ".custom-file-input", function () {
+                        readURL(this);
+                    });
+
+                    var dialog_addbalance = $('#modDialog-addbalance');
+                    dialog_addbalance.find('#add-balance-confirm').click(function (e) {
+                        addBalance(dialog_addbalance);
+                    })
+                    function addBalance(dlg) {
+                            const formData = new FormData();
+                            formData.append('Amount', dlg.find('#add-balance-amount').val());
+                            formData.append('Comments', dlg.find('#add-balance-comment').val());
+                            formData.append('__RequestVerificationToken', $('[name="__RequestVerificationToken"]').val());
+
+                            formData.append('Id', $('#user-fin-id').val());
+                            formData.append('CompanyId', $('#user-fin-companyid').val());
+                            formData.append('IncomeType', '2');
+                            //formData.append('TransactionDate', (new Date).toJSON().slice(0, 10).split("-").reverse().join("."));
+
+
+                        fetch('@Url.Content("~/Account/AddBalanceTo")', {
+                            method: 'POST',
+                            headers: {
+                                'Accept': 'application/json, application/xml, text/plain, text/html, *.*',
+
+
+                            },
+                            body: formData
+                        })
+                            .then(response => {
+                                console.log(response);
+                                loadfin();
+                            })
+                            .catch(error => dialog_error(error));
+
+                        }
+                    function loadfin() {
+                        var userId = $('.modal-body').attr('data-id');
+                         var urlfin = '@Url.Content("~/Account/UserFinanceOfUser?userId=")' + userId;
+                        $.get(urlfin, function (data) {
+                            $("#nav-content-fin-of-user").html(data);
+                            setupfinhandlers($("#nav-content-fin-of-user"));
+                        });
+
+                    }
+                    function loadchildren() {
+                        var userId = $('.modal-body').attr('data-id');
+                         var urlchildren = '@Url.Content("~/Account/UserChildrenOfUser?userId=")' + userId;
+                        $.get(urlchildren, function (data) {
+                            $("#children-content").html(data);
+                        });
+
+                    }
+                    function setupfinhandlers(cont) {
+                        cont.find('#addbalance').click(function (e) {
+                            e.preventDefault();
+                            dialog_addbalance.modal('show');
+                            $(document).on('hidden.bs.modal', '.modal', function () {
+                                $('.modal:visible').length && $(document.body).addClass('modal-open');
+                            });
+                        });
+                    }
+
+                    function onload() {
+                        var userId = $('.modal-body').attr('data-id');
+                        var url = '@Url.Content("~/Account/RolesForUser?userId=")' + userId;
+                        $.get(url, function (data) {
+                            $("#user-roles-content").html(data);
+                            setuproleshandler($("#user-roles-content"));
+                        });
+                        var urlcomp = '@Url.Content("~/Account/EditCompaniesForUser?userId=")' + userId;
+                        $.get(urlcomp, function (data) {
+                            $("#user-companies-content").html(data);
+                            setupcompanyhandler($("#user-companies-content"))
+                        });
+                        loadfin();
+                        loadchildren();
+
+
+                        function setuproleshandler(cont) {
+                            cont.find(".role-item").click(function (e) {
+                                e.preventDefault();
+                                if ($(this).hasClass('active'))
+                                    $(this).removeClass('active').removeClass("fa-check-square-o").addClass("fa-square-o");
+                                else
+                                    $(this).addClass('active').removeClass("fa-square-o").addClass("fa-check-square-o");
+
+                                var roles = cont.find(".role-item.active").map(function () {
+                                    return $(this).text();
+                                })
+                                    .get()
+                                    .join(", ");
+                                cont.find("#roles").val(roles);
+                            });
+                        };
+
+                        function setupcompanyhandler(cont) {
+                            cont.find(".company-item").click(function (e) {
+                                e.preventDefault();
+                                if ($(this).hasClass('active'))
+                                    $(this).removeClass('active').removeClass("fa-check-square-o").addClass("fa-square-o");
+                                else
+                                    $(this).addClass('active').removeClass("fa-square-o").addClass("fa-check-square-o");
+
+                                var roles = cont.find(".company-item.active").map(function () {
+                                    return $(this).attr("data-id");
+                                })
+                                    .get()
+                                    .join(", ");
+                                cont.find("#companies").val(roles);
+                            });
+                        };
+
+        }
+        $(document).on("click", "a.cmd-block", function (e) {
+            e.preventDefault();
+            fetch(this.href, { method: 'GET' })
+                .then(response => response.text())
+                .then(data => {
+                    $('#dialogContentBlock').html(data);
+                    $('#modDialogBlock').modal('show');
+                    const form = $('#modDialogBlock').find('form');
+                    form.submit(function (e) { e.preventDefault(); });
+
+                    var promise = new Promise((resolve, reject) => {
+                        $('#modDialogBlock').find('input[type="submit"]').click(function (e) {
+                            e.preventDefault();
+                            resolve(form);
+
+                        });
+                        $('#modDialogBlock').find('button[type="button"]').click(function (e) {
+
+                            reject();
+
+                        });
+                    });
+                    return promise;
+                })
+                .then((form) => {
+                    var formdata = new FormData(form.get(0));
+                    return fetch(form.attr('action'), {
+                        method: 'POST',
+                        headers: {
+
+                            'RequestVerificationToken': form.find("[name='__RequestVerificationToken'").val()
+                        },
+                        body: formdata
+                    })
+                })
+                .then(response => {
+                    if (response.ok != true) {
+                        if (response.status == 424) {
+                            throw $.text_resource.deleteeditusingerror
+                        }
+                        else {
+                            throw response.statusText;
+                        }
+
+                    }
+                    $(location).attr('href', '/Account/Users')
+
+                })
+                .catch(error => {
+                    if (error)
+                        dialog_error(error);
+
+                })
+                .finally(function () {
+                    $('#modDialogBlock').modal('hide');
+                    $('#dialogContentBlock').empty();
+                    reload();
+                });
+
+
+        });
+                });
+    </script>
+}
+
+
+
+
+
+
+

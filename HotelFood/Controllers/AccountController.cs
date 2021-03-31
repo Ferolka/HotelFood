@@ -160,6 +160,12 @@ namespace HotelFood.Controllers
         {
             return View();
         }
+        [Authorize(Roles = "Admin,CompanyAdmin,UserAdmin,GroupAdmin,SubGroupAdmin")]
+        public IActionResult Users()//async Task<IActionResult> Users()
+        {
+            // return View(await _userManager.Users.Where(u => u.CompanyId == User.GetCompanyID()).ToListAsync());
+            return View(new List<HotelUser>());
+        }
         [Route("Account/Users/UsersList")]
         [Route("Account/UsersList")]
         public async Task<IActionResult> UsersList(QueryModel querymodel)
@@ -202,6 +208,110 @@ namespace HotelFood.Controllers
             List<HotelUser> userslist = await query.ToListAsync();
             
             return userslist;
+        }
+        [Authorize(Roles = "Admin,CompanyAdmin,UserAdmin")]
+        public IActionResult CreateUserModal()
+        {
+
+            var user = new UpdateUserModel();
+            user.InitializeNew();
+            if (user == null)
+            {
+                return NotFound();
+            }
+     
+            return PartialView("EditUserModal", user);
+        }
+
+        [Authorize]
+        [Authorize(Roles = "Admin,CompanyAdmin,UserAdmin,GroupAdmin,SubGroupAdmin")]
+        public async Task<IActionResult> EditUserModal(string userId)
+        {
+
+            //string id = User.GetUserId();
+            HotelUser user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+            {
+                return NotFound();
+            }
+            
+
+            //ViewData["UserGroupId"] = new SelectList(_companyuser_repo.GetUserGroups(User.GetCompanyID()).Result, "Id", "Name", user.UserGroupId);
+            //ViewData["UserSubGroupId"] = new SelectList(_companyuser_repo.GetUserSubGroups(User.GetCompanyID()).Result, "Id", "Name", user.UserSubGroupId);
+
+
+            //ViewData["UserType"] = EnumHelper<UserTypeEnum>.GetSelectListWithIntegerValues(user.UserTypeEn,_localizer).ToList() ;
+            var model = _companyuser_repo.GetUpdateUserModel(user);
+            model.AutoLoginUrl = Url.Action("AutoLogon", "Account", new { token = model.AutoLoginToken, username = model.UserName }, Request.Scheme);
+
+            //return PartialView(model);
+            return PartialView("EditUserModal", model);
+
+        }
+        [Authorize]
+        public JsonResult UserCompanies()
+        {
+            return Json(_companyuser_repo.GetCurrentUsersCompaniesAsync(User.GetUserId()).Result);
+        }
+        [Authorize]
+        public JsonResult UserOtherCompanies()
+        {
+            return Json(_companyuser_repo.GetCurrentUsersCompaniesAsync(User.GetUserId()).Result.Where(c => c.Id != User.GetHotelID()));
+        }
+        [Authorize(Roles = "Admin,CompanyAdmin,UserAdmin")]
+        public JsonResult UserRoles(string userId)
+        {
+            var user = _userManager.FindByIdAsync(userId).Result;
+            if (user == null)
+                return new JsonResult(null) { StatusCode = 500 };
+            return Json(_userManager.GetRolesAsync(user).Result);
+        }
+        [Authorize(Roles = "Admin,CompanyAdmin,UserAdmin")]
+        public JsonResult ErrorPasswChange()
+        {
+            return new JsonResult(null) { StatusCode = 424 };
+        }
+        [Authorize(Roles = "Admin,CompanyAdmin,UserAdmin")]
+        public async Task<IActionResult> RolesForUser(string userId)
+        {
+
+            var user = _userManager.FindByIdAsync(userId).Result;
+            if (user == null && !string.IsNullOrEmpty(userId))
+                return NotFound();
+            var roles = await _companyuser_repo.GetRolesForUserAsync(user);
+            return PartialView(roles);
+        }
+
+        [Authorize]
+        public async Task<IActionResult> CompaniesForUser(string userId)
+        {
+
+            var user = _userManager.FindByIdAsync(userId).Result;
+            if (user == null && !string.IsNullOrEmpty(userId))
+                return NotFound();
+            var usercompanies = await _companyuser_repo.GetAssignedCompaniesEdit(userId);
+            return PartialView(usercompanies);
+        }
+        [Authorize]
+        public async Task<IActionResult> EditCompaniesForUser(string userId)
+        {
+
+            var user = _userManager.FindByIdAsync(userId).Result;
+            if (user == null && !string.IsNullOrEmpty(userId))
+                return NotFound();
+            var usercompanies = await _companyuser_repo.GetAssignedEditCompanies(userId);
+            return PartialView(usercompanies);
+        }
+        [Authorize/*(Roles = "Admin,CompanyAdmin,UserAdmin")*/]
+        public async Task<IActionResult> SetCompanyId(int CompanyId)
+        {
+            if (!await _companyuser_repo.ChangeUserCompanyAsync(User.GetUserId(), CompanyId, User))
+                return BadRequest();
+            var user = await _userManager.FindByIdAsync(User.GetUserId());
+            if (user == null)
+                return BadRequest();
+            await _signInManager.RefreshSignInAsync(user);
+            return new EmptyResult();//RedirectToAction("Index", "Home");
         }
     }
 }

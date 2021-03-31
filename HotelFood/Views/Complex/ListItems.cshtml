@@ -11,7 +11,7 @@
     }
 
 }
-@if (true)
+@if (false)
 {
     <div class="col-12 p-0  mt-2">
         @foreach (var item in Model)
@@ -107,9 +107,11 @@ else
                     <td>
 
 
-                        <a asp-action="Delete" asp-route-id="@item.Id" class="cmd-delete dialog-edit-icon"> <span class="fa fa-trash" aria-hidden="true"></span></a>
-                        @Html.ActionLink("", "EditModal",
-                                  new { id = item.Id }, new { @class = "cmd-edit dialog-edit-icon fa fa-pencil-square-o" })
+                        <a asp-action="Delete" asp-route-id="@item.Id" class="cmd-delete dialog-edit-icon"> <span class="fa fa-trash" aria-hidden="true">Delete</span></a>
+                        <a href="@Url.Action("EditModal","Complex",
+                                  new { id = item.Id }, null)" class="cmd-edit dialog-edit-icon btn ">
+                            <img src="/img/pen-icon.svg" alt="Change item">
+                        </a>
                     </td>
                 </tr>
             }

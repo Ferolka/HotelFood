@@ -40,11 +40,11 @@ namespace HotelFood.Controllers
             //var appDbContext = _context.Dishes.Include(d => d.Category).Include(d => d.Company);
             return await Task.FromResult(View());
         }
-        public async Task<IActionResult> IndexNew()
-        {
-            //var appDbContext = _context.Dishes.Include(d => d.Category).Include(d => d.Company);
-            return await Task.FromResult(View());
-        }
+        //public async Task<IActionResult> IndexNew()
+        //{
+        //    //var appDbContext = _context.Dishes.Include(d => d.Category).Include(d => d.Company);
+        //    return await Task.FromResult(View());
+        //}
         public async Task<IActionResult> Test()
         {
             //var appDbContext = _context.Dishes.Include(d => d.Category).Include(d => d.Company);

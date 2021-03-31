@@ -1,0 +1,15 @@
+﻿@model IEnumerable<UserRoleViewModel>
+@inject HotelFood.Core.SharedViewLocalizer Localizer
+
+@{
+    string roles = string.Join(",", Model.Where(r => r.IsAssigned).Select(r => r.RoleName));
+}
+<input type="hidden" id="roles" name="roles" value="@roles" />
+<ul class="list-group">
+
+    @foreach (var ur in Model)
+    {
+        <li class="role-item list-group-item@(ur.IsAssigned?" active fa fa-check-square-o":" fa fa-square-o")" style="cursor:pointer;">&nbsp;@ur.RoleName</li>
+
+    }
+</ul>

@@ -1,0 +1,109 @@
+﻿@model IEnumerable<UserCardViewModel>
+@inject HotelFood.Core.SharedViewLocalizer Localizer
+@{
+
+    Layout = null;
+
+}
+@if (true)
+{
+    <div class="container users-cards-list-content">
+        <div class="row user-card bg-info text-white my-2">
+            <div class="col-2 user-card-picture">
+                <span>@Localizer["Photo"]</span>
+            </div>
+
+            <div class="col-2 user-card-name overflow-hidden">
+                <span>@Localizer["NameSurname"]</span>
+            </div>
+            <div class="col-2 user-card-email overflow-hidden">
+                <span>E-mail</span>
+            </div>
+            <div class="col-2 user-card-name overflow-hidden">
+                <span>@Localizer["Child"]</span>
+            </div>
+            <div class="col-2 user-card-name overflow-hidden">
+                <span>@Localizer["Token"]</span>
+            </div>
+            <div class="col-2 user-card-action overflow-hidden">
+                <span>@Localizer["Action"]</span>
+            </div>
+
+        </div>
+        @if (Model.Count() == 0)
+        {
+            <div class="row user-card border rounded">
+                <div class="col-12 ">
+                    @Localizer["NoRecords"]
+                </div>
+            </div>
+        }
+
+        @foreach (var it in @Model)
+        {
+            <div class="row user-card border-bottom text-wrap text-break word-break align-middle" data-id="@it.UserId">
+                <div class="col-2 user-card-picture p-2">
+                    <img src="@Url.Action("GetPicture", "Pictures", new { id = it.PictureId, width = 80, height = 80 })" style="width:80px;height:80px;" />
+
+                </div>
+
+                <div class="col-2 user-card-name">
+                    @it.UserName
+                </div>
+                <div class="col-2 user-card-email">
+                    @it.UserEmail
+                </div>
+                <div class="col-2 user-card-name">
+                    @it.UserChildName
+                </div>
+                <div class="col-2 user-card-name">
+                    @it.CardToken
+                </div>
+                <div class="col-2 user-card-action  align-middle">
+                    <button class="burn-card btn btn-danger" data-id="@it.UserId">@Localizer["Write"]</button>
+                </div>
+
+            </div>
+        }
+    </div>
+}
+else
+{
+<div class="col-12 p-0  mt-2">
+    @foreach (var it in @Model)
+    {
+        <div class="col-12 p-0 d-flex box-shadow-container brd-bot-line py-3 my-2" style="min-height: 52px; color: #232323">
+            <div class="col-12 p-0  d-flex flex-lg-row flex-md-row flex-column align-items-center mt-2 mt-lg-0 mt-md-0">
+                <div class="col-12 col-md-6 col-lg-6 p-0 d-flex flex-md-row flex-lg-row flex-column">
+                    <div class="col-12 col-md-3 col-lg-3 d-flex" style="">
+                        <img src="@Url.Action("GetPicture", "Pictures", new { id = it.PictureId, width = 70, height = 70 })" alt="" style="box-shadow: 0 0 8px rgba(0, 0, 0, 0.15); border-radius: 4px;"><span class="col-6 p-0 d-md-none d-lg-none d-flex align-items-center" style="font-size: 14px; margin-left:15px; font-weight: bold">Ольга Погребицька</span>
+                    </div>
+                    <div class="col-12 col-md-4 col-lg-4 d-flex align-items-center my-2" style=""><span class="col-6 p-0 d-md-none d-lg-none d-inline" style="font-size: 14px; font-weight: bold">Ім’я та прізвище</span><span class="col-6 col-lg-12 col-md-12 p-0" style="">@it.UserName</span></div>
+                    <div class="col-12 col-md-5 col-lg-5 d-flex align-items-center my-2" style="">
+                        <span class="col-6 p-0 d-md-none d-lg-none d-inline" style="font-size: 14px; font-weight: bold">E-mail</span><span class="col-6 col-lg-12 col-md-12 p-0 for-email-wrap" style="">@it.UserEmail</span>
+                    </div>
+
+                </div>
+                <div class="col-12 col-md-6 col-lg-6 p-0 d-flex flex-md-row flex-lg-row flex-column">
+                    <div class="col-12 col-md-4 col-lg-4 align-items-center my-2 d-md-flex d-lg-flex d-none" style=""><span class="col-6 p-0 d-md-none d-lg-none d-inline" style="font-size: 14px; font-weight: bold">Ім’я та прізвище</span><span class="col-6 col-lg-12 col-md-12 p-0 for-email-wrap" style="">@it.UserChildName</span></div>
+                    <div class="col-12 col-md-4 col-lg-4 d-flex align-items-center my-2" style="">
+                        <span class="col-6 p-0 d-md-none d-lg-none d-inline" style="font-size: 14px; font-weight: bold">Токен</span><span class="col-6 col-lg-12 col-md-12 p-0 for-email-wrap" style="">@it.CardToken</span>
+                    </div>
+                    <div class="col-12 col-md-4 col-lg-4 d-flex align-items-center my-2">
+                        <div data-id="@it.UserId" class="burn-card col-12 d-flex justify-content-center align-items-center rewrite-button" style="cursor: pointer; text-transform: uppercase; height: 48px; font-size: 14px; font-weight: bold;" @*data-toggle="modal"  data-target="#error-popup"*@>
+                            @Localizer["Write"]
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    }
+
+
+
+
+
+    </div>
+
+}

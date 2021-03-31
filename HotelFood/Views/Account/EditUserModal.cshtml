@@ -1,0 +1,502 @@
+﻿@model HotelFood.ViewModels.UpdateUserModel
+@inject HotelFood.Core.SharedViewLocalizer Localizer
+
+@{
+    ViewData["Title"] = "Edit";
+    string tabchildname = @Localizer["EditChildren"];
+    //if(!Model.IsChildType)
+    //{
+    //    if (Model.ChildrenCount > 1)
+    //    {
+    //        tabchildname = @Localizer["EditPhotoAndChildren"];
+    //    }
+    //    else
+    //    {
+    //        tabchildname = @Localizer["EditPhoto"];
+    //    }
+    //}
+}
+
+
+
+@if (true)
+{
+    <div class="modal-content col-lg-12 col-12">
+        <div class="modal-header align-items-center col-12 px-0 px-md-3 px-lg-3" style="padding-top:20px">
+            <h5 class="modal-title p-0" id="exampleModalLabel"
+                style="font-size: 34px; line-height: 40px; font-weight: bold">
+                @Localizer["EditUser"]
+            </h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <img src="../img/close-modal.svg" aria-hidden="true" alt="">
+            </button>
+        </div>
+
+        <div class="modal-body col-auto p-0 mt-2" data-id="@Model.Id">
+            <form asp-action="EditUserModal">
+                <ul class="nav nav-tabs justify-content-lg-center justify-content-md-center justify-content-center "
+                    id="tab-user" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active px-0" style="width: 100%;" id="home-user-tab" data-toggle="tab"
+                           href="#user-home"
+                           role="tab"
+                           aria-controls="home"
+                           aria-selected="true">Головна</a>
+                    </li>
+                    <li class="nav-item mr-2 ml-2">
+                        <a class="nav-link px-0" style="width: 100%;" id="role-tab" data-toggle="tab"
+                           href="#user-role"
+                           role="tab"
+                           aria-controls="roles"
+                           aria-selected="false">Ролі</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link px-0" style="width: 100%;" id="company-tab" data-toggle="tab"
+                           href="#user-company"
+                           role="tab"
+                           aria-controls="company"
+                           aria-selected="false">Компанії</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link px-0" style="width: 100%;" id="finance-tab" data-toggle="tab"
+                           href="#nav-content-fin-of-user"
+                           role="tab"
+                           aria-controls="nav-content-fin-of-user"
+                           aria-selected="false">@Localizer["Finance"]</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link px-0" style="width: 100%;" id="children-tab" data-toggle="tab"
+                           href="#nav-content-children"
+                           role="tab"
+                           aria-controls="nav-content-children"
+                           aria-selected="false">@tabchildname</a>
+                    </li>
+                </ul>
+                <div class="tab-content mt-lg-5 pt-lg-3 mt-md-5 pt-md-3 mt-3 pt-0" id="user-tab">
+                    <div class="tab-pane fade show active" id="user-home" role="tabpanel"
+                         aria-labelledby="home-user-tab">
+                        <div class="col-12 p-0">
+                            <div class="row p-0 flex-lg-row flex-md-row flex-column">
+                                <div class="form-group d-flex flex-lg-row flex-md-row flex-column col-lg-6 col-md-6 col-12 input-row-black  align-content-center">
+                                    <span style="font-size: 18px; font-weight: 500; color: #000000">Головна</span>
+                                    <a class="px-2" href="#" onclick="window.open('@Model.AutoLoginUrl', '_blank')">
+                                        @Localizer["UserButtonLogin"]
+                                    </a>
+                                   
+                                </div>
+                            </div>
+                            <div class="row p-0 flex-lg-row flex-md-row flex-column">
+                                <div class="form-group d-flex flex-lg-row flex-md-row flex-column col-lg-6 col-md-6 col-12 input-row-black  align-content-center">
+                                    @if (Model.LockoutEnd == null || Model.LockoutEnd < DateTime.Now)
+                                    {
+                                        <a class="px-2 cmd-block" href="@Url.Action("Block", "Account",
+                           new { userId = Model.Id })">
+                                            @Localizer["Block"]
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <a class="px-2" href="@Url.Action("UnBlock", "Account",
+                           new { userId = Model.Id })">
+                                            @Localizer["UnBlock"]
+                                        </a>
+                                    }
+                                </div>
+                            </div>
+                            @Html.ValidationSummary()
+                            <ul>
+                                @if (Model.Errors != null && Model.Errors.Count() > 0)
+                                {
+                                    @foreach (var error in Model.Errors)
+                                    {
+                                        <li><div asp-validation-summary="All" class="text-danger"> @error</div> </li>
+                                    }
+                                }
+                            </ul>
+                            @*<div asp-validation-summary="All" id="errr" class="text-danger"></div>*@
+                            <input type="hidden" asp-for="Id" />
+                            <input type="hidden" asp-for="IsNew" />
+                            @*@if (Model.LockoutEnd > DateTimeOffset.MinValue) {
+        <div class="row p-0 flex-lg-row flex-md-row flex-column">
+            <div class="form-group d-flex flex-lg-row flex-md-row flex-column col-lg-9 col-md-9 col-12 input-row-black  align-content-center">
+                <button class="btn btn-primary">reset</button>
+            </div>
+        </div>
+        }*@
+                            <div class="row p-0 flex-lg-row flex-md-row flex-column">
+                                <div class="form-group d-flex flex-lg-row flex-md-row flex-column col-lg-9 col-md-9 col-12 input-row-black  align-content-center">
+                                    <label asp-for="UserName" for="input-login"
+                                           class="profile-form-title col-12 col-lg-4 col-md-4 p-0 d-flex align-items-center mb-0">@Localizer["UserNameLogin"]</label>
+                                        <input asp-for="UserName" type="text" class="form-control col-12 col-lg-8 col-md-8 pl-9"
+                                               id="input-login"
+                                               placeholder="Логін" style="height: 34px">
+                                        @*<span asp-validation-for="UserName" class="text-danger"></span>*@
+                                    </div>
+                                </div>
+                                <div class="row p-0 flex-lg-row flex-md-row flex-column">
+                                    <div class="form-group d-flex flex-lg-row flex-md-row flex-column col-lg-9 col-md-9 col-12 input-row-black  align-content-center">
+                                        <label asp-for="Email" for="input-email"
+                                               class="profile-form-title col-12 col-lg-4 col-md-4 p-0 d-flex align-items-center mb-0"></label>
+                                        <input asp-for="Email" type="text" class="form-control col-12 col-lg-8 col-md-8 pl-9"
+                                               id="input-email"
+                                               placeholder="E-mail" style="height: 34px">
+
+                                    </div>
+                                </div>
+                                <div class="row p-0 flex-lg-row flex-md-row flex-column">
+                                    <div class="form-group d-flex flex-lg-row flex-md-row flex-column col-lg-9 col-md-9 col-12 input-row-black  align-content-center">
+                                        <label asp-for="PhoneNumber" for="input-telephone"
+                                               class="profile-form-title col-12 col-lg-4 col-md-4 p-0 d-flex align-items-center mb-0"></label>
+                                        <input asp-for="PhoneNumber" type="text" class="form-control col-12 col-lg-8 col-md-8 pl-9"
+                                               id="input-telephone"
+                                               placeholder="Телефон" style="height: 34px">
+                                        @*<span asp-validation-for="PhoneNumber" class="text-danger"></span>*@
+                                    </div>
+                                </div>
+                                <div class="row p-0 flex-lg-row flex-md-row flex-column">
+                                    <div class="form-group d-flex flex-lg-row flex-md-row flex-column col-lg-9 col-md-9 col-12 input-row-black  align-content-center">
+                                        <label asp-for="NameSurname" for="input-namesurname"
+                                               class="profile-form-title col-12 col-lg-4 col-md-4 p-0 d-flex align-items-center mb-0"></label>
+                                        <input asp-for="NameSurname" type="text" class="form-control col-12 col-lg-8 col-md-8 pl-9"
+                                               id="input-namesurname"
+                                               placeholder="Ім'я" style="height: 34px">
+                                        @*<span asp-validation-for="NameSurname" class="text-danger"></span>*@
+                                    </div>
+                                </div>
+                                <div class="row p-0 flex-lg-row flex-md-row flex-column">
+                                    <div class="form-group d-flex flex-lg-row flex-md-row flex-column col-lg-9 col-md-9 col-12 input-row-black  align-content-center">
+                                        <label asp-for="City" for="input-city"
+                                               class="profile-form-title col-12 col-lg-4 col-md-4 p-0 d-flex align-items-center mb-0">Місто</label>
+                                        <input asp-for="City" type="text" class="form-control col-12 col-lg-8 col-md-8 pl-9"
+                                               id="input-city"
+                                               placeholder="Місто" style="height: 34px">
+
+                                    </div>
+                                </div>
+                                @if (Model.IsNew)
+                                {
+                                    <div class="row p-0 flex-lg-row flex-md-row flex-column">
+                                        <div class="form-group d-flex flex-lg-row flex-md-row flex-column col-lg-9 col-md-9 col-12 input-row-black  align-content-center">
+                                            <label asp-for="NewPassword" for="input-city"
+                                                   class="profile-form-title col-12 col-lg-4 col-md-4 p-0 d-flex align-items-center mb-0">Новий пароль</label>
+                                            <input asp-for="NewPassword" type="text" class="form-control col-12 col-lg-8 col-md-8 pl-9"
+                                                   id="input-city"
+                                                   placeholder="" style="height: 34px" autocomplete="off">
+
+                                        </div>
+                                    </div>
+                                    <div class="row p-0 flex-lg-row flex-md-row flex-column">
+                                        <div class="form-group d-flex flex-lg-row flex-md-row flex-column col-lg-9 col-md-9 col-12 input-row-black  align-content-center">
+                                            <label asp-for="ConfirmPassword" for="input-city"
+                                                   class="profile-form-title col-12 col-lg-4 col-md-4 p-0 d-flex align-items-center mb-0">Пiдтвердить пароль</label>
+                                            <input asp-for="ConfirmPassword" type="text" class="form-control col-12 col-lg-8 col-md-8 pl-9"
+                                                   id="input-city"
+                                                   placeholder="" style="height: 34px" autocomplete="off">
+
+                                        </div>
+                                    </div>
+                                }
+                                <div class="row p-0 flex-column">
+
+                                    <div class="form-group d-flex flex-lg-row flex-md-row flex-column col-lg-9 col-md-9 col-12 input-row-black  align-content-center">
+                                        @*<label asp-for="UserTypeEn" for="input-select-group"
+                                               class="profile-form-title col-12 col-lg-4 col-md-4 p-0 d-flex align-items-center mb-0 "></label>
+                                        <select asp-for="UserTypeEn" class="form-control col-12 col-lg-8 col-md-8 pl-3 "
+                                                id="input-select-group"
+                                                style="height: 34px; border: 1px solid #ced4da; border-radius: 4px" asp-items="ViewBag.UserType">
+                                        </select>*@
+                                    </div>
+
+                                    <div class="form-group d-flex flex-lg-row flex-md-row flex-column col-lg-9 col-md-9 col-12 input-row-black  align-content-center">
+                                        <label asp-for="ConfirmedByAdmin" for="confirm-by-admin"
+                                               class="profile-form-title col-12 col-lg-4 col-md-4 p-0 d-flex align-items-center mb-0 ">
+                                        </label>
+                                        <label for="confirm-by-admin" class="col-1 pl-3">
+                                            <input asp-for="ConfirmedByAdmin" type="checkbox" id="confirm-by-admin" class="checkbox-user">
+                                            <span class="checkmark-user" style="margin-top: 3px"></span>
+                                        </label>
+                                    </div>
+                                    <div class="form-group d-flex flex-lg-row flex-md-row flex-column col-lg-9 col-md-9 col-12 input-row-black  align-content-center">
+                                        <label asp-for="UserGroupId" for="input-select-group"
+                                               class="profile-form-title col-12 col-lg-4 col-md-4 p-0 d-flex align-items-center mb-0 "></label>
+                                        <select asp-for="UserGroupId" class="form-control col-12 col-lg-8 col-md-8 pl-3 "
+                                                id="input-select-group"
+                                                style="height: 34px; border: 1px solid #ced4da; border-radius: 4px" asp-items="ViewBag.UserGroupId">
+                                        </select>
+                                    </div>
+                                    <div class="form-group d-flex flex-lg-row flex-md-row flex-column col-lg-9 col-md-9 col-12 input-row-black  align-content-center">
+                                        <label asp-for="UserSubGroupId" for="input-select-group"
+                                               class="profile-form-title col-12 col-lg-4 col-md-4 p-0 d-flex align-items-center mb-0 "></label>
+                                        <select asp-for="UserSubGroupId" class="form-control col-12 col-lg-8 col-md-8 pl-3 "
+                                                id="input-select-group"
+                                                style="height: 34px; border: 1px solid #ced4da; border-radius: 4px" asp-items="ViewBag.UserSubGroupId">
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade"
+                             id="user-role" role="tabpanel"
+                             aria-labelledby="role-tab">
+                            <div class="col-12 p-0">
+                                <div class="row p-0 flex-lg-row flex-md-row flex-column">
+                                    <div class="form-group d-flex flex-lg-row flex-md-row flex-column col-lg-6 col-md-6 col-12 input-row-black  align-content-center">
+                                        <span style="font-size: 18px; font-weight: 500; color: #000000">@Localizer["UserRoles"]</span>
+                                    </div>
+                                </div>
+                                <div id="user-roles-content" class="col-12 p-0 d-flex flex-md-row flex-lg-row flex-column container">
+
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="tab-pane fade " id="user-company" role="tabpanel" aria-labelledby="company-tab">
+                            <div class="col-12 p-0">
+                                <div class="row p-0 flex-lg-row flex-md-row flex-column">
+                                    <div class="form-group d-flex flex-lg-row flex-md-row flex-column col-lg-6 col-md-6 col-12 input-row-black  align-content-center">
+                                        <span style="font-size: 18px; font-weight: 500; color: #000000">Компанії</span>
+                                    </div>
+                                </div>
+                                <div class="col-12 p-0 d-flex flex-md-row flex-lg-row flex-column">
+                                    <div class="col-12 col-md-6 col-lg-6 p-0">
+                                        <div class="form-group d-flex  col-12  p-0 input-row-black  align-content-center justify-content-start" id="user-companies-content">
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade " id="nav-content-fin-of-user" role="tabpanel" aria-labelledby="finance-tab">
+
+                        </div>
+                        <div class="tab-pane fade" id="nav-content-children" role="tabpanel" aria-labelledby="nav-tab-children">
+                            <div id="children-content" class="container">
+                            </div>
+                            <div>
+                                <div class="col-6 p-0 d-flex justify-content-end align-self-end align-self-sm-end align-self-md-center"
+                                     style="height: 34px">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+
+            <div class="container">
+                <div class="modal-footer justify-content-center border-0"
+                     style="font-size: 14px; font-weight: bold; line-height: 16px; padding: 40px 0 58px">
+                    <button type="button" data-save-user="modal" class="btn btn-primary m-2 col-sm-4 col-xl-4 col-12"
+                            style="background: #36C233; border: 1px solid #36C233; height: 48px">
+                        @Localizer["Save"]
+                    </button>
+                    <button type="button" data-dismiss="modal" class="btn btn-secondary m-2 col-sm-4 col-xl-4 col-12 "
+                            style="background: #ffffff; border: 1px solid #F15E25; height: 48px; color: #f15e25">
+                        @Localizer["Cancel"]
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    }
+    else
+    {
+        <style>
+            form dt {
+                float: left;
+                display: block;
+                width: 30%;
+            }
+
+            dd select {
+                width: 50%;
+            }
+
+            dd textarea {
+                width: 100%;
+            }
+        </style>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">@Localizer["EditUser"]</h5>
+                <button class="close" data-dismiss="modal" area-hidden="true">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+
+            </div>
+            <div class="modal-body" data-id="@Model.Id">
+                @Html.ValidationSummary()
+
+                <form asp-action="EditUserModal">
+                    @Html.AntiForgeryToken()
+                    <nav>
+                        <div class="nav nav-tabs" id="nav-tabs" role="tablist">
+                            <a class="nav-item nav-link nav-main active" id="nav-tab-0" data-toggle="tab" href="#nav-content-0" role="tab" aria-controls="nav-content-1" aria-selected="false">Головна</a>
+                            <a class="nav-item nav-link nav-roles" id="nav-tab-1" data-toggle="tab" href="#nav-content-1" role="tab" aria-controls="nav-content-1" aria-selected="false">Ролі</a>
+                            <a class="nav-item nav-link nav-companies" id="nav-tab-1" data-toggle="tab" href="#nav-content-2" role="tab" aria-controls="nav-content-2" aria-selected="false">Компанії</a>
+                            <a class="nav-item nav-link nav-finance" id="nav-tab-fin-of-user" data-toggle="tab" href="#nav-content-fin-of-user" role="tab" aria-controls="nav-content-fin-of-user" aria-selected="false">@Localizer["Finance"]</a>
+                            <a class="nav-item nav-link nav-children" id="nav-tab-children" data-toggle="tab" href="#nav-content-children" role="tab" aria-controls="nav-content-children" aria-selected="false">@Localizer["EditChildren"]</a>
+                        </div>
+                        <div class="tab-content day-content" id="nav-tabContent">
+                            <div class="tab-pane fade show active" id="nav-content-0" role="tabpanel" aria-labelledby="nav-tab-0">
+                                <dl class="">
+                                    <dd><input type="hidden" asp-for="Id" /></dd>
+                                    <dd><input type="hidden" asp-for="IsNew" /></dd>
+
+                                    <dt>  <label asp-for=UserName class="control-label">@Localizer["UserNameLogin"]</label></dt>
+                                    <dd>
+                                        <input asp-for="UserName" class="form-control" autocomplete="off" />
+                                        <span asp-validation-for="UserName" class="text-danger"></span>
+                                    </dd>
+                                    <dt>  <label asp-for="Email" class="control-label"></label></dt>
+                                    <dd>
+                                        <table border="0">
+                                            <tr>
+                                                <td>
+                                                    <input asp-for="Email" class="form-control" autocomplete="off" />
+                                                    <span asp-validation-for="Email" class="text-danger"></span>
+                                                </td>
+                                                <td>
+                                                    @if (Model.EmailConfirmed)
+                                                    {
+                                                        <span class="confirmed fa fa-check fa-2x text-success"></span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="danger fa fa-times fa-2x text-danger"></span>
+                                                    }
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </dd>
+
+
+                                    <dt>  <label asp-for="PhoneNumber" class="control-label"></label></dt>
+                                    <dd>
+                                        <input asp-for="PhoneNumber" class="form-control" autocomplete="off" />
+                                        <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                                    </dd>
+                                    <dt>  <label asp-for="NameSurname" class="control-label"></label></dt>
+                                    <dd>
+                                        <input asp-for="NameSurname" class="form-control" autocomplete="off" />
+                                        <span asp-validation-for="NameSurname" class="text-danger"></span>
+                                    </dd>
+                                    <dt> <label asp-for="City" class="control-label"></label> </dt>
+                                    <dd> <input asp-for="City" class="form-control" autocomplete="off" /></dd>
+
+                                    <dt> <label asp-for="NewPassword" class="control-label"></label> </dt>
+                                    <dd>
+                                        <input asp-for="NewPassword" class="form-control" autocomplete="new-password" />
+                                        <span asp-validation-for="NewPassword" class="text-danger"></span>
+                                    </dd>
+
+                                    <dt> <label asp-for="ConfirmPassword" class="control-label">@Localizer["ConfirmPassword"]</label></dt>
+                                    <dd>
+                                        <input asp-for="ConfirmPassword" class="form-control" autocomplete="new-password" />
+                                        <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+                                    </dd>
+
+                                    <dt> <label asp-for="ConfirmedByAdmin" class="control-label">@Localizer["ConfirmedByAdmin"]</label></dt>
+                                    <dd>
+                                        <input asp-for="ConfirmedByAdmin" class="form-control" />
+                                        <span asp-validation-for="ConfirmedByAdmin" class="text-danger"></span>
+                                    </dd>
+
+                                    <dt>
+                                        <label asp-for="UserGroupId" class="control-label col-md-2"></label>
+                                    </dt>
+                                    <dd>
+
+                                        <select asp-for="UserGroupId" class="form-control" asp-items="ViewBag.UserGroupId"></select>
+                                        <span asp-validation-for="UserGroupId" class="text-danger"></span>
+
+                                    </dd>
+                                    <dt>
+                                        <label asp-for="UserSubGroupId" class="control-label col-md-2"></label>
+                                    </dt>
+                                    <dd>
+
+                                        <select asp-for="UserSubGroupId" class="form-control" asp-items="ViewBag.UserSubGroupId"></select>
+                                        <span asp-validation-for="UserSubGroupId" class="text-danger"></span>
+
+                                    </dd>
+                                </dl>
+                            </div>
+                            <div class="tab-pane fade" id="nav-content-1" role="tabpanel" aria-labelledby="nav-tab-1">
+                                <dl>
+                                    <dt>
+                                        <label class="control-label col-md-2">@Localizer["UserRoles"]</label>
+                                    </dt>
+                                    <dd>
+                                        <div id="user-roles-content" class="container">
+
+                                        </div>
+                                    </dd>
+                                </dl>
+                            </div>
+                            <div class="tab-pane fade" id="nav-content-2" role="tabpanel" aria-labelledby="nav-tab-2">
+                                <dl>
+                                    <dt>
+                                        <label class="control-label col-md-2">@Localizer["UserCompanies"]</label>
+                                    </dt>
+                                    <dd>
+                                        <div id="user-companies-content" class="container">
+
+                                        </div>
+                                    </dd>
+                                </dl>
+                            </div>
+                            <div class="tab-pane fade" id="nav-content-fin-of-user" role="tabpanel" aria-labelledby="nav-tab-fin-of-user">
+
+                            </div>
+                            <div class="tab-pane fade" id="nav-content-children" role="tabpanel" aria-labelledby="nav-tab-children">
+                                <div id="children-content" class="container">
+                                </div>
+                                <div>
+                                    <input asp-controller="Account" asp-action="UpdateChildrenForUser" type="submit" class="btn btn-primary" value="@Localizer["Save"]" />
+                                    <div class="col-6 p-0 d-flex justify-content-end align-self-end align-self-sm-end align-self-md-center"
+                                         style="height: 34px">
+                                        <button asp-controller="Account" asp-action="AddNewChildToUser" type="submit" id="addchild"
+                                                class=" btn  btn-xl btn-outline-danger justify-content-center float-md-none font-weight-bold btn-block col-lg-5 col-md-5 col-7 m-0 p-0"
+                                                onmousemove="this.style.background='#36C233'; this.style.color='#ffffff'"
+                                                onmouseout="this.style.background='#ffffff'; this.style.color='#36C233'"
+                                                style="background: #ffffff; border-color: #36C233; outline: none; height: 34px; color: #36C233; display: flex; align-items: center; justify-content: space-evenly; margin: 28px 0 23px; font-size: 14px;">
+                                            &#65291; @Localizer["Add"]
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </nav>
+                </form>
+                <div class="container">
+                    <div class="row">
+                        <div class="col-1 col-sm-1">
+                        </div>
+                        <div class="col-4 col-sm-4">
+                            <button type="button" button class="btn btn-primary" data-save="modal">@Localizer["Save"]</button>
+                        </div>
+                        <div class="col-1 col-sm-1">
+                        </div>
+                        <div class="col-4 col-sm-4">
+                            <button type="button" button class="btn btn-primary" data-dismiss="modal">@Localizer["Cancel"]</button>
+                        </div>
+
+                        <div class="col-1 col-sm-1">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+
+
+
+
+
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+
+}

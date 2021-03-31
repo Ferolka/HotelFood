@@ -29,8 +29,7 @@ namespace HotelFood.Data
             //  var queue = context.DeliveryQueues.Where(dq => dq.UserId == "27fb457f-8b4f-4a66-96ce-5e98ae2f1d91" && dq.DayDate == dayDate.ResetHMS()).ToList();
 
            
-            if (env.EnvironmentName != "LocalProduction")
-            {
+           
                 CreateAdminRole(context, roleManager, userManager);
                 CreateRole(UserExtension.UserRole_CompanyAdmin, context, roleManager);
                 CreateRole(UserExtension.UserRole_GroupAdmin, context, roleManager);
@@ -48,8 +47,7 @@ namespace HotelFood.Data
                 {
                     return;
                 }
-            }
-            
+           
             return; //danger
             ClearDatabase(context);
             CreateAdminRole(context, roleManager, userManager);

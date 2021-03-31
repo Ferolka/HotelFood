@@ -9,7 +9,7 @@
     else if (Model.Count() > 0)
         i = Model.First().DishCourse;
 }
-@if (true)
+@if (false)
 {
 
     <div class="col-12 complex d-flex flex-column px-0 mb-3 complex-line" id="complex-line$@i"
@@ -85,10 +85,10 @@
                     <label class="control-label">@*@(i+1)-@Localizer["DishCourse"]*@ @Localizer["Course" + (i + 1)]</label>
                 </div>
                 <div class="col-4">
-                    <a class="add-complex-line fa fa-plus-square-o fa-2x" course="@i"></a>
+                    <a class="add-complex-line fa fa-plus-square-o fa-2x" course="@i">Add</a>
                 </div>
                 <div class="col-1 delete-line">
-                    <span class="fa fa-trash fa-2x" aria-hidden="true"></span>
+                    <span class="fa fa-trash fa-2x" aria-hidden="true">Delete</span>
 
                 </div>
             </div>
@@ -107,7 +107,7 @@
                         @Html.DisplayFor(modelItem => it.Dish.Name)
                     </div>
                     <div class="col-sm-1">
-                        <a class="dialog-edit-icon delete-item"> <span class="fa fa-trash" aria-hidden="true"></span></a>
+                        <a class="dialog-edit-icon delete-item"> <span class="fa fa-trash" aria-hidden="true">Delete</span></a>
                     </div>
                 </div>
 

@@ -1,0 +1,87 @@
+﻿@model UserCardViewModel
+@inject HotelFood.Core.SharedViewLocalizer Localizer
+@{
+
+    Layout = null;
+
+}
+@if (true)
+{
+    <div class="container users-cards-list-content">
+
+        @if (Model == null)
+        {
+            <div class="row user-card  border border-danger rounded justify-content-center my-2">
+                <div class="col-12 justify-content-center bg-danger text-white">
+                    <span>@Localizer["NoRecords"]</span>
+                </div>
+            </div>
+        }
+        else
+        {
+
+            <div class="row user-card border border-dark rounded bg-primary text-white text-wrap text-break word-break align-middle" data-id="@Model.UserId">
+                <div class="col-2 user-card-picture p-2">
+                    <img src="@Url.Action("GetPicture", "Pictures", new { id = Model.PictureId, width = 80, height = 80 })" style="width:80px;height:80px;" />
+
+                </div>
+
+                <div class="col-2 user-card-name">
+                    @Model.UserName
+                </div>
+                <div class="col-2 user-card-email">
+                    @Model.UserEmail
+                </div>
+                <div class="col-2 user-card-name">
+                    @Model.UserChildName
+                </div>
+                <div class="col-2 user-card-name">
+                    @Model.CardToken
+                </div>
+
+
+            </div>
+        }
+    </div>
+}
+else
+{
+<div class="col-12 col-md-7 col-lg-5 d-flex flex-column p-0 py-3 justify-content-between users-cards-list-content" style="margin: 35px 0 5px; min-height: 232px; border: 2px solid #E7E7E7; box-sizing: border-box; box-shadow: 0 4px 35px rgba(0, 0, 0, 0.15); border-radius: 8px;">
+    @if (Model == null)
+    {
+        <div class="col-12 px-3 d-flex justify-content-between" style="max-height: 84px; box-sizing: border-box">
+            <div class="d-flex justify-content-center align-items-center" style="width: 84px; height: 84px; box-shadow: 0 0 8px rgba(0, 0, 0, 0.15); border-radius: 4px;">
+                <img src="~/img/camera-svg.svg" alt="">
+            </div>
+            <div class="d-flex justify-content-end align-items-start">
+                <img src="~/img/nfc-signal.svg" alt="" style="height: inherit; width: 51px">
+            </div>
+        </div>
+        <div class="col-12 px-3 d-flex flex-column flex-grow-1 justify-content-end mb-2" style="max-height: 130px">
+            <div class="col-12 p-0 my-2" style="max-height: 25px"><img src="~/img/mail-for-nfc.svg" alt=""><span style="margin-left: 15px">@Localizer["NoRecords"]</span></div>
+            <div class="col-12 p-0 my-2 " style="max-height: 25px">
+                <img src="~/img/token-for-nfc.svg" alt=""><span class="py-3" style="margin-left: 15px; font-family: Open-Sans, sans-serif"></span>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="col-12 px-3 d-flex justify-content-between" style="max-height: 84px; box-sizing: border-box">
+            <div class="d-flex justify-content-center align-items-center" style="width: 84px; height: 84px; box-shadow: 0 0 8px rgba(0, 0, 0, 0.15); border-radius: 4px;">
+                <img src="@Url.Action("GetPicture", "Pictures", new { id = Model.PictureId, width = 80, height = 80 })" alt="">
+            </div>
+            <div class="d-flex justify-content-end align-items-start">
+                <img src="~/img/nfc-signal.svg" alt="" style="height: inherit; width: 51px">
+            </div>
+        </div>
+        <div class="col-12 px-3 d-flex flex-column flex-grow-1 justify-content-end mb-2" @*style="max-height: 130px"*@>
+            <div class="col-12 p-0 my-2" style="max-height: 25px"><span style="margin-left: 15px"> @Model.UserName</span></div>
+            <div class="col-12 p-0 my-2" style="max-height: 25px"><img src="~/img/mail-for-nfc.svg" alt=""><span style="margin-left: 15px">@Model.UserEmail</span></div>
+            <div class="col-12 p-0 my-2" style="max-height: 25px"><img src="~/img/profile-icon.svg" alt=""><span style="margin-left: 15px">@Model.UserChildName</span></div>
+            <div class="col-12 p-0 my-2 " style="max-height: 25px">
+                <img src="~/img/token-for-nfc.svg" alt=""><span class="py-3" style="margin-left: 15px; font-family: Open-Sans, sans-serif">@Model.CardToken</span>
+            </div>
+        </div>
+    }
+</div>
+}

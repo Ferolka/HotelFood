@@ -1,0 +1,349 @@
+﻿@model UserFinanceViewModel
+@inject HotelFood.Core.SharedViewLocalizer Localizer
+@using HotelFood.Core
+@using Microsoft.Extensions.Configuration
+@inject HotelFood.Core.SharedViewLocalizer Localizer
+@inject IConfiguration Configuration
+@{
+    
+    QueryModel querymodel = ViewData["QueryModel"] as QueryModel;
+
+    if (querymodel == null)
+    {
+        querymodel = new QueryModel();
+    }
+}
+@if (true)
+{
+    
+        <link rel="stylesheet" href="~/css/jquery-ui.css" />
+
+        <div class="d-flex justify-content-center flex-column align-items-center">
+            <div class="col-12 col-md-8 col-lg-9 p-0 d-flex align-items-start  flex-column">
+                @*  <span class="h2 mb-3" style="font-weight: 500; font-size: 18px; line-height: 21px; color: #232323;">Фінанси</span>*@
+                <div class="col-12 col-md-7 my-2 col-lg-6 p-0  d-flex flex-row justify-content-between align-items-lg-center align-items-md-center"
+                     style="font-weight: normal; font-size: 16px;">
+                    <span class=" m-0">@Localizer["Balance"]</span>
+                    <span class=" m-0" style="font-family: Open-Sans">@Model.Finance.Balance</span>
+                </div>
+                <div class="col-12 col-md-7 my-2 col-lg-6 p-0  d-flex flex-row justify-content-between align-items-lg-center align-items-md-center"
+                     style="font-weight: normal; font-size: 16px;">
+                    <span class=" m-0">@Localizer["Income"]</span>
+                    <span class=" m-0" style="font-family: Open-Sans">@Model.Finance.TotalIncome</span>
+                </div>
+                <div class="col-12 col-md-7 my-2 col-lg-6 p-0  d-flex flex-row justify-content-between align-items-lg-center align-items-md-center"
+                     style="font-weight: normal; font-size: 16px;">
+                    <span class=" m-0">@Localizer["OutCome"]</span>
+                    <span class=" m-0" style="font-family: Open-Sans">@Model.Finance.TotalOutCome</span>
+                </div>
+                <div class="col-12 col-md-7 my-2 col-lg-6 p-0  d-flex flex-row justify-content-between align-items-lg-center align-items-md-center"
+                     style="font-weight: normal; font-size: 16px;">
+                    <span class=" m-0">@Localizer["TotalPreOrderedAmount"]</span>
+                    <span class=" m-0" style="font-family: Open-Sans">@Model.Finance.TotalPreOrderedAmount</span>
+                </div>
+                <div class="col-12 col-md-7 my-2 col-lg-6 p-0  d-flex flex-row justify-content-between align-items-lg-center align-items-md-center"
+                     style="font-weight: normal; font-size: 16px;">
+                    <span class=" m-0">@Localizer["TotalPreOrderBalance"]</span>
+                    <span class=" m-0" style="font-family: Open-Sans">@Model.Finance.TotalPreOrderBalance</span>
+                </div>
+            </div>
+            <div class="container border rounded my-2">
+                
+                
+                <div id="addbalanceliqpay" class="row  my-2">
+                    <div class="container">
+                        <div class="row justify-content-center  my-2">
+
+                            <div class="col-6 text-center ">
+                                <span>
+                                    Введіть суму та натисніть “Поповнити рахунок”
+                                </span>
+                                <input class="form-control text-center font-weight-bold" id="liqpay-amount" type="number" name="amount" value="3000.00" placeholder="Сумма" style="max-width:200px;" />
+
+
+                            </div>
+
+                        </div>
+                        <div class="row  justify-content-center my-2">
+                            <div class="col-6 text-center">
+                                @*@if (User.IsInRole("Admin") || User.IsInRole("CompanyAdmin")&& setting.EnableLiqPay)
+                                {*@
+
+                                    <button type="button" id="addliqpay-btn"
+                                            class="btn btn-xl btn-outline-danger  font-weight-bold btn-block "
+                                            onmousemove="this.style.background='#36C233'; this.style.color='#ffffff'"
+                                            onmouseout="this.style.background='#ffffff'; this.style.color='#36C233'"
+                                            style="max-width: 200px; background: #ffffff; border-color: #36C233; outline: none; height: 48px; color: #36C233; display: flex; align-items: center; justify-content: space-evenly; font-size: 14px;">
+                                        &#65291;@Localizer["AddBalance"]
+                                    </button>
+                                @*}*@
+                                </div>
+
+                        </div>
+                        <div class="row justify-content-center ">
+                            <div class="col-12 ">
+                                @*<a href="@Html.Raw("https://next.privat24.ua/payments/form/%7B%22token%22%3A%223700ff9e-b150-4e47-9bbe-8588a59144fa%22%7D?fbclid=IwAR1Ft3dFuABYjCdQjy9BBN3rnTUXsel2Q7yhv5Msggy3D3SZdgPdG0wad8I")">
+            Ви можете сплатити, перейшовши за посиланням
+        </a>*@
+                                <strong>2. </strong>
+                                <a href="@Html.Raw("https://next.privat24.ua/payments/form/%7B%22companyID%22:%223963530%22,%22form%22:%7B%22query%22:%22%D0%BA%D0%B0%D0%B1%D0%B0%D1%87%D0%BE%D0%BA%22%7D%7D")">
+                                    Приватбанк
+                                </a>
+                                <br />
+                                <span>
+                                    комісія - 1 грн або ж згідно інших тарифів банку, зарахування коштів на баланс в системі замовлень відбувається після надходження коштів на рахунок компанії в робочий час будніх днів
+                                </span>
+                            </div>
+                        </div>
+                        <div class="row justify-content-center ">
+                            <div class="col-12 ">
+                                <strong>3. </strong>
+                                <a @*type="button"*@ href="#"
+                                   data-toggle="modal" data-target="#requisites">
+                                    Сплатити за реквізитами
+                                </a>
+                                <br />
+                                <span>
+                                    сплачується комісія Вашого банку, зарахування коштів на баланс в системі замовлень відбувається після надходження коштів на рахунок компанії в робочий час будніх днів
+                                </span>
+
+                            </div>
+                        </div>
+                        <div class="modal" tabindex="-1" id="requisites" role="dialog">
+                            <div class="modal-dialog" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title">Сплатити за реквізитами</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <span style="white-space: pre-line">
+                                            ФОП Черкасенко Лариса Анатоліївна
+                                            (Код отримувача) - 1656006505
+                                            (Рахунок отримувача) - UA343052990000026009016811908
+                                            (Назва банку) - АТ КБ "ПРИВАТБАНK"
+                                            Призначення платежу: “За харчування (Прізвище та ім’я) дитини”
+                                        </span>
+                                    </div>
+                                    <div class="modal-footer">
+
+                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрити</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 p-0 d-flex flex-wrap justify-content-around">
+                <div class="col-lg-5 col-md-9 col-sm-8  col-6 d-flex justify-content-lg-between justify-content-md-between  justify-content-center flex-md-row flex-lg-row flex-column p-0"
+                     style="box-sizing: border-box">
+                    <div class="col-9  col-lg-6 col-md-6 col-sm-6 p-0 d-flex justify-content-between align-items-center "
+                         style="height: 34px">
+                        <label for="datefrom"
+                               class="mb-0"
+                               style="font-size: 16px; color: #232323">@Localizer["DateFrom"]</label>
+                            <input id="datefrom" class="inputs-report ml-3 mr-lg-3 mr-md-3 mr-0">
+
+                        </div>
+                        <div class="col-9 col-lg-6 col-md-6 col-sm-6 p-0 d-flex justify-content-between align-items-center mt-3 mt-lg-0 mt-md-0"
+                             style="height: 34px">
+                            <label for="dateto"
+                                   class="mb-0 ml-lg-3 ml-md-3 ml-0"
+                                   style="font-size: 16px; color: #232323">@Localizer["DateTo"]</label>
+
+                                <input id="dateto" class="inputs-report ml-3">
+                            </div>
+
+                        </div>
+                        <div class="col-9 col-lg-6 col-md-6 col-sm-6 p-0 d-flex justify-content-between align-items-center mt-3 mt-lg-0 mt-md-0" style="box-sizing: border-box">
+
+                            <a class="set-datefrom set-dateto set-format"
+                               asp-controller="Account" asp-action="UserFinanceReport"
+                               asp-route-datefrom="@DateTime.Today.ShortJSDate()"
+                               asp-route-dateto="@DateTime.Today.AddDays(3).ShortJSDate()">@Localizer["Report"]</a>
+                        </div>
+                    </div>
+                   
+                            <div class="finance-table container">
+                                <div class="container border rounded">
+                                    <div class="row justify-content-center">
+                                        <div class="col-12 bg-info text-white">
+                                            @Localizer["Income"]
+                                        </div>
+
+                                    </div>
+
+                                    @*@foreach (var it in Model.Incomes)
+                                    {
+                                        <div class="row">
+
+                                            <div class="col-4">
+                                                <span>@it.TransactionDate</span>
+                                            </div>
+                                            <div class="col-4">
+                                                <span>@it.Comments</span>
+                                            </div>
+                                            <div class="col-4">
+                                                <span>@it.Amount</span>
+                                            </div>
+                                        </div>
+                                    }*@
+
+                                </div>
+                                <div class="container border rounded">
+                                    <div class="row justify-content-center">
+                                        <div class="col-12 bg-info text-white">
+                                            @Localizer["OutCome"]
+                                        </div>
+
+                                    </div>
+                                    @foreach (var it in Model.Outcomes)
+                                    {
+                                        <div class="row">
+
+                                            <div class="col-4">
+                                                <span>@it.TransactionDate</span>
+                                            </div>
+                                            <div class="col-4">
+                                                <span>@it.Comments</span>
+                                            </div>
+                                            <div class="col-4">
+                                                <span>@it.Amount</span>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                            @Html.DisplayFor(model => querymodel, "PageNavigation", null)
+                        </div>
+        }
+
+        else
+        {
+            <div class="container">
+                <div class="row">
+                    <div class="col-4">
+                        <span>@Localizer["Balance"]</span>
+                    </div>
+                    <div class="col-4">
+                        <span>@Model.Finance.Balance</span>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-4">
+                        <span>@Localizer["Income"]</span>
+                    </div>
+                    <div class="col-4">
+                        <span>@Model.Finance.TotalIncome</span>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-4">
+                        <span>@Localizer["OutCome"]</span>
+                    </div>
+                    <div class="col-4">
+                        <span>@Model.Finance.TotalOutCome</span>
+                    </div>
+                </div>
+                <div class="container border rounded">
+                    <div class="row justify-content-center">
+                        <div class="col-12 bg-info text-white">
+                            @Localizer["Income"]
+                        </div>
+
+                    </div>
+
+                    @*@foreach (var it in Model.Incomes)
+                    {
+                        <div class="row">
+
+                            <div class="col-4">
+                                <span>@it.TransactionDate</span>
+                            </div>
+                            <div class="col-4">
+                                <span>@it.Comments</span>
+                            </div>
+                            <div class="col-4">
+                                <span>@it.Amount</span>
+                            </div>
+                        </div>
+                    }*@
+                </div>
+                <div class="container border rounded">
+                    <div class="row justify-content-center">
+                        <div class="col-12 bg-info text-white">
+                            @Localizer["OutCome"]
+                        </div>
+
+                    </div>
+                    @foreach (var it in Model.Outcomes)
+                    {
+                        <div class="row">
+
+                            <div class="col-4">
+                                <span>@it.TransactionDate</span>
+                            </div>
+                            <div class="col-4">
+                                <span>@it.Comments</span>
+                            </div>
+                            <div class="col-4">
+                                <span>@it.Amount</span>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+
+<script type="text/javascript">
+$(function() {
+
+    var dtfrom=$('#datefrom').datepicker();
+    var dtto = $('#dateto').datepicker();
+    console.log("hello");
+    //var dtfrom = $('#datefrom');
+    //var dtto = $('#dateto');
+    var format = $("#format").val("html");
+    dtfrom.datepicker('setDate', new Date(@DateTime.Today.MSDateSince1970()));
+    dtto.datepicker('setDate', new Date(@DateTime.Today.AddDays(3).MSDateSince1970()));
+    dtfrom.change(function (el) {
+        $(".set-datefrom").each(function ( idx,elem) {
+            var href = $(elem).attr('href');
+            href = buildUrl(href, "datefrom", dtfrom.datepicker('getDate'));
+            $(elem).attr('href', href);
+        });
+    });
+    dtto.change(function (el) {
+         $(".set-dateto").each(function (idx,elem) {
+            var href = $(elem).attr('href');
+             href = buildUrl(href, "dateto", dtto.datepicker('getDate'));
+            $(elem).attr('href', href);
+         });
+
+    });
+    format.change(function (el) {
+        $(".set-format").each(function (idx, elem) {
+            var href = $(elem).attr('href');
+            href = buildUrl(href, "format", format.children("option:selected").val());
+            console.log(href);
+            $(elem).attr('href', href);
+        });
+    });
+    var buildUrl = function (url, paramname, paramvalue) {
+        var newurl = new URL(url, '@Url.AbsoluteContent("~/")');
+        var paramvalstring = paramvalue.toString();
+        if (paramvalue instanceof Date) {
+            paramvalstring = `${paramvalue.getFullYear()}-${paramvalue.getMonth()+1}-${paramvalue.getDate()}`;
+        }
+        newurl.searchParams.set(paramname,paramvalstring);
+
+        return newurl.pathname + newurl.search;
+    }
+
+});
+</script>
+
+
