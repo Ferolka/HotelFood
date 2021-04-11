@@ -55,8 +55,8 @@ namespace HotelFood.Models
         public bool ConfirmedByAdmin { get; set; }
 
         public virtual ICollection<HotelUser> RoomGuests { get; set; }
+        public int? PictureId { get; set; }
 
-        
 
         [StringLength(64)]
         public string CardTag { get; set; }
